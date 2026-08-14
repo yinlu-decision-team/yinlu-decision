@@ -311,6 +311,28 @@ const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const read = (key, fallback) => { try { const value = JSON.parse(localStorage.getItem(key)); return value ?? fallback; } catch { return fallback; } };
 const write = (key, value) => localStorage.setItem(key, JSON.stringify(value));
 const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
+
+// ✅ 密码安全 - SHA-256哈希（从修正版集成）
+async function createPasswordRecord(password) {
+  const salt = Array.from({ length: 16 }, () => Math.random().toString(36).charAt(2)).join('');
+  const encoder = new TextEncoder();
+  const data = encoder.encode(salt + password);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return { passwordSalt: salt, passwordHash: hashHex };
+}
+
+async function passwordMatches(user, password) {
+  if (!user.passwordSalt || !user.passwordHash) return false;
+  const encoder = new TextEncoder();
+  const data = encoder.encode(user.passwordSalt + password);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashHex === user.passwordHash;
+}
+
 const uid = (prefix = "id") => `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 const majorCandidateId = (schoolId, major) => `major-${schoolId}-${encodeURIComponent(major)}`;
 const majorDecisionKey = (school, major) => encodeURIComponent(`${school}::${major}`);
@@ -657,10 +679,10 @@ function renderQuestions() {
   const list = $("#questionList");
   if (!list) return;
   if (!user) {
-    list.innerHTML = demoQuestions.map((item) => `<article class="question-list-item"><header><strong>${item.title}</strong><span class="question-status ${item.waiting ? "waiting" : ""}">${item.status}</span></header><p>${item.meta}</p></article>`).join("");
+    list.innerHTML = demoQuestions.map((item) => `<article class="question-list-item"><header><strong>${escapeHtml(item.title)}</strong><span class="question-status ${item.waiting ? "waiting" : ""}">${escapeHtml(item.status)}</span></header><p>${escapeHtml(item.meta)}</p></article>`).join("");
   } else {
     const mine = read(STORE.questions, []).filter((item) => item.userId === user.id);
-    list.innerHTML = mine.length ? mine.map((item) => `<article class="question-list-item"><header><strong>${item.title}</strong><span class="question-status ${item.status === "已回答" ? "" : "waiting"}">${item.status}</span></header><p>${item.meta || `${item.topic || "未分类"} · 发布于 ${new Date(item.createdAt).toLocaleDateString("zh-CN")}`}</p></article>`).join("") : `<p>你还没有发布问题</p>`;
+    list.innerHTML = mine.length ? mine.map((item) => `<article class="question-list-item"><header><strong>${escapeHtml(item.title)}</strong><span class="question-status ${item.status === "已回答" ? "" : "waiting"}">${escapeHtml(item.status)}</span></header><p>${escapeHtml(item.meta || `${item.topic || "未分类"} · 发布于 ${new Date(item.createdAt).toLocaleDateString("zh-CN")}`)}</p></article>`).join("") : `<p>你还没有发布问题</p>`;
   }
   $("#questionsCount") && ($("#questionsCount").textContent = user ? read(STORE.questions, []).filter((item) => item.userId === user.id).length : "示例");
   hydrateIcons();
@@ -751,19 +773,19 @@ function renderSchoolDetail() {
   const schoolCommentSection = renderSchoolCommentSection(item);
   const latestUpdatesSection = renderLatestUpdates(item);
   const campusSection = renderCampusSection(item);
-  panel.innerHTML = `<div class="school-detail-topbar"><button class="quiet-button" data-view-target="${currentSchoolReturnView}"><i data-lucide="arrow-left"></i>${returnCopy}</button><div class="school-detail-top-actions"><a class="quiet-button" href="${item.officialUrl}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link"></i>学校官网</a><button class="primary-button" data-favorite="school-${item.id}"><i data-lucide="${saved ? "bookmark-check" : "bookmark-plus"}"></i>${saved ? "已加入候选" : "加入我的候选"}</button></div></div>
-    <header class="school-profile-header"><div class="institution-mark school-profile-mark">${item.school.slice(0, 1)}</div><div class="school-profile-copy"><span class="section-kicker">学校详情 · 平台整理</span><h1>${item.school}</h1><p class="school-english-name">${item.englishName}</p><div class="school-profile-tags"><span><i data-lucide="map-pin"></i>${item.city}</span><span><i data-lucide="landmark"></i>${item.type}</span>${item.highlights.map((highlight) => `<span>${highlight}</span>`).join("")}</div></div></header>
+  panel.innerHTML = `<div class="school-detail-topbar"><button class="quiet-button" data-view-target="${currentSchoolReturnView}"><i data-lucide="arrow-left"></i>${escapeHtml(returnCopy)}</button><div class="school-detail-top-actions"><a class="quiet-button" href="${escapeHtml(item.officialUrl)}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link"></i>学校官网</a><button class="primary-button" data-favorite="school-${escapeHtml(item.id)}"><i data-lucide="${saved ? "bookmark-check" : "bookmark-plus"}"></i>${saved ? "已加入候选" : "加入我的候选"}</button></div></div>
+    <header class="school-profile-header"><div class="institution-mark school-profile-mark">${escapeHtml(item.school.slice(0, 1))}</div><div class="school-profile-copy"><span class="section-kicker">学校详情 · 平台整理</span><h1>${escapeHtml(item.school)}</h1><p class="school-english-name">${escapeHtml(item.englishName)}</p><div class="school-profile-tags"><span><i data-lucide="map-pin"></i>${escapeHtml(item.city)}</span><span><i data-lucide="landmark"></i>${escapeHtml(item.type)}</span>${item.highlights.map((highlight) => `<span>${escapeHtml(highlight)}</span>`).join("")}</div></div></header>
     <nav class="school-section-nav" aria-label="学校详情目录"><button data-school-anchor="school-overview" class="active">学校概况</button><button data-school-anchor="school-updates">最新资讯</button><button data-school-anchor="school-majors">专业列表</button><button data-school-anchor="school-admission">招生录取</button><button data-school-anchor="school-campus">校园与城市</button><button data-school-anchor="school-progression">升学参考</button><button data-school-anchor="school-comments">本校评论</button></nav>
     <div class="school-detail-grid">
       <section class="school-detail-main">
-        <article class="detail-panel detail-overview school-detail-anchor" id="school-overview"><div class="detail-panel-heading"><div><span class="subsection-kicker"><i data-lucide="notebook-tabs"></i>学校概况</span><h2>先建立整体认识</h2></div><span class="source-level-tag level-institution">平台整理</span></div><p>${item.intro}</p><dl class="school-facts"><div><dt>中文名称</dt><dd>${item.school}</dd></div><div><dt>英文名称</dt><dd>${item.englishName}</dd></div><div><dt>办学类型</dt><dd>${item.type}</dd></div><div><dt>办学层次</dt><dd>${item.educationLevel}</dd></div><div><dt>创办时间</dt><dd>${item.founded}</dd></div><div><dt>主要校区</dt><dd>${item.campuses}</dd></div></dl><div class="school-source-note"><span><i data-lucide="clock-3"></i>资料更新：${item.updatedAt}</span><a href="${item.officialUrl}" target="_blank" rel="noopener noreferrer">来源：${item.officialSource}<i data-lucide="external-link"></i></a></div></article>
+        <article class="detail-panel detail-overview school-detail-anchor" id="school-overview"><div class="detail-panel-heading"><div><span class="subsection-kicker"><i data-lucide="notebook-tabs"></i>学校概况</span><h2>先建立整体认识</h2></div><span class="source-level-tag level-institution">平台整理</span></div><p>${escapeHtml(item.intro)}</p><dl class="school-facts"><div><dt>中文名称</dt><dd>${escapeHtml(item.school)}</dd></div><div><dt>英文名称</dt><dd>${escapeHtml(item.englishName)}</dd></div><div><dt>办学类型</dt><dd>${escapeHtml(item.type)}</dd></div><div><dt>办学层次</dt><dd>${escapeHtml(item.educationLevel)}</dd></div><div><dt>创办时间</dt><dd>${escapeHtml(item.founded)}</dd></div><div><dt>主要校区</dt><dd>${escapeHtml(item.campuses)}</dd></div></dl><div class="school-source-note"><span><i data-lucide="clock-3"></i>资料更新：${escapeHtml(item.updatedAt)}</span><a href="${escapeHtml(item.officialUrl)}" target="_blank" rel="noopener noreferrer">来源：${escapeHtml(item.officialSource)}<i data-lucide="external-link"></i></a></div></article>
         ${latestUpdatesSection}
-        <article class="detail-panel major-program-panel school-detail-anchor" id="school-majors"><div class="detail-panel-heading"><div><span class="subsection-kicker"><i data-lucide="book-open"></i>专业列表</span><h2>查看专业与培养方向</h2></div><span class="source-level-tag level-official">官方信息</span></div><p>${item.officialSummary}</p><div class="major-program-search"><i data-lucide="search"></i><input id="schoolMajorSearch" type="search" placeholder="搜索专业名称、学院或学科门类" autocomplete="off"><span id="majorProgramCount">${item.majorPrograms.length} 个示例专业</span></div><div class="major-program-list" id="majorProgramList">${renderMajorPrograms(item)}</div><div class="major-program-foot"><span>当前为页面结构示例，完整目录以学校官方发布为准。</span><a class="source-link" href="${item.officialUrl}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link"></i>查看 ${item.officialSource}</a></div></article>
-        <article class="detail-panel admission-panel school-detail-anchor" id="school-admission"><div class="detail-panel-heading"><div><span class="subsection-kicker"><i data-lucide="graduation-cap"></i>招生与录取</span><h2>按年份和报考条件查资料</h2></div><span class="source-level-tag level-data">公开资料</span></div><p>${item.admissionBrief}</p><div class="admission-filter-bar"><label><span>年份</span><select id="admissionYear">${item.admissionYears.map((year) => `<option>${year}</option>`).join("")}</select></label><label><span>省份</span><select id="admissionProvince">${item.admissionProvinces.map((province) => `<option>${province}</option>`).join("")}</select></label><label><span>科类</span><select id="admissionSubject">${item.admissionSubjects.map((subject) => `<option>${subject}</option>`).join("")}</select></label></div><div class="admission-selection-note"><i data-lucide="filter"></i><span id="admissionSelectionNote">当前条件：${item.admissionYears[0]} · ${item.admissionProvinces[0]} · ${item.admissionSubjects[0]}</span><small>前端结构示例，真实查询待数据接口接入</small></div><div class="admission-resource-list">${renderAdmissionResources(item)}</div><div class="admission-disclaimer"><i data-lucide="info"></i><span>${item.dataSummary}</span></div></article>
+        <article class="detail-panel major-program-panel school-detail-anchor" id="school-majors"><div class="detail-panel-heading"><div><span class="subsection-kicker"><i data-lucide="book-open"></i>专业列表</span><h2>查看专业与培养方向</h2></div><span class="source-level-tag level-official">官方信息</span></div><p>${escapeHtml(item.officialSummary)}</p><div class="major-program-search"><i data-lucide="search"></i><input id="schoolMajorSearch" type="search" placeholder="搜索专业名称、学院或学科门类" autocomplete="off"><span id="majorProgramCount">${item.majorPrograms.length} 个示例专业</span></div><div class="major-program-list" id="majorProgramList">${renderMajorPrograms(item)}</div><div class="major-program-foot"><span>当前为页面结构示例,完整目录以学校官方发布为准。</span><a class="source-link" href="${escapeHtml(item.officialUrl)}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link"></i>查看 ${escapeHtml(item.officialSource)}</a></div></article>
+        <article class="detail-panel admission-panel school-detail-anchor" id="school-admission"><div class="detail-panel-heading"><div><span class="subsection-kicker"><i data-lucide="graduation-cap"></i>招生与录取</span><h2>按年份和报考条件查资料</h2></div><span class="source-level-tag level-data">公开资料</span></div><p>${escapeHtml(item.admissionBrief)}</p><div class="admission-filter-bar"><label><span>年份</span><select id="admissionYear">${item.admissionYears.map((year) => `<option>${escapeHtml(year)}</option>`).join("")}</select></label><label><span>省份</span><select id="admissionProvince">${item.admissionProvinces.map((province) => `<option>${escapeHtml(province)}</option>`).join("")}</select></label><label><span>科类</span><select id="admissionSubject">${item.admissionSubjects.map((subject) => `<option>${escapeHtml(subject)}</option>`).join("")}</select></label></div><div class="admission-selection-note"><i data-lucide="filter"></i><span id="admissionSelectionNote">当前条件：${escapeHtml(item.admissionYears[0])} · ${escapeHtml(item.admissionProvinces[0])} · ${escapeHtml(item.admissionSubjects[0])}</span><small>前端结构示例,真实查询待数据接口接入</small></div><div class="admission-resource-list">${renderAdmissionResources(item)}</div><div class="admission-disclaimer"><i data-lucide="info"></i><span>${escapeHtml(item.dataSummary)}</span></div></article>
         ${campusSection}
-        <article class="detail-panel progression-panel school-detail-anchor" id="school-progression"><div class="detail-panel-heading"><div><span class="subsection-kicker"><i data-lucide="trending-up"></i>升学参考</span><h2>保研率先看统计口径</h2></div><span class="source-level-tag level-data">待核验数据</span></div><p>${item.careerSummary}</p><div class="recommendation-summary"><div><span>保研率</span><strong>${item.postgraduateRecommendation.value}</strong><small>数据年份：${item.postgraduateRecommendation.year}</small></div><div><span>推免人数</span><strong>${item.postgraduateRecommendation.recommendedCount}</strong><small>需对应学校公示名单</small></div><div><span>毕业生统计范围</span><strong>${item.postgraduateRecommendation.graduateScope}</strong><small>需明确分母范围</small></div></div><dl class="recommendation-method"><div><dt>建议计算口径</dt><dd>${item.postgraduateRecommendation.methodology}</dd></div><div><dt>建议来源</dt><dd>${item.postgraduateRecommendation.source}</dd></div><div><dt>更新时间</dt><dd>${item.postgraduateRecommendation.updatedAt}</dd></div></dl><div class="admission-disclaimer warning"><i data-lucide="triangle-alert"></i><span>不同学院、专业和年份的推免情况可能不同，正式展示时必须保留原始来源与统计范围。</span></div></article>
+        <article class="detail-panel progression-panel school-detail-anchor" id="school-progression"><div class="detail-panel-heading"><div><span class="subsection-kicker"><i data-lucide="trending-up"></i>升学参考</span><h2>保研率先看统计口径</h2></div><span class="source-level-tag level-data">待核验数据</span></div><p>${escapeHtml(item.careerSummary)}</p><div class="recommendation-summary"><div><span>保研率</span><strong>${escapeHtml(item.postgraduateRecommendation.value)}</strong><small>数据年份：${escapeHtml(item.postgraduateRecommendation.year)}</small></div><div><span>推免人数</span><strong>${escapeHtml(item.postgraduateRecommendation.recommendedCount)}</strong><small>需对应学校公示名单</small></div><div><span>毕业生统计范围</span><strong>${escapeHtml(item.postgraduateRecommendation.graduateScope)}</strong><small>需明确分母范围</small></div></div><dl class="recommendation-method"><div><dt>建议计算口径</dt><dd>${escapeHtml(item.postgraduateRecommendation.methodology)}</dd></div><div><dt>建议来源</dt><dd>${escapeHtml(item.postgraduateRecommendation.source)}</dd></div><div><dt>更新时间</dt><dd>${escapeHtml(item.postgraduateRecommendation.updatedAt)}</dd></div></dl><div class="admission-disclaimer warning"><i data-lucide="triangle-alert"></i><span>不同学院、专业和年份的推免情况可能不同,正式展示时必须保留原始来源与统计范围。</span></div></article>
       </section>
-      <aside class="school-detail-side"><section class="detail-source-panel"><span class="subsection-kicker"><i data-lucide="shield-check"></i>信息凭证</span><h2>每条摘要都有来源入口</h2><p>平台负责整理和解释，官方页面与公开数据用于核验具体细节。</p><a class="detail-source-row" href="${item.officialUrl}" target="_blank" rel="noopener noreferrer"><span class="source-icon official-icon"><i data-lucide="landmark"></i></span><span><strong>${item.officialSource}</strong><small>学校简介 · 招生简章 · 培养信息</small></span><i data-lucide="external-link"></i></a><a class="detail-source-row" href="${item.dataUrl}" target="_blank" rel="noopener noreferrer"><span class="source-icon data-icon"><i data-lucide="database"></i></span><span><strong>${item.dataSource}</strong><small>招生计划 · 专业目录 · 公开录取信息</small></span><i data-lucide="external-link"></i></a></section>${schoolCommentSection}</aside>
+      <aside class="school-detail-side"><section class="detail-source-panel"><span class="subsection-kicker"><i data-lucide="shield-check"></i>信息凭证</span><h2>每条摘要都有来源入口</h2><p>平台负责整理和解释,官方页面与公开数据用于核验具体细节。</p><a class="detail-source-row" href="${escapeHtml(item.officialUrl)}" target="_blank" rel="noopener noreferrer"><span class="source-icon official-icon"><i data-lucide="landmark"></i></span><span><strong>${escapeHtml(item.officialSource)}</strong><small>学校简介 · 招生简章 · 培养信息</small></span><i data-lucide="external-link"></i></a><a class="detail-source-row" href="${escapeHtml(item.dataUrl)}" target="_blank" rel="noopener noreferrer"><span class="source-icon data-icon"><i data-lucide="database"></i></span><span><strong>${escapeHtml(item.dataSource)}</strong><small>招生计划 · 专业目录 · 公开录取信息</small></span><i data-lucide="external-link"></i></a></section>${schoolCommentSection}</aside>
     </div>`;
   hydrateIcons();
 }
@@ -773,7 +795,7 @@ function renderAnswerHistory() {
   if (!list) return;
   const user = currentUser();
   const history = user ? read(STORE.answers, []).filter((item) => item.userId === user.id) : demoAnswers;
-  list.innerHTML = history.length ? history.map((item) => `<article class="question-list-item"><header><strong>${item.title}</strong><span class="question-status">${item.status}</span></header><p>${item.meta || `${item.topic || "未分类"} · 已完成回答`}</p></article>`).join("") : `<div class="qa-empty"><i data-lucide="message-square-off"></i><p>你还没有回答过问题</p><span>完成认证后，可以从左侧问题池选择自己真正经历过的问题。</span></div>`;
+  list.innerHTML = history.length ? history.map((item) => `<article class="question-list-item"><header><strong>${escapeHtml(item.title)}</strong><span class="question-status">${escapeHtml(item.status)}</span></header><p>${escapeHtml(item.meta || `${item.topic || "未分类"} · 已完成回答`)}</p></article>`).join("") : `<div class="qa-empty"><i data-lucide="message-square-off"></i><p>你还没有回答过问题</p><span>完成认证后，可以从左侧问题池选择自己真正经历过的问题。</span></div>`;
   hydrateIcons();
 }
 
@@ -1164,7 +1186,7 @@ function renderCompare() {
       schoolCompareMode = false;
       schoolMajorSelectionMode = false;
       schoolMajorCompareMode = false;
-      panel.innerHTML = schoolCandidates.length ? `<div class="candidate-list-heading"><div><strong>候选院校</strong><span>${user ? `已收藏 ${schoolCandidates.length} 所学校` : "访客示例，登录后保存自己的候选"}</span></div><div class="candidate-compare-toolbar"><span>已选择 <strong>${selectedCandidates.length}</strong> / 3</span><button class="primary-button" type="button" data-start-school-compare${selectedCandidates.length < 2 ? " disabled" : ""}><i data-lucide="columns-3"></i>开始对比</button></div></div><div class="candidate-list">${schoolCandidates.map((item) => `<article class="candidate-row"><label class="candidate-select" aria-label="选择${item.school}进行对比"><input type="checkbox" data-select-school-candidate="${item.id}"${selectedSchoolCandidateIds.has(item.id) ? " checked" : ""}><span></span></label><div class="candidate-identity"><span class="candidate-mark">${item.school.slice(0, 1)}</span><div><strong>${item.school}</strong><small>${item.city} · ${item.type}</small></div></div><div class="candidate-summary"><span>重点专业</span><p>${item.majors.slice(0, 3).join(" · ")}</p><div>${item.highlights.slice(0, 3).map((highlight) => `<span class="content-tag">${highlight}</span>`).join("")}</div></div><div class="candidate-actions">${renderCandidateStatusControl("school", item.id, user)}<button class="text-button" type="button" data-school-detail="${item.id}">查看详情<i data-lucide="arrow-up-right"></i></button>${user ? `<button class="remove-candidate" type="button" data-remove-school-candidate="${item.id}"><i data-lucide="trash-2"></i>移出候选</button>` : `<button class="remove-candidate" type="button" data-open-account><i data-lucide="log-in"></i>登录后保存</button>`}</div></article>`).join("")}</div>` : `<div class="compare-empty"><i data-lucide="school"></i><strong>你还没有收藏学校</strong><p>前往院校与经验页面，将感兴趣的学校加入候选。</p><button class="quiet-button" data-view-target="experience">去查找院校</button></div>`;
+      panel.innerHTML = schoolCandidates.length ? `<div class="candidate-list-heading"><div><strong>候选院校</strong><span>${user ? `已收藏 ${schoolCandidates.length} 所学校` : "访客示例,登录后保存自己的候选"}</span></div><div class="candidate-compare-toolbar"><span>已选择 <strong>${selectedCandidates.length}</strong> / 3</span><button class="primary-button" type="button" data-start-school-compare${selectedCandidates.length < 2 ? " disabled" : ""}><i data-lucide="columns-3"></i>开始对比</button></div></div><div class="candidate-list">${schoolCandidates.map((item) => `<article class="candidate-row"><label class="candidate-select" aria-label="选择${escapeHtml(item.school)}进行对比"><input type="checkbox" data-select-school-candidate="${escapeHtml(item.id)}"${selectedSchoolCandidateIds.has(item.id) ? " checked" : ""}><span></span></label><div class="candidate-identity"><span class="candidate-mark">${escapeHtml(item.school.slice(0, 1))}</span><div><strong>${escapeHtml(item.school)}</strong><small>${escapeHtml(item.city)} · ${escapeHtml(item.type)}</small></div></div><div class="candidate-summary"><span>重点专业</span><p>${escapeHtml(item.majors.slice(0, 3).join(" · "))}</p><div>${item.highlights.slice(0, 3).map((highlight) => `<span class="content-tag">${escapeHtml(highlight)}</span>`).join("")}</div></div><div class="candidate-actions">${renderCandidateStatusControl("school", item.id, user)}<button class="text-button" type="button" data-school-detail="${escapeHtml(item.id)}">查看详情<i data-lucide="arrow-up-right"></i></button>${user ? `<button class="remove-candidate" type="button" data-remove-school-candidate="${escapeHtml(item.id)}"><i data-lucide="trash-2"></i>移出候选</button>` : `<button class="remove-candidate" type="button" data-open-account><i data-lucide="log-in"></i>登录后保存</button>`}</div></article>`).join("")}</div>` : `<div class="compare-empty"><i data-lucide="school"></i><strong>你还没有收藏学校</strong><p>前往院校与经验页面,将感兴趣的学校加入候选。</p><button class="quiet-button" data-view-target="experience">去查找院校</button></div>`;
     }
   } else {
     const selectedCandidates = majorCandidates.filter((item) => selectedMajorCandidateKeys.has(item.key));
@@ -1292,11 +1314,18 @@ function renderFamily() {
   if (!main) return;
   if (!user) {
     main.innerHTML = `<div class="family-compact-status"><span class="linked-status inactive"><span></span>未关联</span><small>登录后创建家庭关联</small></div><button class="primary-button" type="button" data-open-account><i data-lucide="log-in"></i>登录后关联</button>`;
+  } else if (user.role === "家长") {
+    const linkedFamily = Object.values(read(STORE.family, {})).find((family) => family.parents?.includes(user.id));
+    main.innerHTML = linkedFamily
+      ? `<div class="family-compact-status"><span class="linked-status"><span></span>已加入家庭</span><small>邀请码 ${escapeHtml(linkedFamily.code)}</small></div>`
+      : `<div class="family-join-inline"><input id="familyCodeInput" type="text" maxlength="11" autocomplete="off" aria-label="家庭邀请码" placeholder="输入家庭邀请码"><button class="primary-button" id="joinFamily" type="button"><i data-lucide="user-plus"></i>加入家庭</button></div>`;
   } else {
     const family = read(STORE.family, {})[user.id];
-    main.innerHTML = family
-      ? `<div class="family-compact-status"><span class="linked-status"><span></span>已创建关联</span><small>邀请码 ${family.code}</small></div><button class="quiet-button" type="button" data-copy-code="${family.code}"><i data-lucide="copy"></i>复制邀请码</button>`
-      : `<div class="family-compact-status"><span class="linked-status inactive"><span></span>未关联</span><small>尚未向家庭成员共享候选</small></div><button class="primary-button" type="button" data-family-invite><i data-lucide="user-plus"></i>创建关联</button>`;
+    main.innerHTML = isStudentRole(user.role)
+      ? (family
+        ? `<div class="family-compact-status"><span class="linked-status"><span></span>已创建关联</span><small>邀请码 ${escapeHtml(family.code)}</small></div><button class="quiet-button" type="button" data-copy-code="${escapeHtml(family.code)}"><i data-lucide="copy"></i>复制邀请码</button>`
+        : `<div class="family-compact-status"><span class="linked-status inactive"><span></span>未关联</span><small>尚未向家庭成员共享候选</small></div><button class="primary-button" type="button" data-family-invite><i data-lucide="user-plus"></i>创建关联</button>`)
+      : `<div class="family-compact-status"><span class="linked-status inactive"><span></span>暂不支持</span><small>当前角色不参与家庭关联</small></div>`;
   }
   hydrateIcons();
 }
@@ -1306,7 +1335,7 @@ function renderTrust() {
   const status = user ? (read(STORE.verification, {})[user.id] || {}).status : null;
   const card = $("#verificationContent");
   if (!card) return;
-  card.innerHTML = `<div class="verification-status"><span class="status-icon"><i data-lucide="shield-check"></i></span><div><span>当前身份</span><strong>${user ? `${user.role} · ${status ? status : "未认证"}` : "未登录"}</strong></div></div>`;
+  card.innerHTML = `<div class="verification-status"><span class="status-icon"><i data-lucide="shield-check"></i></span><div><span>当前身份</span><strong>${user ? `${escapeHtml(user.role)} · ${escapeHtml(status ? status : "未认证")}` : "未登录"}</strong></div></div>`;
   hydrateIcons();
 }
 
@@ -1370,18 +1399,80 @@ function showAccount() {
 
 function requireAuth(message = "登录后才能使用这个功能") { if (currentUser()) return true; showAccount(); showToast(message); return false; }
 
-function register(event) {
-  event.preventDefault(); const name = $("#registerName")?.value.trim() || ""; const email = $("#registerEmail").value.trim().toLowerCase(); const password = $("#registerPassword").value;
+async function register(event) {
+  event.preventDefault();
+  const name = $("#registerName")?.value.trim() || "";
+  const email = $("#registerEmail").value.trim().toLowerCase();
+  const password = $("#registerPassword").value;
   const users = read(STORE.users, []);
-  if (users.some((user) => user.email === email)) { showToast("这个邮箱已经注册，请直接登录"); $("[data-auth-tab=login]")?.click(); $("#loginEmail").value = email; return; }
-  const user = { id: uid("user"), nickname: name || `用户${Date.now()}`, email, password, role: $("#registerRole")?.value || "学生", stage: $("#registerStage")?.value || "高考志愿", createdAt: new Date().toISOString() };
-  write(STORE.users, [...users, user]); localStorage.setItem(STORE.session, user.id); $("#registerForm")?.reset(); closeModal("accountModal"); updateAccountHeader(); showToast(`欢迎加入引路，${user.nickname}`);
+  if (users.some((user) => user.email === email)) {
+    showToast("这个邮箱已经注册，请直接登录");
+    $("[data-auth-tab=login]")?.click();
+    $("#loginEmail").value = email;
+    return;
+  }
+  // ✅ 使用SHA-256哈希存储密码
+  const passwordRecord = await createPasswordRecord(password);
+  const user = {
+    id: uid("user"),
+    nickname: name || `用户${Date.now()}`,
+    email,
+    passwordSalt: passwordRecord.passwordSalt,
+    passwordHash: passwordRecord.passwordHash,
+    role: $("#registerRole")?.value || "学生",
+    stage: $("#registerStage")?.value || "高考志愿",
+    createdAt: new Date().toISOString()
+  };
+  write(STORE.users, [...users, user]);
+  localStorage.setItem(STORE.session, user.id);
+  $("#registerForm")?.reset();
+  closeModal("accountModal");
+  updateAccountHeader();
+  showToast(`欢迎加入引路，${user.nickname}`);
 }
 
-function login(event) {
-  event.preventDefault(); const email = $("#loginEmail").value.trim().toLowerCase(); const password = $("#loginPassword").value; const user = read(STORE.users, []).find((item) => item.email === email && item.password === password);
-  if (!user) { showToast("邮箱或密码不正确，请检查后重试"); return; }
-  localStorage.setItem(STORE.session, user.id); closeModal("accountModal"); updateAccountHeader(); showToast(`欢迎回来，${user.nickname}`);
+async function login(event) {
+  event.preventDefault();
+  const email = $("#loginEmail").value.trim().toLowerCase();
+  const password = $("#loginPassword").value;
+  const users = read(STORE.users, []);
+  const user = users.find((item) => item.email === email);
+
+  if (!user) {
+    showToast("邮箱或密码不正确，请检查后重试");
+    return;
+  }
+
+  // ✅ 兼容旧版明文密码和新版哈希密码
+  let isValidPassword = false;
+  if (user.passwordHash && user.passwordSalt) {
+    // 新版：使用SHA-256验证
+    isValidPassword = await passwordMatches(user, password);
+  } else if (user.password) {
+    // 旧版：明文密码（兼容性）
+    isValidPassword = user.password === password;
+    // 自动升级为哈希密码
+    if (isValidPassword) {
+      const passwordRecord = await createPasswordRecord(password);
+      const updatedUsers = users.map(u => u.id === user.id ? {
+        ...u,
+        passwordSalt: passwordRecord.passwordSalt,
+        passwordHash: passwordRecord.passwordHash,
+        password: undefined
+      } : u);
+      write(STORE.users, updatedUsers);
+    }
+  }
+
+  if (!isValidPassword) {
+    showToast("邮箱或密码不正确，请检查后重试");
+    return;
+  }
+
+  localStorage.setItem(STORE.session, user.id);
+  closeModal("accountModal");
+  updateAccountHeader();
+  showToast(`欢迎回来，${user.nickname}`);
 }
 
 function saveProfile(event) {
@@ -1498,9 +1589,88 @@ function toggleFavorite(id) {
   const user = currentUser(); const all = read(STORE.favorites, {}); const list = all[user.id] || []; all[user.id] = list.includes(id) ? list.filter((item) => item !== id) : [...list, id]; write(STORE.favorites, all); renderExperiences(); renderCompare(); if ($("#view-school-detail")?.classList.contains("active")) renderSchoolDetail(); showToast(all[user.id].includes(id) ? "已加入候选" : "已从候选移除");
 }
 
+// ✅ 完整的家庭功能（从第三组集成）
+const isStudentRole = (role) => ["学生", "高中生", "大学生"].includes(role);
+
 function generateFamilyInvite() {
   if (!requireAuth("登录后才能创建家庭关联")) return;
-  const user = currentUser(); const all = read(STORE.family, {}); if (!all[user.id]) all[user.id] = { code: `YL-${Math.random().toString(36).slice(2, 6).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}` , createdAt: new Date().toISOString() }; write(STORE.family, all); renderFamily(); showToast("家庭邀请码已生成");
+  const user = currentUser();
+  const all = read(STORE.family, {});
+
+  // 只有学生可以生成邀请码
+  if (!isStudentRole(user.role)) {
+    showToast("只有学生可以生成家庭邀请码");
+    return;
+  }
+
+  if (!all[user.id]) {
+    // 使用8位随机字符，更安全
+    const code = `YL-${Array.from({ length: 8 }, () =>
+      Math.random().toString(36).charAt(2).toUpperCase()
+    ).join('')}`;
+
+    all[user.id] = {
+      code,
+      owner: user.id,
+      parents: [],
+      status: "waiting",
+      createdAt: new Date().toISOString()
+    };
+  }
+
+  write(STORE.family, all);
+  renderFamily();
+  showToast("家庭邀请码已生成");
+}
+
+function joinFamilyInvite(code) {
+  if (!requireAuth("登录后才能加入家庭")) return;
+
+  const user = currentUser();
+
+  // 只有家长可以加入
+  if (user.role !== "家长") {
+    showToast("只有家长可以使用邀请码加入家庭");
+    return;
+  }
+
+  if (!code || code.trim().length === 0) {
+    showToast("请输入邀请码");
+    return;
+  }
+
+  const all = read(STORE.family, {});
+  let targetUserId = null;
+
+  // 查找匹配的邀请码
+  Object.keys(all).forEach(userId => {
+    if (all[userId].code === code.trim().toUpperCase()) {
+      targetUserId = userId;
+    }
+  });
+
+  if (!targetUserId) {
+    showToast("邀请码不存在或已过期");
+    return;
+  }
+
+  const family = all[targetUserId];
+
+  // 检查是否已经加入
+  if (family.parents && family.parents.includes(user.id)) {
+    showToast("您已经加入了这个家庭");
+    return;
+  }
+
+  // 添加家长到家庭
+  if (!family.parents) family.parents = [];
+  family.parents.push(user.id);
+  family.status = "linked";
+  family.linkedAt = new Date().toISOString();
+
+  write(STORE.family, all);
+  renderFamily();
+  showToast("家庭关联成功");
 }
 
 function requestVerification() {
@@ -1591,6 +1761,12 @@ document.addEventListener("click", (event) => {
   if (event.target.classList.contains("modal-backdrop")) closeModal(event.target.id);
   const favorite = event.target.closest("[data-favorite]"); if (favorite) { toggleFavorite(favorite.dataset.favorite); return; }
   if (event.target.closest("[data-family-invite]")) { generateFamilyInvite(); return; }
+  const joinFamily = event.target.closest("#joinFamily");
+  if (joinFamily) {
+    const code = document.querySelector("#familyCodeInput")?.value.trim();
+    joinFamilyInvite(code);
+    return;
+  }
   const code = event.target.closest("[data-copy-code]"); if (code) { copyText(code.dataset.copyCode); return; }
   if (event.target.closest("[data-start-verify]")) { requestVerification(); return; }
   if (event.target.closest("[data-report-comment]")) { showToast("已记录举报，正式版本将进入内容审核流程"); return; }
