@@ -28,6 +28,10 @@ const institutions = [
     englishName: "Fujian Normal University",
     city: "福州",
     type: "公办本科 · 师范类院校",
+    identityTags: ["非985", "非211", "非双一流"],
+    identityNote: "当前不属于985、211或第二轮双一流建设高校",
+    academicProfile: "教师教育与师范类培养特色突出，同时覆盖文、理、工、经、管等学科方向。",
+    admissionReference: { value: "近三年录取位次待接入", note: "需按省份、年份、选科和专业组比较，不能只看最低分" },
     founded: "1907年",
     educationLevel: "本科 / 研究生教育",
     campuses: "旗山校区、仓山校区",
@@ -88,6 +92,10 @@ const institutions = [
     englishName: "Fuzhou University",
     city: "福州",
     type: "公办本科 · 综合类院校",
+    identityTags: ["非985", "211", "双一流"],
+    identityNote: "211工程高校、第二轮双一流建设高校",
+    academicProfile: "以工为主、理工结合，经济、管理及人文等学科协同发展。",
+    admissionReference: { value: "近三年录取位次待接入", note: "需按省份、年份、选科和专业组比较，不能只看最低分" },
     founded: "1958年",
     educationLevel: "本科 / 研究生教育",
     campuses: "旗山校区等",
@@ -141,6 +149,70 @@ const institutions = [
     dataSource: "阳光高考信息平台",
     dataUrl: "https://gaokao.chsi.com.cn/",
     dimensions: ["课程学习", "录取信息", "城市环境", "就业去向"]
+  },
+  {
+    id: "fafu",
+    school: "福建农林大学",
+    englishName: "Fujian Agriculture and Forestry University",
+    city: "福州",
+    type: "公办本科 · 农林类院校",
+    identityTags: ["非985", "非211", "非双一流"],
+    identityNote: "当前不属于985、211或第二轮双一流建设高校",
+    academicProfile: "农林、生命科学与生态相关方向特色明显，同时覆盖工、理、经、管等学科。",
+    admissionReference: { value: "近三年录取位次待接入", note: "需按省份、年份、选科和专业组比较，不能只看最低分" },
+    founded: "1936年",
+    educationLevel: "本科 / 研究生教育",
+    campuses: "金山校区等",
+    updatedAt: "2026年8月",
+    intro: "学校以农林学科和生命科学为特色，同时覆盖工、理、经、管、文、法、艺等学科方向。平台将学校概况、专业培养、招生资料和校园体验分开整理，便于进一步核对不同专业所在学院与培养安排。",
+    majors: ["风景园林", "食品科学与工程", "植物保护"],
+    majorPrograms: [
+      { name: "风景园林", school: "风景园林与艺术学院", category: "工学", level: "本科", note: "关注景观设计、生态规划、制图表达与项目实践。", officialUrl: "https://www.fafu.edu.cn/" },
+      { name: "食品科学与工程", school: "食品科学学院", category: "工学", level: "本科", note: "关注食品加工、质量安全、工程基础与实验实践。", officialUrl: "https://www.fafu.edu.cn/" },
+      { name: "植物保护", school: "植物保护学院", category: "农学", level: "本科", note: "关注植物病虫害、农业生态与绿色防控技术。", officialUrl: "https://www.fafu.edu.cn/" },
+      { name: "农学", school: "农学院", category: "农学", level: "本科", note: "关注作物生产、遗传育种与现代农业技术。", officialUrl: "https://www.fafu.edu.cn/" },
+      { name: "计算机科学与技术", school: "计算机与信息学院", category: "工学", level: "本科", note: "关注计算机基础、软件开发及信息技术应用。", officialUrl: "https://www.fafu.edu.cn/" }
+    ],
+    highlights: ["农林学科特色", "生命科学方向", "福州城市环境"],
+    dataSummary: "可查招生章程、招生计划、专业目录和公开录取信息。涉及年份、省份与专业组的具体数据时，应以学校和公开招生平台当年度发布内容为准。",
+    admissionBrief: "招生计划与录取条件会因省份、科类和专业组发生变化。平台先呈现查询结构与官方来源入口，不使用未经核实的分数或录取概率。",
+    admissionYears: ["2026", "2025", "2024"],
+    admissionProvinces: ["福建", "全国"],
+    admissionSubjects: ["物理类", "历史类", "不限科类"],
+    admissionResources: [
+      { icon: "clipboard-list", title: "招生计划", description: "分省、分科类和分专业查看招生名额", sourceType: "学校官方发布", sourceName: "福建农林大学官网", year: "2026", status: "待接入", url: "https://www.fafu.edu.cn/" },
+      { icon: "chart-no-axes-column-increasing", title: "历年分数与位次", description: "按省份、批次和专业查看公开录取资料", sourceType: "公开数据平台", sourceName: "阳光高考信息平台", year: "近三年", status: "待接入", url: "https://gaokao.chsi.com.cn/" },
+      { icon: "file-text", title: "招生章程", description: "查看报考条件、录取规则和专业要求", sourceType: "学校官方发布", sourceName: "福建农林大学官网", year: "2026", status: "查看来源", url: "https://www.fafu.edu.cn/" }
+    ],
+    latestUpdates: [
+      { type: "招生政策", title: "年度招生政策与章程", summary: "关注报考条件、选考科目、录取规则和专业限制是否调整。", date: "发布日期待接入", publisher: "福建农林大学官方发布", status: "原文待接入", url: "https://www.fafu.edu.cn/" },
+      { type: "专业调整", title: "招生专业与培养方向调整", summary: "关注农林、工科和生命科学相关专业的招生目录与培养方向变化。", date: "发布日期待接入", publisher: "福建农林大学官方发布", status: "原文待接入", url: "https://www.fafu.edu.cn/" },
+      { type: "培养政策", title: "转专业与培养安排通知", summary: "关注转专业条件、实践教学、实验安排和校区分布等最新通知。", date: "发布日期待接入", publisher: "福建农林大学官方发布", status: "原文待接入", url: "https://www.fafu.edu.cn/" }
+    ],
+    postgraduateRecommendation: { value: "待接入可靠数据", year: "待确认", recommendedCount: "待接入", graduateScope: "待接入", methodology: "推免人数 ÷ 对应届本科毕业生统计范围；以学校公示口径为准", source: "学校推免公示及年度就业质量报告", updatedAt: "待确认" },
+    officialSummary: "可查学校概况、学院设置、招生简章、专业介绍和培养相关通知。",
+    campusSummary: "学校主要办学地点位于福州。校园体验、学院位置和住宿安排需结合具体校区、专业及当年通知确认。",
+    campusDetails: [
+      { name: "金山校区", location: "福州市仓山区", colleges: "具体学院分布待接入学校官方资料", transport: "公共交通和校内通行信息待核实", status: "主要校区" },
+      { name: "其他办学地点", location: "具体信息以学校官方发布为准", colleges: "专业与学院分布待接入学校官方资料", transport: "交通与住宿安排待核实", status: "待完善" }
+    ],
+    cityReferences: [
+      { icon: "train-front", label: "跨城交通", value: "高铁、机场等城市交通信息", note: "具体通勤时间待接入地图数据" },
+      { icon: "cloud-sun", label: "气候环境", value: "亚热带季风气候", note: "生活体验结合本校评论查看" },
+      { icon: "briefcase-business", label: "实践环境", value: "农业、生态、食品与设计相关实践方向", note: "具体合作单位与岗位信息待可靠来源" },
+      { icon: "wallet-cards", label: "生活费用", value: "待接入可靠数据", note: "不使用未经核实的费用估算" }
+    ],
+    campusMedia: [
+      { icon: "circle-play", title: "官方视频", description: "校园宣传片、校区介绍与学校公开讲座", status: "待接入官方素材", url: "https://www.fafu.edu.cn/" },
+      { icon: "images", title: "校园相册", description: "教学空间、实验场地、宿舍与公共区域", status: "待接入官方素材", url: "https://www.fafu.edu.cn/" },
+      { icon: "map", title: "校区地图", description: "查看校区位置、学院分布与交通入口", status: "待接入地图数据", url: "https://www.fafu.edu.cn/" }
+    ],
+    careerSummary: "农林、食品、生态、景观和信息技术等专业的培养路径差异较大，应结合目标专业的培养方案、实践安排与行业信息比较。",
+    officialSource: "福建农林大学官网",
+    officialUrl: "https://www.fafu.edu.cn/",
+    dataSource: "阳光高考信息平台",
+    dataUrl: "https://gaokao.chsi.com.cn/",
+    dimensions: ["课程学习", "录取信息", "城市环境", "就业去向"]
   }
 ];
 
@@ -157,7 +229,7 @@ const demoAnswers = [
 
 const stageNames = { gaokao: "高考志愿", graduate: "考研择校", career: "职业选择", adapt: "大学适应" };
 const stageOrder = ["gaokao", "graduate", "career", "adapt"];
-const STORE = { users: "yinlu_users", session: "yinlu_session", questions: "yinlu_questions", answers: "yinlu_answers", favorites: "yinlu_favorites", family: "yinlu_family", verification: "yinlu_verification" };
+const STORE = { users: "yinlu_users", session: "yinlu_session", questions: "yinlu_questions", answers: "yinlu_answers", favorites: "yinlu_favorites", candidateStatus: "yinlu_candidate_status", compareHistory: "yinlu_compare_history", family: "yinlu_family", verification: "yinlu_verification" };
 let currentStage = "gaokao";
 let currentSchoolSearch = "";
 let currentMajorSearch = "";
@@ -166,12 +238,32 @@ let currentSourceFilter = "all";
 let currentScopeFilter = "all";
 let currentSearch = "";
 let currentSchoolDetail = "fjnu";
+let currentCandidateTab = "school";
+let currentSchoolReturnView = "experience";
+let schoolCompareMode = false;
+const selectedSchoolCandidateIds = new Set();
+let schoolMajorSelectionMode = false;
+let schoolMajorCompareMode = false;
+let schoolMajorTargetSchoolId = "";
+const selectedSchoolMajorNames = new Set();
+let currentSchoolMajorResults = [];
+let majorCompareMode = false;
+const selectedMajorCandidateKeys = new Set();
+let selectedMajorName = "";
+let candidateMajorSearchQuery = "";
+let activeHistoryComparison = null;
+let currentSchoolCandidateResults = [];
+let currentMajorCandidateResults = [];
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const read = (key, fallback) => { try { const value = JSON.parse(localStorage.getItem(key)); return value ?? fallback; } catch { return fallback; } };
 const write = (key, value) => localStorage.setItem(key, JSON.stringify(value));
+const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
 const uid = (prefix = "id") => `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+const majorCandidateId = (schoolId, major) => `major-${schoolId}-${encodeURIComponent(major)}`;
+const majorDecisionKey = (school, major) => encodeURIComponent(`${school}::${major}`);
+const candidateStatuses = ["待了解", "正在比较", "已倾向", "暂不考虑"];
 const currentUser = () => { const id = localStorage.getItem(STORE.session); return read(STORE.users, []).find((user) => user.id === id) || null; };
 const userFavorites = () => { const user = currentUser(); return user ? read(STORE.favorites, {})[user.id] || [] : []; };
 const initials = (name = "访客") => name.trim().slice(0, 1) || "访";
@@ -187,7 +279,7 @@ function showToast(message) {
   showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 2800);
 }
 
-function openModal(id) { const modal = $(`#${id}`); if (!modal) return; modal.classList.add("open"); modal.setAttribute("aria-hidden", "false"); window.setTimeout(() => $("#questionInput")?.focus?.(), 300); }
+function openModal(id) { const modal = $(`#${id}`); if (!modal) return; modal.classList.add("open"); modal.setAttribute("aria-hidden", "false"); window.setTimeout(() => $("textarea, input, select, button", modal)?.focus?.(), 300); }
 function closeModal(id) { const modal = $(`#${id}`); if (!modal) return; modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true"); }
 
 function switchView(name) {
@@ -403,6 +495,11 @@ const schoolCommentExamples = {
     { id: "fzu-campus-route", major: "经济学", grade: "2022级", dimension: "校园环境", text: "查看校区信息时要继续确认学院所在区域和常用教学楼，只看学校总地址不一定能判断每天的通行安排。", date: "示例内容" },
     { id: "fzu-lab-detail", major: "机械设计制造及其自动化", grade: "2023级", dimension: "培养安排", text: "了解工科专业时可以进一步确认实验课、课程设计和实训场地分别安排在哪些学期与校区。", date: "示例内容" },
     { id: "fzu-dorm-detail", major: "计算机科学与技术", grade: "2023级", dimension: "宿舍生活", text: "宿舍设施与分配安排可能按年份调整，报考前可以把官方住宿通知和在校生当年的实际补充放在一起看。", date: "示例内容" }
+  ],
+  fafu: [
+    { id: "fafu-studio-detail", major: "风景园林", grade: "2023级", dimension: "课程学习", text: "设计课程通常需要连续完成图纸、模型与软件表达，了解专业时可以进一步确认工作室安排和不同学期的项目强度。", date: "示例内容" },
+    { id: "fafu-campus-detail", major: "风景园林", grade: "2023级", dimension: "校园环境", text: "课程使用的教室、实验空间和宿舍位置可能影响日常通行，建议结合学院所在区域确认真实距离。", date: "示例内容" },
+    { id: "fafu-practice-detail", major: "食品科学与工程", grade: "2022级", dimension: "培养安排", text: "了解专业时除了课程名称，还可以关注实验课、实习基地和实践学期分别怎样安排。", date: "示例内容" }
   ]
 };
 
@@ -417,8 +514,11 @@ function renderMajorPrograms(item, query = "") {
   const keyword = query.trim().toLowerCase();
   const filtered = list.filter((program) => !keyword || `${program.name}${program.school}${program.category}${program.note}`.toLowerCase().includes(keyword));
   return filtered.length ? filtered.map((program) => {
-    const content = `<div class="major-program-title"><span class="major-program-icon"><i data-lucide="book-open"></i></span><div><strong>${program.name}</strong><small>${program.school}</small></div><i data-lucide="arrow-up-right"></i></div><div class="major-program-meta"><span>${program.level}</span><span>${program.category}</span></div><p>${program.note}</p><div class="major-program-source"><i data-lucide="landmark"></i><span>${program.officialUrl ? "查看学院官网" : "官方链接待补充"}</span></div>`;
-    return program.officialUrl ? `<a class="major-program-item" href="${program.officialUrl}" target="_blank" rel="noopener noreferrer" aria-label="查看${item.school}${program.school}官网：${program.name}">${content}</a>` : `<article class="major-program-item pending" aria-label="${program.name}官方链接待补充">${content}</article>`;
+    const favoriteId = majorCandidateId(item.id, program.name);
+    const saved = userFavorites().includes(favoriteId);
+    const sourceLink = program.officialUrl ? `<a class="major-program-source-link" href="${program.officialUrl}" target="_blank" rel="noopener noreferrer" aria-label="查看${item.school}${program.school}官网：${program.name}"><i data-lucide="landmark"></i>查看学院官网<i data-lucide="external-link"></i></a>` : `<span class="major-program-source-link pending-source"><i data-lucide="landmark"></i>官方链接待补充</span>`;
+    const content = `<div class="major-program-title"><span class="major-program-icon"><i data-lucide="book-open"></i></span><div><strong>${program.name}</strong><small>${program.school}</small></div></div><div class="major-program-meta"><span>${program.level}</span><span>${program.category}</span></div><p>${program.note}</p><div class="major-program-actions">${sourceLink}<button class="save-experience ${saved ? "saved" : ""}" type="button" data-favorite="${favoriteId}"><i data-lucide="${saved ? "bookmark-check" : "bookmark-plus"}"></i>${saved ? "已加入候选" : "加入候选专业"}</button></div>`;
+    return `<article class="major-program-item${program.officialUrl ? "" : " pending"}" aria-label="${item.school} ${program.name}">${content}</article>`;
   }).join("") : `<div class="major-program-empty"><i data-lucide="search-x"></i><p>没有找到匹配的专业</p></div>`;
 }
 
@@ -444,10 +544,11 @@ function renderSchoolDetail() {
   const item = institutions.find((school) => school.id === currentSchoolDetail) || institutions[0];
   if (!panel || !item) return;
   const saved = userFavorites().includes(`school-${item.id}`);
+  const returnCopy = currentSchoolReturnView === "compare" ? "返回我的候选" : "返回院校与经验";
   const schoolCommentSection = renderSchoolCommentSection(item);
   const latestUpdatesSection = renderLatestUpdates(item);
   const campusSection = renderCampusSection(item);
-  panel.innerHTML = `<div class="school-detail-topbar"><button class="quiet-button" data-view-target="experience"><i data-lucide="arrow-left"></i>返回院校与经验</button><div class="school-detail-top-actions"><a class="quiet-button" href="${item.officialUrl}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link"></i>学校官网</a><button class="primary-button" data-favorite="school-${item.id}"><i data-lucide="${saved ? "bookmark-check" : "bookmark-plus"}"></i>${saved ? "已加入候选" : "加入我的候选"}</button></div></div>
+  panel.innerHTML = `<div class="school-detail-topbar"><button class="quiet-button" data-view-target="${currentSchoolReturnView}"><i data-lucide="arrow-left"></i>${returnCopy}</button><div class="school-detail-top-actions"><a class="quiet-button" href="${item.officialUrl}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link"></i>学校官网</a><button class="primary-button" data-favorite="school-${item.id}"><i data-lucide="${saved ? "bookmark-check" : "bookmark-plus"}"></i>${saved ? "已加入候选" : "加入我的候选"}</button></div></div>
     <header class="school-profile-header"><div class="institution-mark school-profile-mark">${item.school.slice(0, 1)}</div><div class="school-profile-copy"><span class="section-kicker">学校详情 · 平台整理</span><h1>${item.school}</h1><p class="school-english-name">${item.englishName}</p><div class="school-profile-tags"><span><i data-lucide="map-pin"></i>${item.city}</span><span><i data-lucide="landmark"></i>${item.type}</span>${item.highlights.map((highlight) => `<span>${highlight}</span>`).join("")}</div></div></header>
     <nav class="school-section-nav" aria-label="学校详情目录"><button data-school-anchor="school-overview" class="active">学校概况</button><button data-school-anchor="school-updates">最新资讯</button><button data-school-anchor="school-majors">专业列表</button><button data-school-anchor="school-admission">招生录取</button><button data-school-anchor="school-campus">校园与城市</button><button data-school-anchor="school-progression">升学参考</button><button data-school-anchor="school-comments">本校评论</button></nav>
     <div class="school-detail-grid">
@@ -473,19 +574,513 @@ function renderAnswerHistory() {
   hydrateIcons();
 }
 
+function candidateStatusFor(type, key) {
+  const user = currentUser();
+  if (!user) return candidateStatuses[0];
+  return read(STORE.candidateStatus, {})[user.id]?.[`${type}:${key}`] || candidateStatuses[0];
+}
+
+function renderCandidateStatusControl(type, key, user) {
+  const status = candidateStatusFor(type, key);
+  if (!user) return `<span class="candidate-demo-status"><i data-lucide="circle-dashed"></i>示例状态 · ${status}</span>`;
+  const options = candidateStatuses.map((item) => `<option${item === status ? " selected" : ""}>${item}</option>`).join("");
+  return `<label class="candidate-status-control"><span>判断状态</span><select data-candidate-status data-candidate-status-type="${type}" data-candidate-status-key="${key}" aria-label="修改候选判断状态">${options}</select></label>`;
+}
+
+function updateCandidateStatus(type, key, status) {
+  const user = currentUser();
+  if (!user || !candidateStatuses.includes(status)) return;
+  const all = read(STORE.candidateStatus, {});
+  all[user.id] = { ...(all[user.id] || {}), [`${type}:${key}`]: status };
+  write(STORE.candidateStatus, all);
+  renderCompare();
+  showToast(`候选状态已更新为“${status}”`);
+}
+
+function clearCandidateStatus(type, key) {
+  const user = currentUser();
+  if (!user) return;
+  const all = read(STORE.candidateStatus, {});
+  if (!all[user.id]) return;
+  delete all[user.id][`${type}:${key}`];
+  write(STORE.candidateStatus, all);
+}
+
+function toggleSchoolCandidateSelection(id, checked) {
+  if (checked && !selectedSchoolCandidateIds.has(id) && selectedSchoolCandidateIds.size >= 3) {
+    showToast("一次最多对比 3 所院校");
+    renderCompare();
+    return;
+  }
+  if (checked) selectedSchoolCandidateIds.add(id);
+  else selectedSchoolCandidateIds.delete(id);
+  renderCompare();
+}
+
+function toggleMajorCandidateSelection(key, major, checked) {
+  if (checked && selectedMajorName && selectedMajorName !== major) {
+    showToast("专业优先只能比较同一个专业");
+    renderCompare();
+    return;
+  }
+  if (checked && !selectedMajorCandidateKeys.has(key) && selectedMajorCandidateKeys.size >= 3) {
+    showToast("一次最多对比 3 个专业组合");
+    renderCompare();
+    return;
+  }
+  if (checked) {
+    selectedMajorName = major;
+    selectedMajorCandidateKeys.add(key);
+  } else {
+    selectedMajorCandidateKeys.delete(key);
+    if (!selectedMajorCandidateKeys.size) selectedMajorName = "";
+  }
+  renderCompare();
+}
+
+function renderSchoolComparison(candidates) {
+  const cell = (content) => candidates.map((item) => `<td>${content(item)}</td>`).join("");
+  const experienceSummary = (item) => {
+    const related = experiences.filter((experience) => experience.school === item.school && experience.source === "student");
+    const dimensions = [...new Set(related.flatMap((experience) => experience.dimensions || []))];
+    return `<strong>${related.length} 条学生经验</strong><small>${dimensions.length ? dimensions.join(" · ") : "暂无经验维度"}</small>`;
+  };
+  return `<div class="school-compare-view">
+    <div class="school-compare-heading"><div><span class="subsection-kicker"><i data-lucide="columns-3"></i>院校对比</span><h2>${candidates.length} 所候选院校并列查看</h2><p>只呈现已有资料与来源状态，不生成综合评分或推荐结论。</p></div><button class="quiet-button" type="button" data-exit-school-compare><i data-lucide="arrow-left"></i>返回候选列表</button></div>
+    <div class="school-compare-table-wrap">
+      <table class="school-compare-table">
+        <thead><tr><th scope="col">比较维度</th>${candidates.map((item) => `<th scope="col"><span class="compare-school-mark">${item.school.slice(0, 1)}</span><strong>${item.school}</strong><small>${item.city}</small></th>`).join("")}</tr></thead>
+        <tbody>
+          <tr><th scope="row">我的状态</th>${cell((item) => `<span class="compare-status">${candidateStatusFor("school", item.id)}</span>`)}</tr>
+          <tr><th scope="row">院校身份</th>${cell((item) => `<div class="compare-tag-list identity-tags">${(item.identityTags || ["身份标签待更新"]).map((tag) => `<span>${tag}</span>`).join("")}</div><strong>${item.type}</strong><small>${item.identityNote || "重新发起对比后显示最新院校身份"}</small>`)}</tr>
+          <tr><th scope="row">城市与校区</th>${cell((item) => `<strong>${item.city} · ${item.campuses}</strong><small>${item.campusDetails.map((campus) => `${campus.name}（${campus.location}）`).join(" · ")}</small>`)}</tr>
+          <tr><th scope="row">学科与培养</th>${cell((item) => `<strong>${item.academicProfile || item.intro}</strong><div class="compare-tag-list">${item.majors.slice(0, 3).map((major) => `<span>${major}</span>`).join("")}</div><button class="compare-inline-action" type="button" data-school-detail="${item.id}">查看学校专业<i data-lucide="arrow-up-right"></i></button>`)}</tr>
+          <tr><th scope="row">保研与升学</th>${cell((item) => `<strong>保研率：${item.postgraduateRecommendation.value}</strong><small>数据年份：${item.postgraduateRecommendation.year} · ${item.postgraduateRecommendation.methodology}</small>`)}</tr>
+          <tr><th scope="row">录取参考</th>${cell((item) => `<strong>${item.admissionReference?.value || "近三年录取位次待接入"}</strong><small>${item.admissionReference?.note || "需按省份、年份、选科和专业组比较"}</small><a class="compare-inline-action" href="${item.dataUrl}" target="_blank" rel="noopener noreferrer">核验公开数据<i data-lucide="external-link"></i></a>`)}</tr>
+          <tr><th scope="row">校园与体验</th>${cell((item) => `<strong>${item.campusSummary}</strong>${experienceSummary(item)}`)}</tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="compare-disclaimer"><i data-lucide="info"></i><span>“待接入”与“待确认”代表当前样本没有可靠数据，不用估算值补齐。</span></div>
+    <div class="compare-next-step school-choice-next"><div><strong>确定一所院校后，继续比较校内专业</strong><span>先选择你想深入了解的学校，再比较这所学校的 2–3 个专业。</span></div><div class="compare-next-school-actions">${candidates.map((item) => `<button class="quiet-button" type="button" data-continue-school-major="${item.id}"><span>${item.school}</span><i data-lucide="arrow-right"></i></button>`).join("")}</div></div>
+  </div>`;
+}
+
+function majorCombinationFor(school, majorName) {
+  const program = school?.majorPrograms.find((item) => item.name === majorName);
+  if (!school || !program) return null;
+  const relatedExperiences = experiences.filter((item) => item.school === school.school && item.major === program.name);
+  return {
+    key: majorDecisionKey(school.school, program.name),
+    school: school.school,
+    schoolId: school.id,
+    major: program.name,
+    city: school.city,
+    academy: program.school,
+    category: program.category,
+    level: program.level,
+    note: program.note,
+    officialUrl: program.officialUrl,
+    experienceCount: relatedExperiences.length,
+    experienceDimensions: [...new Set(relatedExperiences.flatMap((item) => item.dimensions || []))]
+  };
+}
+
+function renderSchoolMajorSelection(school) {
+  const selectedCount = selectedSchoolMajorNames.size;
+  return `<div class="school-major-selection-view">
+    <div class="school-compare-heading"><div><span class="subsection-kicker"><i data-lucide="list-tree"></i>院校优先 · 第二步</span><h2>比较 ${school.school} 的不同专业</h2><p>学校条件保持不变，只比较该校专业之间的培养与发展差异。</p></div><button class="quiet-button" type="button" data-back-school-comparison><i data-lucide="arrow-left"></i>返回院校对比</button></div>
+    <header class="within-school-heading"><span class="candidate-mark">${school.school.slice(0, 1)}</span><div><strong>${school.school}</strong><small>${school.city} · ${school.identityTags.join(" · ")}</small></div></header>
+    <div class="school-major-choice-list">${school.majorPrograms.map((program) => `<article class="school-major-choice"><label class="school-major-checkbox"><input type="checkbox" data-select-school-major="${escapeHtml(program.name)}"${selectedSchoolMajorNames.has(program.name) ? " checked" : ""}><span></span></label><div class="school-major-choice-name"><strong>${program.name}</strong><small>${program.school}</small></div><div class="school-major-choice-detail"><p>${program.note}</p><div><span>${program.category}</span><span>${program.level}</span><a href="${program.officialUrl}" target="_blank" rel="noopener noreferrer">专业官方信息<i data-lucide="external-link"></i></a></div></div></article>`).join("")}</div>
+    <div class="school-major-selection-actions"><div><strong>已选择 ${selectedCount} / 3</strong><span>请选择 2–3 个专业进行校内比较。</span></div><button class="primary-button" type="button" data-start-school-major-compare${selectedCount < 2 ? " disabled" : ""}><i data-lucide="columns-3"></i>开始校内专业对比</button></div>
+  </div>`;
+}
+
+function renderMajorComparison(candidates, mode = "same-major") {
+  const withinSchool = mode === "within-school";
+  const cell = (content) => candidates.map((item) => `<td>${content(item)}</td>`).join("");
+  const institutionFor = (item) => institutions.find((school) => school.id === item.schoolId || school.school === item.school);
+  const experienceFor = (item) => {
+    const related = experiences.filter((experience) => experience.school === item.school && experience.major === item.major && experience.source === "student");
+    const signals = [...new Set(related.flatMap((experience) => [...(experience.dimensions || []), ...(experience.tags || [])]))];
+    return { related, signals };
+  };
+  const experienceSignals = (item) => {
+    const { related, signals } = experienceFor(item);
+    return related.length ? `<div class="compare-tag-list">${signals.slice(0, 5).map((signal) => `<span>${signal}</span>`).join("")}</div><small>${related.length} 条相关学生经验</small>` : `<strong>暂无相关学生经验</strong><small>当前不使用其他专业经验代替</small>`;
+  };
+  const experienceExcerpt = (item) => {
+    const { related } = experienceFor(item);
+    return related.length ? `<strong>${related[0].text}</strong><small>${related.length > 1 ? `另有 ${related.length - 1} 条经验可继续查看` : "当前仅收录 1 条经验"}</small>` : `<strong>经验摘要待补充</strong><small>可前往问答中心追问该专业在读体验</small>`;
+  };
+  const trainingFocus = (item) => `<strong>${item.note || "培养重点待核验"}</strong>${item.officialUrl ? `<a class="compare-inline-action" href="${item.officialUrl}" target="_blank" rel="noopener noreferrer">核对专业官方信息<i data-lucide="external-link"></i></a>` : ""}`;
+  const rows = withinSchool ? `
+          <tr><th scope="row">我的状态</th>${cell((item) => `<span class="compare-status">${candidateStatusFor("major", item.key)}</span>`)}</tr>
+          <tr><th scope="row">所属学院</th>${cell((item) => `<strong>${item.academy || "所属学院待确认"}</strong>`)}</tr>
+          <tr><th scope="row">学科门类</th>${cell((item) => `<strong>${item.category || "学科门类待确认"}</strong>`)}</tr>
+          <tr><th scope="row">培养重点</th>${cell(trainingFocus)}</tr>
+          <tr><th scope="row">学习与实践线索</th>${cell(experienceSignals)}</tr>
+          <tr><th scope="row">学生经验摘要</th>${cell(experienceExcerpt)}</tr>` : `
+          <tr><th scope="row">我的状态</th>${cell((item) => `<span class="compare-status">${candidateStatusFor("major", item.key)}</span>`)}</tr>
+          <tr><th scope="row">学校与学院</th>${cell((item) => `<strong>${item.school}</strong><small>${item.academy || "所属学院待确认"}</small>`)}</tr>
+          <tr><th scope="row">院校学科背景</th>${cell((item) => { const school = institutionFor(item); return school ? `<div class="compare-tag-list identity-tags">${school.identityTags.map((tag) => `<span>${tag}</span>`).join("")}</div><strong>${school.academicProfile}</strong>` : `<strong>院校背景待确认</strong>`; })}</tr>
+          <tr><th scope="row">培养方向差异</th>${cell(trainingFocus)}</tr>
+          <tr><th scope="row">城市与校区</th>${cell((item) => { const school = institutionFor(item); return school ? `<strong>${school.city} · ${school.campuses}</strong><small>具体专业所在校区需继续核验</small>` : `<strong>${item.city}</strong>`; })}</tr>
+          <tr><th scope="row">学生经验差异</th>${cell((item) => `${experienceSignals(item)}${experienceExcerpt(item)}`)}</tr>`;
+  return `<div class="school-compare-view major-compare-view">
+    <div class="school-compare-heading"><div><span class="subsection-kicker"><i data-lucide="book-copy"></i>${withinSchool ? "院校优先 · 校内专业" : "专业优先 · 同专业跨校"}</span><h2>${withinSchool ? `${candidates[0].school} · ${candidates.length} 个专业` : `${candidates.length} 个学校专业组合`}并列查看</h2><p>${withinSchool ? "在同一所学校内比较不同专业，不混入院校层面的重复差异。" : "同一个专业放到不同学校中比较，不生成专业排名或推荐分数。"}</p></div><button class="quiet-button" type="button" data-exit-major-compare><i data-lucide="arrow-left"></i>${withinSchool ? "返回专业选择" : "返回专业列表"}</button></div>
+    <div class="school-compare-table-wrap">
+      <table class="school-compare-table major-compare-table">
+        <thead><tr><th scope="col">比较维度</th>${candidates.map((item) => `<th scope="col"><span class="compare-school-mark major-mark"><i data-lucide="book-open"></i></span><strong>${item.major}</strong><small>${item.school}</small></th>`).join("")}</tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div class="compare-disclaimer"><i data-lucide="info"></i><span>${withinSchool ? "学校和城市条件相同，因此不重复占用比较行。" : "培养层次等完全相同的信息不重复占用比较行。"} 核心课程、升学方向和典型岗位将在可靠培养方案与就业资料接入后展示。</span></div>
+  </div>`;
+}
+
+function comparisonHistoryScope() {
+  return currentUser()?.id || "guest";
+}
+
+function comparisonHistory() {
+  return (read(STORE.compareHistory, {})[comparisonHistoryScope()] || []).filter((item) => item.type !== "school-major");
+}
+
+function recordComparison(type, candidates, origin) {
+  if (candidates.length < 2) return;
+  const all = read(STORE.compareHistory, {});
+  const scope = comparisonHistoryScope();
+  const history = all[scope] || [];
+  const itemKeys = candidates.map((item) => type === "school" ? item.id : item.key).sort();
+  const signature = `${type}:${itemKeys.join("|")}`;
+  const entry = {
+    id: history.find((item) => item.signature === signature)?.id || uid("compare"),
+    signature,
+    type,
+    origin,
+    viewedAt: new Date().toISOString(),
+    items: JSON.parse(JSON.stringify(candidates))
+  };
+  all[scope] = [entry, ...history.filter((item) => item.signature !== signature)].slice(0, 12);
+  write(STORE.compareHistory, all);
+}
+
+function formatComparisonTime(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "时间待确认";
+  return date.toLocaleString("zh-CN", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" });
+}
+
+function renderComparisonHistory() {
+  const panel = $("#compareHistoryList");
+  if (!panel) return;
+  const history = comparisonHistory();
+  panel.innerHTML = history.length ? history.map((entry) => {
+    const isSchool = entry.type === "school";
+    const isWithinSchool = entry.type === "within-school-major";
+    const names = entry.items.map((item) => isSchool ? item.school : `${item.school} · ${item.major}`);
+    const label = isSchool ? "院校对比" : (isWithinSchool ? "校内专业对比" : "同专业跨校对比");
+    return `<article class="compare-history-item"><div class="compare-history-icon"><i data-lucide="${isSchool ? "school" : "book-open"}"></i></div><div><header><strong>${label}</strong><span>${formatComparisonTime(entry.viewedAt)}</span></header><p>${names.join(" / ")}</p><small>${entry.origin || (isSchool ? "院校优先" : "专业优先")}</small></div><div class="compare-history-actions"><button class="text-button" type="button" data-restore-comparison="${entry.id}">重新查看<i data-lucide="arrow-up-right"></i></button><button class="icon-button" type="button" data-delete-comparison="${entry.id}" aria-label="删除这条对比记录"><i data-lucide="trash-2"></i></button></div></article>`;
+  }).join("") : `<div class="compare-empty compact"><i data-lucide="history"></i><strong>还没有历史对比</strong><p>真正打开院校或专业对比后，记录会自动出现在这里。</p></div>`;
+  hydrateIcons();
+}
+
+function openComparisonHistory() {
+  renderComparisonHistory();
+  openModal("compareHistoryModal");
+}
+
+function restoreComparison(id) {
+  const entry = comparisonHistory().find((item) => item.id === id);
+  if (!entry) return;
+  activeHistoryComparison = entry;
+  currentCandidateTab = entry.type === "major" ? "major" : "school";
+  schoolCompareMode = entry.type === "school";
+  schoolMajorSelectionMode = false;
+  schoolMajorCompareMode = entry.type === "within-school-major";
+  if (entry.type === "within-school-major") {
+    schoolMajorTargetSchoolId = entry.items[0]?.schoolId || "";
+    selectedSchoolMajorNames.clear();
+    entry.items.forEach((item) => selectedSchoolMajorNames.add(item.major));
+    currentSchoolMajorResults = entry.items;
+  }
+  majorCompareMode = entry.type === "major";
+  closeModal("compareHistoryModal");
+  renderCompare();
+}
+
+function deleteComparisonHistory(id) {
+  const all = read(STORE.compareHistory, {});
+  const scope = comparisonHistoryScope();
+  all[scope] = (all[scope] || []).filter((item) => item.id !== id);
+  write(STORE.compareHistory, all);
+  if (activeHistoryComparison?.id === id) activeHistoryComparison = null;
+  renderComparisonHistory();
+  showToast("这条历史对比已删除");
+}
+
 function renderCompare() {
   const panel = $("#compareContent");
   if (!panel) return;
+  const user = currentUser();
   const savedIds = userFavorites();
   const savedExperiences = experiences.filter((item) => savedIds.includes(item.id));
   const savedInstitutions = institutions.filter((item) => savedIds.includes(`school-${item.id}`));
-  const saved = [...savedInstitutions.map((item) => ({ ...item, candidateType: "school" })), ...savedExperiences.map((item) => ({ ...item, candidateType: "experience" }))];
-  if (!currentUser()) {
-    panel.innerHTML = `<div class="compare-empty"><i data-lucide="bookmark"></i><strong>登录后保存你的候选清单</strong><p>先浏览经验，遇到值得比较的学校或专业再登录保存。</p></div>`;
+  const majorMap = new Map();
+  institutions.forEach((school) => (school.majorPrograms || []).forEach((program) => {
+    const favoriteId = majorCandidateId(school.id, program.name);
+    if (!savedIds.includes(favoriteId)) return;
+    majorMap.set(`${school.school}::${program.name}`, {
+      key: majorDecisionKey(school.school, program.name),
+      school: school.school,
+      schoolId: school.id,
+      major: program.name,
+      city: school.city,
+      academy: program.school,
+      category: program.category,
+      level: program.level,
+      note: program.note,
+      officialUrl: program.officialUrl,
+      experienceCount: 0,
+      experienceDimensions: new Set(),
+      dimensions: new Set([program.category, program.level])
+    });
+  }));
+  savedExperiences.forEach((item) => {
+    const key = `${item.school}::${item.major}`;
+    const school = institutions.find((institution) => institution.school === item.school);
+    const program = school?.majorPrograms.find((candidate) => candidate.name === item.major);
+    const existing = majorMap.get(key) || {
+      key: majorDecisionKey(item.school, item.major),
+      school: item.school,
+      schoolId: school?.id || "",
+      major: item.major,
+      city: item.city,
+      academy: program?.school || "",
+      category: program?.category || "",
+      level: program?.level || "",
+      note: program?.note || "",
+      officialUrl: program?.officialUrl || school?.officialUrl || "",
+      experienceCount: 0,
+      experienceDimensions: new Set(),
+      dimensions: new Set(program ? [program.category, program.level] : [])
+    };
+    existing.experienceCount += 1;
+    (item.dimensions || []).forEach((dimension) => {
+      existing.experienceDimensions.add(dimension);
+      existing.dimensions.add(dimension);
+    });
+    majorMap.set(key, existing);
+  });
+  const savedMajors = [...majorMap.values()].map((item) => ({
+    ...item,
+    favoriteId: item.schoolId ? majorCandidateId(item.schoolId, item.major) : "",
+    saved: true,
+    experienceDimensions: [...item.experienceDimensions],
+    dimensions: [...item.dimensions]
+  }));
+  const demoSchools = institutions.slice(0, 3);
+  const demoMajors = institutions.slice(0, 3).map((school) => {
+    const program = school.majorPrograms.find((item) => item.name === "计算机科学与技术") || school.majorPrograms[0];
+    const relatedExperiences = experiences.filter((item) => item.school === school.school && item.major === program.name);
+    return {
+      key: majorDecisionKey(school.school, program.name),
+      school: school.school,
+      schoolId: school.id,
+      major: program.name,
+      city: school.city,
+      academy: program.school,
+      category: program.category,
+      level: program.level,
+      note: program.note,
+      officialUrl: program.officialUrl,
+      favoriteId: majorCandidateId(school.id, program.name),
+      saved: false,
+      experienceCount: relatedExperiences.length,
+      experienceDimensions: [...new Set(relatedExperiences.flatMap((item) => item.dimensions || []))],
+      dimensions: [program.category, program.level]
+    };
+  });
+  const schoolCandidates = user ? savedInstitutions : demoSchools;
+  const baseMajorCandidates = user ? savedMajors : demoMajors;
+  const scopedInstitutions = institutions;
+  const allProgramCandidates = scopedInstitutions.flatMap((school) => school.majorPrograms.map((program) => {
+    const relatedExperiences = (user ? savedExperiences : experiences).filter((item) => item.school === school.school && item.major === program.name);
+    const favoriteId = majorCandidateId(school.id, program.name);
+    return {
+      key: majorDecisionKey(school.school, program.name),
+      school: school.school,
+      schoolId: school.id,
+      major: program.name,
+      city: school.city,
+      academy: program.school,
+      category: program.category,
+      level: program.level,
+      note: program.note,
+      officialUrl: program.officialUrl,
+      favoriteId,
+      saved: savedIds.includes(favoriteId),
+      experienceCount: relatedExperiences.length,
+      experienceDimensions: [...new Set(relatedExperiences.flatMap((item) => item.dimensions || []))],
+      dimensions: [program.category, program.level]
+    };
+  }));
+  const availableMajorNames = [...new Set(allProgramCandidates.map((item) => item.major))];
+  const normalizedMajorSearch = candidateMajorSearchQuery.trim().toLowerCase();
+  const matchingMajorNames = normalizedMajorSearch ? availableMajorNames.filter((name) => name.toLowerCase().includes(normalizedMajorSearch)) : [];
+  const activeMajorName = availableMajorNames.find((name) => name.toLowerCase() === normalizedMajorSearch) || (matchingMajorNames.length === 1 ? matchingMajorNames[0] : "");
+  const majorCandidates = activeMajorName ? allProgramCandidates.filter((item) => item.major === activeMajorName) : (normalizedMajorSearch ? [] : baseMajorCandidates);
+  currentSchoolCandidateResults = schoolCandidates;
+  currentMajorCandidateResults = majorCandidates;
+
+  $("#schoolCandidateCount") && ($("#schoolCandidateCount").textContent = schoolCandidates.length);
+  $("#majorCandidateCount") && ($("#majorCandidateCount").textContent = baseMajorCandidates.length);
+  $$("[data-candidate-tab]").forEach((button) => {
+    const active = button.dataset.candidateTab === currentCandidateTab;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-selected", String(active));
+  });
+
+  const activeHistoryMatches = activeHistoryComparison && (activeHistoryComparison.type === currentCandidateTab || (activeHistoryComparison.type === "within-school-major" && currentCandidateTab === "school"));
+  if (activeHistoryMatches) {
+    panel.innerHTML = activeHistoryComparison.type === "school"
+      ? renderSchoolComparison(activeHistoryComparison.items)
+      : renderMajorComparison(activeHistoryComparison.items, activeHistoryComparison.type === "within-school-major" ? "within-school" : "same-major");
+    hydrateIcons();
+    return;
+  }
+
+  if (currentCandidateTab === "school") {
+    const selectedCandidates = schoolCandidates.filter((item) => selectedSchoolCandidateIds.has(item.id));
+    const schoolMajorTarget = institutions.find((item) => item.id === schoolMajorTargetSchoolId);
+    if (schoolMajorCompareMode && currentSchoolMajorResults.length >= 2) panel.innerHTML = renderMajorComparison(currentSchoolMajorResults, "within-school");
+    else if (schoolMajorSelectionMode && schoolMajorTarget) panel.innerHTML = renderSchoolMajorSelection(schoolMajorTarget);
+    else if (schoolCompareMode && selectedCandidates.length >= 2) panel.innerHTML = renderSchoolComparison(selectedCandidates);
+    else {
+      schoolCompareMode = false;
+      schoolMajorSelectionMode = false;
+      schoolMajorCompareMode = false;
+      panel.innerHTML = schoolCandidates.length ? `<div class="candidate-list-heading"><div><strong>候选院校</strong><span>${user ? `已收藏 ${schoolCandidates.length} 所学校` : "访客示例，登录后保存自己的候选"}</span></div><div class="candidate-compare-toolbar"><span>已选择 <strong>${selectedCandidates.length}</strong> / 3</span><button class="primary-button" type="button" data-start-school-compare${selectedCandidates.length < 2 ? " disabled" : ""}><i data-lucide="columns-3"></i>开始对比</button></div></div><div class="candidate-list">${schoolCandidates.map((item) => `<article class="candidate-row"><label class="candidate-select" aria-label="选择${item.school}进行对比"><input type="checkbox" data-select-school-candidate="${item.id}"${selectedSchoolCandidateIds.has(item.id) ? " checked" : ""}><span></span></label><div class="candidate-identity"><span class="candidate-mark">${item.school.slice(0, 1)}</span><div><strong>${item.school}</strong><small>${item.city} · ${item.type}</small></div></div><div class="candidate-summary"><span>重点专业</span><p>${item.majors.slice(0, 3).join(" · ")}</p><div>${item.highlights.slice(0, 3).map((highlight) => `<span class="content-tag">${highlight}</span>`).join("")}</div></div><div class="candidate-actions">${renderCandidateStatusControl("school", item.id, user)}<button class="text-button" type="button" data-school-detail="${item.id}">查看详情<i data-lucide="arrow-up-right"></i></button>${user ? `<button class="remove-candidate" type="button" data-remove-school-candidate="${item.id}"><i data-lucide="trash-2"></i>移出候选</button>` : `<button class="remove-candidate" type="button" data-open-account><i data-lucide="log-in"></i>登录后保存</button>`}</div></article>`).join("")}</div>` : `<div class="compare-empty"><i data-lucide="school"></i><strong>你还没有收藏学校</strong><p>前往院校与经验页面，将感兴趣的学校加入候选。</p><button class="quiet-button" data-view-target="experience">去查找院校</button></div>`;
+    }
   } else {
-    panel.innerHTML = saved.length ? `<div class="compare-toolbar"><div><strong>我的候选</strong><span>已收藏 ${saved.length} 项</span></div><button class="icon-button" data-share-candidates>分享候选</button></div><div class="compare-list">${saved.map((s) => `<div class="compare-item"><strong>${s.school}</strong><small>${s.candidateType === "school" ? "院校信息" : `${s.major} · ${s.city}`}</small></div>`).join("")}</div>` : `<div class="compare-empty"><i data-lucide="bookmark"></i><strong>你还没有收藏任何候选</strong><p>去信息库收藏感兴趣的学校和专业。</p></div>`;
+    const selectedCandidates = majorCandidates.filter((item) => selectedMajorCandidateKeys.has(item.key));
+    if (majorCompareMode && selectedCandidates.length >= 2) panel.innerHTML = renderMajorComparison(selectedCandidates);
+    else {
+      majorCompareMode = false;
+      const majorCounts = availableMajorNames.map((name) => ({ name, count: allProgramCandidates.filter((item) => item.major === name).length }));
+      const suggestedMajorNames = (normalizedMajorSearch && !activeMajorName ? matchingMajorNames : majorCounts.filter((item) => item.count >= 2).sort((a, b) => b.count - a.count).map((item) => item.name)).slice(0, 6);
+      const majorGroups = [...majorCandidates.reduce((groups, item) => {
+        if (!groups.has(item.major)) groups.set(item.major, []);
+        groups.get(item.major).push(item);
+        return groups;
+      }, new Map()).entries()];
+      const searchSuggestions = suggestedMajorNames.length ? `<div class="major-search-suggestions"><span>${normalizedMajorSearch && !activeMajorName ? "请选择准确专业" : "可比较的同名专业"}</span>${suggestedMajorNames.map((name) => `<button type="button" data-search-major="${escapeHtml(name)}">${escapeHtml(name)}<small>${majorCounts.find((item) => item.name === name)?.count || 0} 所</small></button>`).join("")}</div>` : "";
+      const searchPanel = `<section class="major-search-panel"><div><span class="subsection-kicker"><i data-lucide="search"></i>专业优先</span><h2>先确定专业，再比较不同学校</h2><p>输入一个专业名称，结果不会混入其他专业。</p></div><form class="major-search-form" id="candidateMajorSearchForm"><label for="candidateMajorSearch"><i data-lucide="search"></i><input id="candidateMajorSearch" name="major" type="search" value="${escapeHtml(candidateMajorSearchQuery)}" list="candidateMajorOptions" placeholder="例如：计算机科学与技术" autocomplete="off"></label><datalist id="candidateMajorOptions">${availableMajorNames.map((name) => `<option value="${escapeHtml(name)}"></option>`).join("")}</datalist><button class="primary-button" type="submit">查找专业</button>${normalizedMajorSearch ? `<button class="quiet-button" type="button" data-clear-major-search aria-label="清空专业搜索"><i data-lucide="x"></i>清空</button>` : ""}</form>${searchSuggestions}</section>`;
+      let majorContent = "";
+      if (normalizedMajorSearch && !activeMajorName) {
+        majorContent = `<div class="compare-empty compact"><i data-lucide="search-x"></i><strong>${matchingMajorNames.length ? "请选择一个准确的专业名称" : "当前样本没有找到这个专业"}</strong><p>${matchingMajorNames.length ? "上方列出了匹配专业，选择后再比较学校。" : "可以更换关键词，或取消院校范围后重新查找。"}</p></div>`;
+      } else if (majorCandidates.length) {
+        majorContent = `<div class="candidate-list-heading"><div><strong>${activeMajorName ? `${activeMajorName} · 学校对比范围` : "我的专业候选"}</strong><span>${activeMajorName ? `当前样本收录 ${majorCandidates.length} 所学校` : (user ? `已归入 ${majorCandidates.length} 个学校专业组合` : "访客示例，同一专业下比较不同学校")}</span></div><div class="candidate-compare-toolbar"><span>已选择 <strong>${selectedCandidates.length}</strong> / 3</span><button class="primary-button" type="button" data-start-major-compare${selectedCandidates.length < 2 ? " disabled" : ""}><i data-lucide="columns-3"></i>开始对比</button></div></div>${activeMajorName && majorCandidates.length < 2 ? `<div class="major-result-notice"><i data-lucide="info"></i>当前范围只收录 1 所学校，暂时不能形成同专业对比。</div>` : ""}<div class="major-priority-groups">${majorGroups.map(([major, items]) => `<section class="major-priority-group"><header><div><span class="candidate-mark major-mark"><i data-lucide="book-open"></i></span><div><h3>${major}</h3><p>${items.length} 个学校专业组合</p></div></div><span>官方信息与经验并列查看</span></header><div class="candidate-list">${items.map((item) => `<article class="candidate-row"><label class="candidate-select" aria-label="选择${item.school}${item.major}进行对比"><input type="checkbox" data-select-major-candidate="${item.key}" data-major-name="${escapeHtml(item.major)}"${selectedMajorCandidateKeys.has(item.key) ? " checked" : ""}><span></span></label><div class="candidate-identity"><span class="candidate-mark">${item.school.slice(0, 1)}</span><div><strong>${item.school}</strong><small>${item.academy || "所属学院待确认"} · ${item.city}</small></div></div><div class="candidate-summary"><span>专业参考</span><p>${item.note || "培养方向待接入"}</p><div>${[item.category, item.level, ...item.experienceDimensions].filter(Boolean).slice(0, 3).map((dimension) => `<span class="content-tag">${dimension}</span>`).join("")}</div></div><div class="candidate-actions">${renderCandidateStatusControl("major", item.key, user)}${item.schoolId ? `<button class="text-button" type="button" data-school-detail="${item.schoolId}">查看学校<i data-lucide="arrow-up-right"></i></button>` : ""}${user ? (item.saved ? `<button class="remove-candidate" type="button" data-remove-major-school="${item.school}" data-remove-major-name="${item.major}"><i data-lucide="trash-2"></i>移出候选</button>` : `<button class="save-experience" type="button" data-favorite="${item.favoriteId}"><i data-lucide="bookmark-plus"></i>加入候选</button>`) : `<button class="remove-candidate" type="button" data-open-account><i data-lucide="log-in"></i>登录后保存</button>`}</div></article>`).join("")}</div></section>`).join("")}</div>`;
+      } else {
+        majorContent = `<div class="compare-empty"><i data-lucide="book-open"></i><strong>你还没有专业候选</strong><p>可以在上方直接搜索专业，或前往学校详情收藏专业。</p><button class="quiet-button" data-view-target="experience">去查找专业</button></div>`;
+      }
+      panel.innerHTML = `${searchPanel}${majorContent}`;
+    }
   }
   hydrateIcons();
+}
+
+function switchCandidateTab(name) {
+  if (!["school", "major"].includes(name)) return;
+  activeHistoryComparison = null;
+  currentCandidateTab = name;
+  if (name !== "school") {
+    schoolCompareMode = false;
+    schoolMajorSelectionMode = false;
+    schoolMajorCompareMode = false;
+  }
+  if (name !== "major") majorCompareMode = false;
+  renderCompare();
+}
+
+function applyMajorSearch(value) {
+  candidateMajorSearchQuery = value.trim();
+  selectedMajorCandidateKeys.clear();
+  selectedMajorName = "";
+  majorCompareMode = false;
+  activeHistoryComparison = null;
+  renderCompare();
+}
+
+function continueSchoolComparisonToMajors(schoolId) {
+  const school = institutions.find((item) => item.id === schoolId);
+  if (!school) return;
+  schoolMajorTargetSchoolId = school.id;
+  selectedSchoolMajorNames.clear();
+  currentSchoolMajorResults = [];
+  schoolCompareMode = false;
+  schoolMajorSelectionMode = true;
+  schoolMajorCompareMode = false;
+  activeHistoryComparison = null;
+  currentCandidateTab = "school";
+  renderCompare();
+}
+
+function toggleSchoolMajorSelection(majorName, checked) {
+  if (checked && !selectedSchoolMajorNames.has(majorName) && selectedSchoolMajorNames.size >= 3) {
+    showToast("一次最多比较 3 个校内专业");
+    renderCompare();
+    return;
+  }
+  if (checked) selectedSchoolMajorNames.add(majorName);
+  else selectedSchoolMajorNames.delete(majorName);
+  renderCompare();
+}
+
+function startSchoolMajorComparison() {
+  const school = institutions.find((item) => item.id === schoolMajorTargetSchoolId);
+  if (!school || selectedSchoolMajorNames.size < 2) {
+    showToast("请先选择至少 2 个校内专业");
+    return;
+  }
+  const combinations = [...selectedSchoolMajorNames].map((major) => majorCombinationFor(school, major)).filter(Boolean);
+  if (combinations.length < 2) return;
+  currentSchoolMajorResults = combinations;
+  schoolMajorSelectionMode = false;
+  schoolMajorCompareMode = true;
+  recordComparison("within-school-major", combinations, `院校优先 · ${school.school}校内专业`);
+  renderCompare();
+}
+
+function removeSchoolCandidate(id) {
+  const user = currentUser();
+  if (!user) return;
+  const all = read(STORE.favorites, {});
+  all[user.id] = (all[user.id] || []).filter((item) => item !== `school-${id}`);
+  write(STORE.favorites, all);
+  selectedSchoolCandidateIds.delete(id);
+  clearCandidateStatus("school", id);
+  renderCompare();
+  renderExperiences();
+  showToast("已从候选院校中移除");
+}
+
+function removeMajorCandidate(school, major) {
+  const user = currentUser();
+  if (!user) return;
+  const matchingIds = new Set(experiences.filter((item) => item.school === school && item.major === major).map((item) => item.id));
+  const schoolId = institutions.find((item) => item.school === school)?.id;
+  const explicitId = schoolId ? majorCandidateId(schoolId, major) : "";
+  const all = read(STORE.favorites, {});
+  all[user.id] = (all[user.id] || []).filter((item) => item !== explicitId && !matchingIds.has(item));
+  write(STORE.favorites, all);
+  const decisionKey = majorDecisionKey(school, major);
+  selectedMajorCandidateKeys.delete(decisionKey);
+  clearCandidateStatus("major", decisionKey);
+  renderCompare();
+  renderExperiences();
+  showToast("已从候选专业中移除");
 }
 
 function renderFamily() {
@@ -493,10 +1088,12 @@ function renderFamily() {
   const main = $("#familyMainContent");
   if (!main) return;
   if (!user) {
-    main.innerHTML = `<div class="family-empty"><i data-lucide="link-2"></i><strong>登录后生成家庭邀请码</strong><span>家庭协作只共享你主动授权的候选内容。</span></div>`;
+    main.innerHTML = `<div class="family-compact-status"><span class="linked-status inactive"><span></span>未关联</span><small>登录后创建家庭关联</small></div><button class="primary-button" type="button" data-open-account><i data-lucide="log-in"></i>登录后关联</button>`;
   } else {
     const family = read(STORE.family, {})[user.id];
-    main.innerHTML = family ? `<div class="family-linked"><div class="linked-code"><span>家庭邀请码</span><strong>${family.code}</strong><button class="icon-button" data-copy-code="${family.code}">复制</button></div></div>` : `<div class="family-empty"><p>还未创建家庭邀请码，点击生成。</p><button class="cyan-button" data-family-invite>生成邀请码</button></div>`;
+    main.innerHTML = family
+      ? `<div class="family-compact-status"><span class="linked-status"><span></span>已创建关联</span><small>邀请码 ${family.code}</small></div><button class="quiet-button" type="button" data-copy-code="${family.code}"><i data-lucide="copy"></i>复制邀请码</button>`
+      : `<div class="family-compact-status"><span class="linked-status inactive"><span></span>未关联</span><small>尚未向家庭成员共享候选</small></div><button class="primary-button" type="button" data-family-invite><i data-lucide="user-plus"></i>创建关联</button>`;
   }
   hydrateIcons();
 }
@@ -635,10 +1232,57 @@ function switchQaTab(name) {
 document.addEventListener("click", (event) => {
   const nav = event.target.closest("[data-view]"); if (nav) { switchView(nav.dataset.view); return; }
   const targetView = event.target.closest("[data-view-target]"); if (targetView) { switchView(targetView.dataset.viewTarget); return; }
-  const schoolDetail = event.target.closest("[data-school-detail]"); if (schoolDetail) { currentSchoolDetail = schoolDetail.dataset.schoolDetail; switchView("school-detail"); return; }
+  const schoolDetail = event.target.closest("[data-school-detail]"); if (schoolDetail) {
+    const activeView = $(".view.active")?.id.replace("view-", "");
+    if (activeView && activeView !== "school-detail") currentSchoolReturnView = activeView;
+    currentSchoolDetail = schoolDetail.dataset.schoolDetail;
+    switchView("school-detail");
+    return;
+  }
   const schoolAnchor = event.target.closest("[data-school-anchor]"); if (schoolAnchor) { scrollToAnchor(schoolAnchor.dataset.schoolAnchor); $$("[data-school-anchor]").forEach((button) => button.classList.toggle("active", button === schoolAnchor)); return; }
   const modalTrigger = event.target.closest("[data-open-modal]"); if (modalTrigger) { openModal(modalTrigger.dataset.openModal); return; }
   if (event.target.closest("[data-open-account]")) { showAccount(); return; }
+  const candidateTab = event.target.closest("[data-candidate-tab]"); if (candidateTab) { switchCandidateTab(candidateTab.dataset.candidateTab); return; }
+  if (event.target.closest("[data-open-compare-history]")) { openComparisonHistory(); return; }
+  const restoreComparisonButton = event.target.closest("[data-restore-comparison]"); if (restoreComparisonButton) { restoreComparison(restoreComparisonButton.dataset.restoreComparison); return; }
+  const deleteComparisonButton = event.target.closest("[data-delete-comparison]"); if (deleteComparisonButton) { deleteComparisonHistory(deleteComparisonButton.dataset.deleteComparison); return; }
+  if (event.target.closest("[data-start-school-compare]")) {
+    const candidates = currentSchoolCandidateResults.filter((item) => selectedSchoolCandidateIds.has(item.id));
+    if (candidates.length < 2) { showToast("请至少选择 2 所院校"); return; }
+    activeHistoryComparison = null;
+    recordComparison("school", candidates, "院校优先");
+    schoolCompareMode = true;
+    renderCompare();
+    return;
+  }
+  if (event.target.closest("[data-exit-school-compare]")) { activeHistoryComparison = null; schoolCompareMode = false; renderCompare(); return; }
+  const continueSchoolMajor = event.target.closest("[data-continue-school-major]"); if (continueSchoolMajor) { continueSchoolComparisonToMajors(continueSchoolMajor.dataset.continueSchoolMajor); return; }
+  if (event.target.closest("[data-back-school-comparison]")) { schoolMajorSelectionMode = false; schoolMajorCompareMode = false; schoolCompareMode = true; renderCompare(); return; }
+  if (event.target.closest("[data-start-school-major-compare]")) { startSchoolMajorComparison(); return; }
+  if (event.target.closest("[data-start-major-compare]")) {
+    const candidates = currentMajorCandidateResults.filter((item) => selectedMajorCandidateKeys.has(item.key));
+    if (candidates.length < 2) { showToast("请至少选择 2 个专业组合"); return; }
+    activeHistoryComparison = null;
+    recordComparison("major", candidates, "专业优先搜索");
+    majorCompareMode = true;
+    renderCompare();
+    return;
+  }
+  if (event.target.closest("[data-exit-major-compare]")) {
+    activeHistoryComparison = null;
+    if (currentCandidateTab === "school") {
+      schoolMajorCompareMode = false;
+      schoolMajorSelectionMode = true;
+    } else {
+      majorCompareMode = false;
+    }
+    renderCompare();
+    return;
+  }
+  const majorSearchSuggestion = event.target.closest("[data-search-major]"); if (majorSearchSuggestion) { applyMajorSearch(majorSearchSuggestion.dataset.searchMajor); return; }
+  if (event.target.closest("[data-clear-major-search]")) { applyMajorSearch(""); return; }
+  const removeSchool = event.target.closest("[data-remove-school-candidate]"); if (removeSchool) { removeSchoolCandidate(removeSchool.dataset.removeSchoolCandidate); return; }
+  const removeMajor = event.target.closest("[data-remove-major-school]"); if (removeMajor) { removeMajorCandidate(removeMajor.dataset.removeMajorSchool, removeMajor.dataset.removeMajorName); return; }
   const modalCloser = event.target.closest("[data-close-modal]"); if (modalCloser) { closeModal(modalCloser.dataset.closeModal); return; }
   if (event.target.classList.contains("modal-backdrop")) closeModal(event.target.id);
   const favorite = event.target.closest("[data-favorite]"); if (favorite) { toggleFavorite(favorite.dataset.favorite); return; }
@@ -666,12 +1310,33 @@ document.addEventListener("input", (event) => {
 });
 
 document.addEventListener("change", (event) => {
+  if (event.target.matches("[data-select-school-candidate]")) {
+    toggleSchoolCandidateSelection(event.target.dataset.selectSchoolCandidate, event.target.checked);
+    return;
+  }
+  if (event.target.matches("[data-select-major-candidate]")) {
+    toggleMajorCandidateSelection(event.target.dataset.selectMajorCandidate, event.target.dataset.majorName, event.target.checked);
+    return;
+  }
+  if (event.target.matches("[data-select-school-major]")) {
+    toggleSchoolMajorSelection(event.target.dataset.selectSchoolMajor, event.target.checked);
+    return;
+  }
+  if (event.target.matches("[data-candidate-status]")) {
+    updateCandidateStatus(event.target.dataset.candidateStatusType, event.target.dataset.candidateStatusKey, event.target.value);
+    return;
+  }
   if (!["admissionYear", "admissionProvince", "admissionSubject"].includes(event.target.id)) return;
   const note = $("#admissionSelectionNote");
   if (note) note.textContent = `当前条件：${$("#admissionYear")?.value || "年份"} · ${$("#admissionProvince")?.value || "省份"} · ${$("#admissionSubject")?.value || "科类"}`;
 });
 
 document.addEventListener("submit", (event) => {
+  if (event.target.id === "candidateMajorSearchForm") {
+    event.preventDefault();
+    applyMajorSearch(new FormData(event.target).get("major") || "");
+    return;
+  }
   if (event.target.id === "schoolCommentForm") submitSchoolComment(event);
 });
 
