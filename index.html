@@ -28,7 +28,12 @@
   <div class="app-shell">
     <aside class="sidebar" id="sidebar">
       <div class="brand-lockup">
-        <div class="brand-mark">引</div>
+        <svg class="brand-mark" viewBox="0 0 48 48" role="img" aria-label="引路标志">
+          <path class="brand-mark-body" d="M13 9H30C34 9 37 12 37 16V37L25 30L13 37V9Z"/>
+          <path class="brand-mark-fold" d="M13 9H25C29 9 32 12 32 16V27"/>
+          <path class="brand-mark-gap" d="M25 16V29"/>
+          <circle class="brand-mark-dot" cx="25" cy="16" r="3"/>
+        </svg>
         <div>
           <div class="brand-name">引路</div>
           <div class="brand-tagline">让每个学生找到自己人</div>
@@ -144,7 +149,13 @@
           <div class="hero-grid">
             <div class="hero-copy">
               <div class="eyebrow"><span class="eyebrow-line"></span>青年生涯决策信息平台</div>
-              <h1 id="homeTitle">找到学校，也找到真正懂你的人</h1>
+              <h1 id="homeTitle" aria-label="找到学校，也找到真正懂你的人">
+                <span class="headline-line-one">找到<span class="headline-school">学校</span></span>
+                <span class="headline-line-two">
+                  <small>也找到</small>
+                  <strong>真正懂你的人</strong>
+                </span>
+              </h1>
               <p class="hero-subtitle">从学校、专业到未来去向，把官方信息和真实经验放到同一张决策桌面上。</p>
               <div class="hero-actions">
                 <button class="primary-button" data-view-target="experience"><i data-lucide="search"></i>查看院校与经验</button>
@@ -263,7 +274,7 @@
           </section>
         </section>
 
-        <section class="view" id="view-experience">
+        <section class="view experience-layout-horizontal" id="view-experience">
           <section class="content-section" id="experienceSection">
             <div class="section-heading">
               <div>
@@ -271,7 +282,17 @@
                 <h1>一条内容，先看来源，再做判断</h1>
                 <p>先看学校与公开信息，再结合学生真实经验，不替你做决定。</p>
               </div>
-              <button class="text-button" data-view-target="compare">查看我的候选 <i data-lucide="arrow-up-right"></i></button>
+              <div class="experience-heading-actions">
+                <div class="experience-layout-switch" role="group" aria-label="院校与经验页面布局">
+                  <button class="experience-layout-option active" type="button" data-experience-layout="horizontal" aria-pressed="true" title="切换为横版布局">
+                    <span class="layout-glyph horizontal" aria-hidden="true"></span>横版
+                  </button>
+                  <button class="experience-layout-option" type="button" data-experience-layout="vertical" aria-pressed="false" title="切换为竖版布局">
+                    <span class="layout-glyph vertical" aria-hidden="true"></span>竖版
+                  </button>
+                </div>
+                <button class="text-button" data-view-target="compare">查看我的候选 <i data-lucide="arrow-up-right"></i></button>
+              </div>
             </div>
             <div class="filter-bar" role="toolbar" aria-label="经验筛选">
               <div class="filter-group filter-scope-group">
@@ -477,9 +498,49 @@
         <p class="local-data-note"><i data-lucide="database"></i>试用版说明：不是真实多用户账号系统，不构成身份认证。</p>
       </div>
       <div id="profilePanel" class="hidden">
-        <div class="modal-kicker">我的引路</div><h2>账户与试用数据</h2><p class="modal-description">你的操作会绑定到这个浏览器中的本地账号。</p>
-        <div class="profile-summary"><span class="profile-avatar-large" id="profileAvatarLarge">访</span><div><strong id="profileSummaryName">访客</strong><span id="profileSummaryMeta">未登录</span></div></div>
-        <form id="profileForm" class="auth-form"><div class="form-grid"><label><span>昵称</span><input id="profileNameInput" maxlength="16" required></label><label><span>角色</span><select id="profileRoleInput"><option>高中生</option><option>大学生</option><option>家长</option><option>教师 / 从业者</option></select></label></div><label><span>当前决策阶段</span><select id="profileStageInput"><option>高考志愿</option><option>考研择校</option><option>职业选择</option><option>大学适应</option></select></label><button class="primary-button full-button" type="submit"><i data-lucide="save"></i>保存资料</button></form>
+        <div class="modal-kicker">我的引路</div><h2>个人资料</h2><p class="modal-description">完善你的基本信息，头像和资料仅保存在当前浏览器。</p>
+        <div class="profile-summary">
+          <div class="profile-avatar-editor">
+            <button class="profile-avatar-button" id="profileAvatarButton" type="button" aria-label="更换头像">
+              <span class="profile-avatar-large" id="profileAvatarLarge">访</span>
+              <span class="profile-avatar-edit" aria-hidden="true"><i data-lucide="camera"></i></span>
+            </button>
+            <input id="profileAvatarInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+          </div>
+          <div class="profile-summary-copy">
+            <strong id="profileSummaryName">访客</strong>
+            <span id="profileSummaryMeta">未登录</span>
+            <div class="profile-summary-details">
+              <span><i data-lucide="map-pin"></i><b id="profileSummaryRegion">地域未设置</b></span>
+              <span><i data-lucide="cake-slice"></i><b id="profileSummaryAge">年龄未设置</b></span>
+              <span><i data-lucide="calendar-days"></i><b>注册于 <time id="profileCreatedAt">--</time></b></span>
+            </div>
+          </div>
+          <div class="profile-avatar-actions">
+            <button class="profile-avatar-action" id="profileAvatarUpload" type="button"><i data-lucide="upload"></i>更换头像</button>
+            <button class="profile-avatar-action danger hidden" id="profileAvatarRemove" type="button"><i data-lucide="rotate-ccw"></i>恢复默认</button>
+          </div>
+        </div>
+        <form id="profileForm" class="auth-form profile-form">
+          <div class="form-grid">
+            <label><span>昵称</span><input id="profileNameInput" maxlength="16" placeholder="请输入昵称" required></label>
+            <label><span>角色</span><select id="profileRoleInput"><option>高中生</option><option>大学生</option><option>家长</option><option>教师 / 从业者</option></select></label>
+          </div>
+          <div class="form-grid">
+            <label><span>所在省份 / 地区</span><select id="profileProvinceInput"><option value="">请选择省份 / 地区</option></select></label>
+            <label><span>所在城市 / 地区</span><select id="profileCityInput" disabled><option value="">请先选择省份 / 地区</option></select></label>
+          </div>
+          <div class="form-grid">
+            <label><span>出生日期</span><input id="profileBirthDateInput" type="date" min="1900-01-01"></label>
+            <label><span>当前年龄</span><input id="profileAgeInput" type="text" value="未设置" readonly aria-readonly="true"></label>
+          </div>
+          <div class="form-grid">
+            <label><span>当前决策阶段</span><select id="profileStageInput"><option>高考志愿</option><option>考研择校</option><option>职业选择</option><option>大学适应</option></select></label>
+            <label><span>注册日期</span><input id="profileCreatedAtInput" type="text" readonly aria-readonly="true"></label>
+          </div>
+          <label><span>登录邮箱</span><input id="profileEmailInput" type="email" readonly aria-readonly="true"></label>
+          <button class="primary-button full-button" type="submit"><i data-lucide="save"></i>保存资料</button>
+        </form>
         <div class="account-stats"><span><strong id="profileQuestionCount">0</strong><small>我的问题</small></span><span><strong id="profileFavoriteCount">0</strong><small>候选收藏</small></span><span><strong id="profileFamilyCode">未生成</strong><small>家庭邀请码</small></span></div>
         <button class="logout-button" id="logoutButton"><i data-lucide="log-out"></i>退出当前账号</button>
       </div>
