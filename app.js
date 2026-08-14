@@ -157,7 +157,21 @@ const demoAnswers = [
 
 const stageNames = { gaokao: "高考志愿", graduate: "考研择校", career: "职业选择", adapt: "大学适应" };
 const stageOrder = ["gaokao", "graduate", "career", "adapt"];
-const STORE = { users: "yinlu_users", session: "yinlu_session", questions: "yinlu_questions", answers: "yinlu_answers", favorites: "yinlu_favorites", family: "yinlu_family", verification: "yinlu_verification" };
+const STORE = { users: "yinlu_users", session: "yinlu_session", questions: "yinlu_questions", answers: "yinlu_answers", favorites: "yinlu_favorites", family: "yinlu_family", verification: "yinlu_verification", theme: "yinlu_theme" };
+const THEME_NAMES = {
+  spring: "春野同行",
+  milestone: "金鱼气泡水",
+  coast: "芭乐花径",
+  sunroad: "晴日路标",
+  ember: "薄荷曼波",
+  night: "夜航星光",
+  apple: "苹果爱丽丝",
+  pearl: "御苑粉黛",
+  buzz: "巴斯光年",
+  iceglass: "碎冰琉璃",
+  retro: "美式复古",
+  orange: "布丁暖阳"
+};
 let currentStage = "gaokao";
 let currentSchoolSearch = "";
 let currentMajorSearch = "";
@@ -177,6 +191,33 @@ const userFavorites = () => { const user = currentUser(); return user ? read(STO
 const initials = (name = "访客") => name.trim().slice(0, 1) || "访";
 
 function hydrateIcons() { if (window.lucide) window.lucide.createIcons(); }
+
+function updateThemeControls(theme) {
+  const label = THEME_NAMES[theme] || THEME_NAMES.apple;
+  const button = $("#themeButton");
+  if (button) button.setAttribute("aria-label", `切换主题，当前为${label}`);
+  $$('[data-theme-option]').forEach((option) => {
+    const active = option.dataset.themeOption === theme;
+    option.classList.toggle("active", active);
+    option.setAttribute("aria-checked", String(active));
+  });
+}
+
+function applyTheme(theme, { persist = false, notify = false } = {}) {
+  const nextTheme = Object.hasOwn(THEME_NAMES, theme) ? theme : "apple";
+  document.documentElement.dataset.theme = nextTheme;
+  if (persist) localStorage.setItem(STORE.theme, nextTheme);
+  updateThemeControls(nextTheme);
+  if (notify) showToast(`已切换为${THEME_NAMES[nextTheme]}主题`);
+}
+
+function setThemeMenu(open) {
+  const button = $("#themeButton");
+  const menu = $("#themeMenu");
+  if (!button || !menu) return;
+  menu.hidden = !open;
+  button.setAttribute("aria-expanded", String(open));
+}
 
 function showToast(message) {
   const toast = $("#toast");
@@ -679,6 +720,9 @@ document.addEventListener("submit", (event) => {
 const menuButton = $("#menuButton"); if (menuButton) menuButton.addEventListener("click", () => $("#sidebar").classList.toggle("open"));
 const accountButton = $("#accountButton"); if (accountButton) accountButton.addEventListener("click", showAccount);
 const notifyButton = $("#notifyButton"); if (notifyButton) notifyButton.addEventListener("click", () => showToast(currentUser() ? "暂无新的认证回答" : "登录后可查看你的通知"));
+const themeButton = $("#themeButton"); if (themeButton) themeButton.addEventListener("click", (event) => { event.stopPropagation(); setThemeMenu(themeButton.getAttribute("aria-expanded") !== "true"); });
+$$('[data-theme-option]').forEach((button) => button.addEventListener("click", () => { applyTheme(button.dataset.themeOption, { persist: true, notify: true }); setThemeMenu(false); }));
+document.addEventListener("click", (event) => { if (!event.target.closest(".theme-control")) setThemeMenu(false); });
 const sameSchoolToggle = $("#sameSchoolToggle"); if (sameSchoolToggle) sameSchoolToggle.addEventListener("change", renderExperiences);
 const submitQuestionBtn = $("#submitQuestion"); if (submitQuestionBtn) submitQuestionBtn.addEventListener("click", submitQuestion);
 const inviteFamilyBtn = $("#inviteFamily"); if (inviteFamilyBtn) inviteFamilyBtn.addEventListener("click", generateFamilyInvite);
@@ -742,8 +786,9 @@ const clearExperienceFilters = $("#clearExperienceFilters"); if (clearExperience
   renderExperiences();
 });
 
-document.addEventListener("keydown", (event) => { if (event.key === "Escape") { closeModal("questionModal"); closeModal("accountModal"); } });
+document.addEventListener("keydown", (event) => { if (event.key === "Escape") { closeModal("questionModal"); closeModal("accountModal"); setThemeMenu(false); } });
 
+applyTheme(localStorage.getItem(STORE.theme) || document.documentElement.dataset.theme || "apple");
 setStage(currentStage); updateAccountHeader(); hydrateIcons();
 switchQaTab("ask");
 if (!currentUser() && !localStorage.getItem("yinlu_guest_seen")) window.setTimeout(showAccount, 500);
