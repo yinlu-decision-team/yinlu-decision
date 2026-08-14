@@ -1,10 +1,16 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="apple">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="引路：经验驱动的青年生涯决策信息平台产品原型">
   <title>引路 | 青年生涯决策工作台</title>
+  <script>
+    try {
+      const savedTheme = localStorage.getItem("yinlu_theme");
+      if (["spring", "milestone", "coast", "sunroad", "ember", "night", "apple", "pearl", "buzz", "iceglass", "retro", "orange"].includes(savedTheme)) document.documentElement.dataset.theme = savedTheme;
+    } catch (error) {}
+  </script>
   <!-- favicon (SVG) -->
 <link rel="icon" href="./favicon.svg" type="image/svg+xml">
 <!-- PNG 备用（可选） -->
@@ -58,6 +64,74 @@
         <button class="icon-button menu-button" id="menuButton" aria-label="打开导航"><i data-lucide="menu"></i></button>
         <div class="breadcrumb"><span>我的引路</span><span class="breadcrumb-separator">/</span><strong id="breadcrumbTitle">首页</strong></div>
         <div class="top-actions">
+          <div class="theme-control">
+            <button class="icon-button theme-button" id="themeButton" type="button" aria-label="切换主题，当前为苹果爱丽丝" aria-haspopup="menu" aria-expanded="false" title="切换主题">
+              <span class="theme-button-icon" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+            </button>
+            <div class="theme-menu" id="themeMenu" role="menu" aria-label="选择网站主题" hidden>
+              <div class="theme-menu-heading">界面主题</div>
+              <button class="theme-option active" type="button" role="menuitemradio" aria-checked="true" data-theme-option="apple">
+                <span class="theme-swatch palette-four apple-swatch" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                <span class="theme-option-copy"><strong>苹果爱丽丝</strong><small>默认 · 苹果红与晴空蓝</small></span>
+                <span class="theme-option-check" aria-hidden="true">✓</span>
+              </button>
+              <button class="theme-option" type="button" role="menuitemradio" aria-checked="false" data-theme-option="ember">
+                <span class="theme-swatch palette-four ember-swatch" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                <span class="theme-option-copy"><strong>薄荷曼波</strong><small>薄荷绿与奶油粉</small></span>
+                <span class="theme-option-check" aria-hidden="true">✓</span>
+              </button>
+              <button class="theme-option" type="button" role="menuitemradio" aria-checked="false" data-theme-option="orange">
+                <span class="theme-swatch palette-four orange-swatch" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                <span class="theme-option-copy"><strong>布丁暖阳</strong><small>老铜棕与星云青</small></span>
+                <span class="theme-option-check" aria-hidden="true">✓</span>
+              </button>
+              <button class="theme-option" type="button" role="menuitemradio" aria-checked="false" data-theme-option="spring">
+                <span class="theme-swatch palette-four spring-swatch" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                <span class="theme-option-copy"><strong>春野同行</strong><small>薄荷绿与薰衣草紫</small></span>
+                <span class="theme-option-check" aria-hidden="true">✓</span>
+              </button>
+              <button class="theme-option" type="button" role="menuitemradio" aria-checked="false" data-theme-option="pearl">
+                <span class="theme-swatch palette-four pearl-swatch" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                <span class="theme-option-copy"><strong>御苑粉黛</strong><small>蔷薇粉与晴空蓝</small></span>
+                <span class="theme-option-check" aria-hidden="true">✓</span>
+              </button>
+              <button class="theme-option" type="button" role="menuitemradio" aria-checked="false" data-theme-option="night">
+                <span class="theme-swatch night-swatch" aria-hidden="true"><i></i><i></i><i></i></span>
+                <span class="theme-option-copy"><strong>夜航星光</strong><small>深海军蓝与星光紫</small></span>
+                <span class="theme-option-check" aria-hidden="true">✓</span>
+              </button>
+              <button class="theme-option" type="button" role="menuitemradio" aria-checked="false" data-theme-option="sunroad">
+                <span class="theme-swatch sunroad-swatch" aria-hidden="true"><i></i><i></i><i></i></span>
+                <span class="theme-option-copy"><strong>晴日路标</strong><small>天空蓝与路标黄</small></span>
+                <span class="theme-option-check" aria-hidden="true">✓</span>
+              </button>
+              <button class="theme-option" type="button" role="menuitemradio" aria-checked="false" data-theme-option="iceglass">
+                <span class="theme-swatch palette-four iceglass-swatch" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                <span class="theme-option-copy"><strong>碎冰琉璃</strong><small>琉璃青与琥珀黄</small></span>
+                <span class="theme-option-check" aria-hidden="true">✓</span>
+              </button>
+              <button class="theme-option" type="button" role="menuitemradio" aria-checked="false" data-theme-option="retro">
+                <span class="theme-swatch palette-four retro-swatch" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                <span class="theme-option-copy"><strong>美式复古</strong><small>复古蓝与珊瑚粉</small></span>
+                <span class="theme-option-check" aria-hidden="true">✓</span>
+              </button>
+              <button class="theme-option" type="button" role="menuitemradio" aria-checked="false" data-theme-option="milestone">
+                <span class="theme-swatch palette-four milestone-swatch" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                <span class="theme-option-copy"><strong>金鱼气泡水</strong><small>气泡蓝与金鱼橙</small></span>
+                <span class="theme-option-check" aria-hidden="true">✓</span>
+              </button>
+              <button class="theme-option" type="button" role="menuitemradio" aria-checked="false" data-theme-option="buzz">
+                <span class="theme-swatch palette-four buzz-swatch" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                <span class="theme-option-copy"><strong>巴斯光年</strong><small>未来紫与跃动绿</small></span>
+                <span class="theme-option-check" aria-hidden="true">✓</span>
+              </button>
+              <button class="theme-option" type="button" role="menuitemradio" aria-checked="false" data-theme-option="coast">
+                <span class="theme-swatch palette-four coast-swatch" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                <span class="theme-option-copy"><strong>芭乐花径</strong><small>芭乐粉与青提绿</small></span>
+                <span class="theme-option-check" aria-hidden="true">✓</span>
+              </button>
+            </div>
+          </div>
           <button class="icon-button" id="notifyButton" aria-label="消息"><i data-lucide="bell"></i><span class="notification-dot"></span></button>
           <button class="avatar-button" id="accountButton" aria-label="打开账户">访</button>
           <span class="profile-name" id="profileName">访客浏览</span>
