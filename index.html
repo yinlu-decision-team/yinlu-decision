@@ -69,6 +69,7 @@
         <button class="icon-button menu-button" id="menuButton" aria-label="打开导航"><i data-lucide="menu"></i></button>
         <div class="breadcrumb"><span>我的引路</span><span class="breadcrumb-separator">/</span><strong id="breadcrumbTitle">首页</strong></div>
         <div class="top-actions">
+          <button class="icon-button onboarding-replay-button" id="onboardingReplayButton" type="button" aria-label="重新查看新手指引" title="重新查看新手指引" hidden><span class="onboarding-replay-symbol" aria-hidden="true">?</span></button>
           <div class="theme-control">
             <button class="icon-button theme-button" id="themeButton" type="button" aria-label="切换主题，当前为苹果爱丽丝" aria-haspopup="menu" aria-expanded="false" title="切换主题">
               <span class="theme-button-icon" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
@@ -477,25 +478,51 @@
   <div class="modal-backdrop" id="accountModal" aria-hidden="true">
     <div class="modal account-modal" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
       <button class="modal-close icon-button" data-close-modal="accountModal" aria-label="关闭"><i data-lucide="x"></i></button>
-      <div id="authPanel">
-        <div class="modal-kicker">引路试用版</div>
-        <h2 id="accountTitle">先建立你的决策身份</h2>
-        <p class="modal-description">注册信息只保存在当前浏览器，用于保存你的问题、收藏和家庭协作状态。</p>
-        <div class="auth-tabs" role="tablist"><button class="auth-tab active" data-auth-tab="login">登录</button><button class="auth-tab" data-auth-tab="register">注册</button></div>
-        <form id="loginForm" class="auth-form">
-          <label><span>邮箱</span><input id="loginEmail" type="email" autocomplete="email" placeholder="name@example.com" required></label>
-          <label><span>密码</span><input id="loginPassword" type="password" autocomplete="current-password" placeholder="至少 6 位字符" required></label>
-          <button class="primary-button full-button" type="submit"><i data-lucide="log-in"></i>登录试用</button>
-        </form>
-        <form id="registerForm" class="auth-form hidden">
-          <div class="form-grid"><label><span>昵称</span><input id="registerName" type="text" maxlength="16" placeholder="例如：小林同学" required></label><label><span>角色</span><select id="registerRole"><option>高中生</option><option>大学生</option><option>家长</option><option>教师 / 从业者</option></select></label></div>
-          <label><span>邮箱</span><input id="registerEmail" type="email" autocomplete="email" placeholder="用于本机登录" required></label>
-          <label><span>密码</span><input id="registerPassword" type="password" autocomplete="new-password" minlength="6" placeholder="至少 6 位字符" required></label>
-          <label><span>当前决策阶段</span><select id="registerStage"><option value="高考志愿">高考志愿</option><option value="考研择校">考研择校</option><option value="职业选择">职业选择</option><option value="大学适应">大学适应</option></select></label>
-          <button class="primary-button full-button" type="submit"><i data-lucide="user-plus"></i>创建试用账号</button>
-        </form>
-        <button class="guest-button" id="continueGuest"><i data-lucide="eye"></i>先浏览产品</button>
-        <p class="local-data-note"><i data-lucide="database"></i>试用版说明：不是真实多用户账号系统，不构成身份认证。</p>
+      <div id="authPanel" class="account-auth-shell">
+        <div class="account-auth-header">
+          <div class="account-auth-brand">
+            <svg class="account-auth-logo" viewBox="0 0 48 48" role="img" aria-label="引路标志">
+              <path class="brand-mark-body" d="M13 9H30C34 9 37 12 37 16V37L25 30L13 37V9Z"/>
+              <path class="brand-mark-fold" d="M13 9H25C29 9 32 12 32 16V27"/>
+              <path class="account-auth-logo-gap" d="M25 16V29"/>
+              <circle class="brand-mark-dot" cx="25" cy="16" r="3"/>
+            </svg>
+            <div><strong>引路</strong><small>让每一次选择更清楚</small></div>
+          </div>
+          <div class="account-life-path" aria-label="人生阶段路径">
+            <span class="completed">高中</span><i></i><span class="active">大学</span><i></i><span>深造</span><i></i><span>职业</span>
+          </div>
+        </div>
+        <div class="account-auth-body">
+          <aside class="account-value-panel">
+            <div class="account-value-copy"><span>从经验出发</span><h3>把复杂选择，<br>一步一步想清楚</h3><p>真实经验、候选比较和家庭协同，都围绕你的决定展开。</p></div>
+            <div class="account-value-list">
+              <div class="mint"><b>01</b><span><strong>向经历过的人提问</strong><small>问题可以匿名，回答标明来源</small></span></div>
+              <div class="pink"><b>02</b><span><strong>收藏并比较候选</strong><small>学校和专业放在同一张桌面</small></span></div>
+              <div class="blue"><b>03</b><span><strong>按需与家人共享</strong><small>未经授权的内容保持私密</small></span></div>
+            </div>
+          </aside>
+          <div class="account-auth-form-panel">
+            <div class="modal-kicker">引路试用版</div>
+            <h2 id="accountTitle">先建立你的决策身份</h2>
+            <p class="modal-description">注册信息只保存在当前浏览器，用于保存你的问题、收藏和家庭协作状态。</p>
+            <div class="auth-tabs" role="tablist"><button class="auth-tab active" data-auth-tab="login">登录</button><button class="auth-tab" data-auth-tab="register">注册</button></div>
+            <form id="loginForm" class="auth-form">
+              <label><span>邮箱</span><input id="loginEmail" type="email" autocomplete="email" placeholder="name@example.com" required></label>
+              <label><span>密码</span><input id="loginPassword" type="password" autocomplete="current-password" placeholder="至少 6 位字符" required></label>
+              <button class="primary-button full-button" type="submit"><i data-lucide="log-in"></i>登录试用</button>
+            </form>
+            <form id="registerForm" class="auth-form hidden">
+              <div class="form-grid"><label><span>昵称</span><input id="registerName" type="text" maxlength="16" placeholder="例如：小林同学" required></label><label><span>角色</span><select id="registerRole"><option>高中生</option><option>大学生</option><option>家长</option><option>教师 / 从业者</option></select></label></div>
+              <label><span>邮箱</span><input id="registerEmail" type="email" autocomplete="email" placeholder="用于本机登录" required></label>
+              <label><span>密码</span><input id="registerPassword" type="password" autocomplete="new-password" minlength="6" placeholder="至少 6 位字符" required></label>
+              <label><span>当前决策阶段</span><select id="registerStage"><option value="高考志愿">高考志愿</option><option value="考研择校">考研择校</option><option value="职业选择">职业选择</option><option value="大学适应">大学适应</option></select></label>
+              <button class="primary-button full-button" type="submit"><i data-lucide="user-plus"></i>创建试用账号</button>
+            </form>
+            <button class="guest-button" id="continueGuest"><i data-lucide="eye"></i>先浏览产品</button>
+            <p class="local-data-note"><i data-lucide="database"></i>试用版说明：不是真实多用户账号系统，不构成身份认证。</p>
+          </div>
+        </div>
       </div>
       <div id="profilePanel" class="hidden">
         <div class="modal-kicker">我的引路</div><h2>个人资料</h2><p class="modal-description">完善你的基本信息，头像和资料仅保存在当前浏览器。</p>
@@ -546,5 +573,7 @@
       </div>
     </div>
   </div>
+
+  <button class="back-to-top-button" id="backToTopButton" type="button" aria-label="回到页面顶部" title="回到顶部" aria-hidden="true" tabindex="-1"><span aria-hidden="true">↑</span></button>
 </body>
 </html>
