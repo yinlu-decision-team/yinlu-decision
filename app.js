@@ -223,19 +223,18 @@ const institutions = [
 ];
 
 const demoQuestions = [
-  { title: "计算机专业每天都要写代码吗？", topic: "课程学习", status: "已回答", meta: "2 个认证回答 · 3 天前" },
-  { title: "福州读研的生活成本大概怎么样？", topic: "城市环境", status: "等待回答", meta: "已匹配 1 位学长 · 昨天", waiting: true },
-  { title: "这个专业毕业后真的只能考公吗？", topic: "就业去向", status: "已回答", meta: "4 个认证回答 · 6 天前" }
+  { title: "计算机专业每天都要写代码吗？", topic: "课程学习", status: "已回答", meta: "2 个认证回答 · 3 天前", answers: [{ author: "福建师范大学 · 软件工程 · 2023级", text: "大一主要学习Java、数据结构等基础课程，真正大量写项目一般从后续课程开始。" }, { author: "福州大学 · 计算机专业 · 2022级", text: "代码量会逐渐增加，建议早点培养工程实践能力。" }] },
+  { title: "福州读研的生活成本大概怎么样？", topic: "城市环境", status: "等待回答", meta: "已匹配 1 位学长 · 昨天", waiting: true, answers: [] },
+  { title: "这个专业毕业后真的只能考公吗？", topic: "就业去向", status: "已回答", meta: "4 个认证回答 · 6 天前", answers: [{ author: "上海财经大学 · 金融学 · 2021级", text: "不是的，商业银行、证券公司、四大会计师事务所都需要金融类专业。" }, { author: "厦门大学 · 金融工程 · 2020级", text: "就业面很广，我身边同学有去银行、券商、基金公司、互联网金融的。" }] }
 ];
 
 const demoAnswers = [
   { title: "转专业需要提前准备哪些课程？", topic: "课程学习", status: "已发布", meta: "收到 2 次感谢 · 5 天前" },
   { title: "大学宿舍生活和高中想象差别大吗？", topic: "宿舍生活", status: "已发布", meta: "收到 1 次追问 · 2 周前" }
 ];
-
 const stageNames = { gaokao: "高考志愿", graduate: "考研择校", career: "职业选择", adapt: "大学适应" };
 const stageOrder = ["gaokao", "graduate", "career", "adapt"];
-const STORE = { users: "yinlu_users", session: "yinlu_session", questions: "yinlu_questions", answers: "yinlu_answers", favorites: "yinlu_favorites", candidateStatus: "yinlu_candidate_status", compareHistory: "yinlu_compare_history", family: "yinlu_family", verification: "yinlu_verification", theme: "yinlu_theme", experienceLayout: "yinlu_experience_layout", decisionEvents: "yinlu_decision_events", petPosition: "yinlu_pet_position_v2", petAvatar: "yinlu_pet_avatar", petMotion: "yinlu_pet_reduce_motion", pageFeedback: "yinlu_page_feedback", onboarding: "yinlu_onboarding_complete_v1" };
+const STORE = { users: "yinlu_users", session: "yinlu_session", questions: "yinlu_questions", answers: "yinlu_answers", favorites: "yinlu_favorites", candidateStatus: "yinlu_candidate_status", compareHistory: "yinlu_compare_history", family: "yinlu_family", verification: "yinlu_verification", theme: "yinlu_theme", experienceLayout: "yinlu_experience_layout", history: "yinlu_history", decisionEvents: "yinlu_decision_events", petPosition: "yinlu_pet_position_v2", petAvatar: "yinlu_pet_avatar", petMotion: "yinlu_pet_reduce_motion", pageFeedback: "yinlu_page_feedback", onboarding: "yinlu_onboarding_complete_v1" };
 const CYBER_PET_AVATARS = {
   egret: { name: "鹭小引", src: "./pet-t-egret-guide.svg?v=20260815" },
   deer: { name: "不迷鹿", src: "./pet-s-never-lost-deer.svg?v=20260815" },
@@ -412,6 +411,15 @@ const majorDecisionKey = (school, major) => encodeURIComponent(`${school}::${maj
 const candidateStatuses = ["待了解", "正在比较", "已倾向", "暂不考虑"];
 const currentUser = () => { const id = localStorage.getItem(STORE.session); return read(STORE.users, []).find((user) => user.id === id) || null; };
 const userFavorites = () => { const user = currentUser(); return user ? read(STORE.favorites, {})[user.id] || [] : []; };
+
+function saveHistory(id) {
+  const user = currentUser();
+  if (!user) return;
+  const all = read(STORE.history, {});
+  all[user.id] = [id, ...(all[user.id] || []).filter((itemId) => itemId !== id)].slice(0, 5);
+  write(STORE.history, all);
+}
+
 const initials = (name = "访客") => name.trim().slice(0, 1) || "访";
 const AVATAR_MAX_FILE_SIZE = 5 * 1024 * 1024;
 
@@ -2034,7 +2042,7 @@ function renderExperiences() {
     const valueHtml = item.value ? `<div class="source-value"><strong>${item.value}</strong><small>来源内容摘要</small></div>` : "";
     const titleHtml = item.title ? `<h3 class="experience-card-title">${item.title}</h3>` : "";
     const institutionSummary = renderExperienceInstitutionSummary(item);
-    return `<article class="experience-card">
+    return `<article class="experience-card" onclick="saveHistory('${item.id}')">
       <div class="experience-top"><span class="school-avatar">${(item.school || "").slice(0, 1)}</span><div class="experience-school"><strong>${item.school || "未命名学校"}</strong><small>${item.major || "未分类专业"} · ${item.city || "未标注城市"}</small></div><span class="source-level-tag ${src.cls}">${src.text}</span></div>
       <div class="experience-divider"></div>
       ${institutionSummary}${valueHtml}${titleHtml}
@@ -2047,15 +2055,21 @@ function renderExperiences() {
   hydrateIcons();
 }
 
+function renderQuestionAnswers(item) {
+  const answers = Array.isArray(item.answers) ? item.answers : [];
+  if (!answers.length) return "";
+  return `<div class="question-answers">${answers.map((answer) => `<div class="answer-card"><div class="answer-author">${escapeHtml(answer.author || "")}</div><div class="answer-content">${escapeHtml(answer.text || "")}</div></div>`).join("")}</div>`;
+}
+
 function renderQuestions() {
   const user = currentUser();
   const list = $("#questionList");
   if (!list) return;
   if (!user) {
-    list.innerHTML = demoQuestions.map((item) => `<article class="question-list-item"><header><strong>${escapeHtml(item.title)}</strong><span class="question-status ${item.waiting ? "waiting" : ""}">${escapeHtml(item.status)}</span></header><p>${escapeHtml(item.meta)}</p></article>`).join("");
+    list.innerHTML = demoQuestions.map((item) => `<article class="question-list-item"><header><strong>${escapeHtml(item.title)}</strong><span class="question-status ${item.waiting ? "waiting" : ""}">${escapeHtml(item.status)}</span></header><p>${escapeHtml(item.meta)}</p>${renderQuestionAnswers(item)}</article>`).join("");
   } else {
     const mine = read(STORE.questions, []).filter((item) => item.userId === user.id);
-    list.innerHTML = mine.length ? mine.map((item) => `<article class="question-list-item"><header><strong>${escapeHtml(item.title)}</strong><span class="question-status ${item.status === "已回答" ? "" : "waiting"}">${escapeHtml(item.status)}</span></header><p>${escapeHtml(item.meta || `${item.topic || "未分类"} · 发布于 ${new Date(item.createdAt).toLocaleDateString("zh-CN")}`)}</p></article>`).join("") : `<p>你还没有发布问题</p>`;
+    list.innerHTML = mine.length ? mine.map((item) => `<article class="question-list-item"><header><strong>${escapeHtml(item.title)}</strong><span class="question-status ${item.status === "已回答" ? "" : "waiting"}">${escapeHtml(item.status)}</span></header><p>${escapeHtml(item.meta || `${item.topic || "未分类"} · 发布于 ${new Date(item.createdAt).toLocaleDateString("zh-CN")}`)}</p>${renderQuestionAnswers(item)}</article>`).join("") : `<p>你还没有发布问题</p>`;
   }
   $("#questionsCount") && ($("#questionsCount").textContent = user ? read(STORE.questions, []).filter((item) => item.userId === user.id).length : "示例");
   hydrateIcons();
@@ -2966,7 +2980,7 @@ function removeProfileAvatar() {
 function submitQuestion() {
   if (!requireAuth("登录后才能发布匿名问题")) return;
   const input = $("#questionInput"); const value = input?.value.trim() || ""; if (value.length < 8) { showToast("请把问题写得再具体一点"); input?.focus(); return; }
-  const user = currentUser(); const all = read(STORE.questions, []); all.unshift({ id: uid("question"), userId: user.id, title: value, topic: $("#questionTopic")?.value || "未分类", stage: $("#questionStage")?.value || "高考志愿", status: "等待回答", createdAt: new Date().toISOString() }); write(STORE.questions, all);
+  const user = currentUser(); const all = read(STORE.questions, []); all.unshift({ id: uid("question"), userId: user.id, title: value, topic: $("#questionTopic")?.value || "未分类", stage: $("#questionStage")?.value || "高考志愿", status: "等待回答", createdAt: new Date().toISOString(), answers: [] }); write(STORE.questions, all);
   input.value = ""; closeModal("questionModal"); renderQuestions(); showToast("匿名问题已发布，正在匹配认证回答者");
 }
 
@@ -2988,7 +3002,8 @@ function submitInlineQuestion() {
     topic: $("#questionTopicPreview")?.value || "未分类",
     stage: $("#questionStagePreview")?.value || "高考志愿",
     status: "等待回答",
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
+    answers: []
   });
   write(STORE.questions, all);
   input.value = "";
