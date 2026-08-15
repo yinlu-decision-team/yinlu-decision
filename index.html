@@ -498,43 +498,100 @@
     </div>
   </div>
 
-  <div class="cyber-pet" id="cyberPet">
-    <section class="cyber-pet-panel" id="cyberPetPanel" aria-label="引路小助手" hidden>
+  <div class="cyber-pet" id="cyberPet" data-pet-avatar="egret">
+    <section class="cyber-pet-panel" id="cyberPetPanel" aria-labelledby="cyberPetAvatarName" hidden>
       <header class="cyber-pet-header">
-        <div class="cyber-pet-identity"><span class="cyber-pet-header-mascot"><img src="./pixel-guide-light.svg?v=20260815" alt="" aria-hidden="true" draggable="false" data-pet-avatar-image><span class="cyber-pet-status"></span></span><div><strong>小引</strong><small id="cyberPetAvatarName">引路灯灵</small></div></div>
-        <div class="cyber-pet-header-actions"><button class="icon-button" id="cyberPetAvatarButton" type="button" aria-label="更换小引形象" aria-expanded="false" title="更换形象"><i data-lucide="refresh-cw"></i></button><button class="icon-button" id="cyberPetClose" type="button" aria-label="收起小助手"><i data-lucide="x"></i></button></div>
+        <div class="cyber-pet-identity">
+          <span class="cyber-pet-header-mascot"><img src="./pet-t-egret-guide.svg?v=20260815" alt="" aria-hidden="true" draggable="false" data-pet-avatar-image><span class="cyber-pet-status"></span></span>
+          <div><strong id="cyberPetAvatarName">鹭小引</strong><small>你的决策助手</small></div>
+        </div>
+        <button class="icon-button" id="cyberPetClose" type="button" aria-label="收起小助手"><i data-lucide="x"></i></button>
       </header>
-      <div class="cyber-pet-avatar-picker" id="cyberPetAvatarPicker" hidden>
-        <div><strong>选择形象</strong><small>选择保存在本机</small></div>
-        <div class="cyber-pet-avatar-options">
-          <button type="button" data-pet-avatar="guide" aria-pressed="true"><img src="./pixel-guide-light.svg?v=20260815" alt=""><span>引路灯灵</span></button>
-          <button type="button" data-pet-avatar="cat" aria-pressed="false"><img src="./pixel-backpack-cat.svg?v=20260815" alt=""><span>书包猫</span></button>
-          <button type="button" data-pet-avatar="dog" aria-pressed="false"><img src="./pixel-sign-dog.svg?v=20260815" alt=""><span>路标犬</span></button>
+
+      <div class="cyber-pet-tabs" role="tablist" aria-label="小引助手功能">
+        <button id="cyberPetTabTools" type="button" role="tab" aria-selected="true" aria-controls="cyberPetTools" data-pet-tab="tools">快捷工具</button>
+        <button id="cyberPetTabChat" type="button" role="tab" aria-selected="false" aria-controls="cyberPetChat" data-pet-tab="chat" tabindex="-1">问问小引</button>
+        <button id="cyberPetTabPlan" type="button" role="tab" aria-selected="false" aria-controls="cyberPetPlan" data-pet-tab="plan" tabindex="-1">规划建议</button>
+      </div>
+
+      <div class="cyber-pet-context">
+        <span>正在进行</span>
+        <strong id="cyberPetContext">高考志愿</strong>
+        <b id="cyberPetContextStatus">信息收集中</b>
+      </div>
+
+      <div class="cyber-pet-tab-panel active" id="cyberPetTools" role="tabpanel" aria-labelledby="cyberPetTabTools" data-pet-tab-panel="tools">
+        <div class="cyber-pet-actions" aria-label="快捷功能">
+          <button type="button" data-pet-action="ask-current"><span class="cyber-pet-action-icon blue"><i data-lucide="sparkles"></i></span><strong>问问当前页面</strong><small>结合浏览内容提问</small></button>
+          <button type="button" data-pet-action="anonymous"><span class="cyber-pet-action-icon pink"><i data-lucide="message-circle-question"></i></span><strong>匿名提问</strong><small>不显示身份发布</small></button>
+          <button type="button" data-pet-action="compare"><span class="cyber-pet-action-icon mint"><i data-lucide="git-compare-arrows"></i></span><strong>比较我的候选</strong><small>并排查看差异</small></button>
+          <button type="button" data-pet-action="calendar"><span class="cyber-pet-action-icon yellow"><i data-lucide="calendar-days"></i></span><strong>设置决策时间</strong><small>记录重要日期</small></button>
+        </div>
+        <button class="cyber-pet-recent" type="button" data-pet-action="compare"><span><i></i>最近关注</span><strong>查看等待比较的候选</strong><i data-lucide="chevron-right"></i></button>
+      </div>
+
+      <div class="cyber-pet-tab-panel" id="cyberPetChat" role="tabpanel" aria-labelledby="cyberPetTabChat" data-pet-tab-panel="chat" hidden>
+        <div class="cyber-pet-messages" id="cyberPetMessages" aria-live="polite" aria-atomic="false">
+          <div class="cyber-pet-message assistant">我会结合你正在查看的内容，陪你把选择一步步理清。</div>
+        </div>
+        <div class="cyber-pet-chat-prompts">
+          <button type="button" data-pet-action="ask-current">帮我整理条件</button>
+          <button type="button" data-view="experience">看看真实经验</button>
         </div>
       </div>
-      <div class="cyber-pet-context"><i data-lucide="scan-search"></i><span>正在查看</span><strong id="cyberPetContext">首页</strong></div>
-      <div class="cyber-pet-messages" id="cyberPetMessages" aria-live="polite">
-        <div class="cyber-pet-message assistant">今天想先处理哪项选择？</div>
+
+      <div class="cyber-pet-tab-panel" id="cyberPetPlan" role="tabpanel" aria-labelledby="cyberPetTabPlan" data-pet-tab-panel="plan" hidden>
+        <div class="cyber-pet-stage-reminder">
+          <div><span>本阶段提醒</span><strong id="cyberPetStageName">志愿填报 · 初选候选</strong></div>
+          <p id="cyberPetStageReminder">先核对分数位次和地区范围，再收集学校与专业。</p>
+        </div>
+        <div class="cyber-pet-next-step">
+          <span>下一步建议</span>
+          <h3 id="cyberPetSuggestionTitle">先确定你最在意什么</h3>
+          <p id="cyberPetSuggestionText">城市、专业实力和录取把握很难同时最大化。先选出两个最重要的维度。</p>
+          <div>
+            <button type="button" data-pet-action="ask-current">整理关注维度</button>
+            <button type="button" data-view="experience">查看真实经验</button>
+          </div>
+        </div>
+        <div class="cyber-pet-plan-note"><i></i><span>建议会随当前事项和浏览内容变化</span></div>
       </div>
-      <div class="cyber-pet-actions" aria-label="快捷功能">
-        <button type="button" data-pet-action="ask-current"><i data-lucide="sparkles"></i><span>问问当前页面</span></button>
-        <button type="button" data-pet-action="anonymous"><i data-lucide="message-circle-question"></i><span>匿名提问</span></button>
-        <button type="button" data-pet-action="compare"><i data-lucide="git-compare-arrows"></i><span>比较候选</span></button>
-        <button type="button" data-pet-action="calendar"><i data-lucide="calendar-days"></i><span>设置决策时间</span></button>
-      </div>
-      <button class="cyber-pet-report-trigger" type="button" data-pet-action="report"><i data-lucide="bug"></i>反馈当前页面问题</button>
+
       <form class="cyber-pet-report" id="cyberPetReport" hidden>
         <label for="cyberPetReportInput">页面问题</label>
         <textarea id="cyberPetReportInput" maxlength="300" placeholder="哪里显示不对，或者哪个按钮无法使用？" required></textarea>
         <div><button class="quiet-button" type="button" data-pet-action="cancel-report">取消</button><button class="primary-button" type="submit">记录反馈</button></div>
       </form>
+
       <form class="cyber-pet-composer" id="cyberPetComposer">
-        <input id="cyberPetInput" type="text" maxlength="200" autocomplete="off" placeholder="问问学校、专业或当前页面">
+        <label class="visually-hidden" for="cyberPetInput">向小引提问</label>
+        <input id="cyberPetInput" type="text" maxlength="200" autocomplete="off" placeholder="说说你现在纠结的选择">
         <button class="icon-button" type="submit" aria-label="发送问题"><i data-lucide="send"></i></button>
       </form>
+
+      <footer class="cyber-pet-footer">
+        <button class="cyber-pet-report-trigger" type="button" data-pet-action="report"><i data-lucide="bug"></i>反馈页面问题</button>
+        <label class="cyber-pet-motion-setting" for="cyberPetReduceMotion">
+          <span>减少动态效果</span>
+          <input id="cyberPetReduceMotion" type="checkbox">
+          <span class="cyber-pet-motion-switch" aria-hidden="true"></span>
+        </label>
+      </footer>
     </section>
-    <button class="cyber-pet-toggle" id="cyberPetToggle" type="button" aria-label="打开小引助手" aria-expanded="false">
-      <img class="cyber-pet-mascot" src="./pixel-guide-light.svg?v=20260815" alt="" aria-hidden="true" draggable="false" data-pet-avatar-image>
+
+    <div class="cyber-pet-avatar-menu" id="cyberPetAvatarMenu" role="menu" aria-label="选择小引伙伴" hidden>
+      <div><strong>选择小引伙伴</strong><small>右键或长按唤出</small></div>
+      <button type="button" role="menuitemradio" aria-checked="true" data-pet-avatar="egret"><img src="./pet-t-egret-guide.svg?v=20260815" alt=""><span><strong>鹭小引</strong><small>默认伙伴</small></span><i data-lucide="check"></i></button>
+      <button type="button" role="menuitemradio" aria-checked="false" data-pet-avatar="deer"><img src="./pet-s-never-lost-deer.svg?v=20260815" alt=""><span><strong>不迷鹿</strong><small>关键选择不迷路</small></span><i data-lucide="check"></i></button>
+      <button type="button" role="menuitemradio" aria-checked="false" data-pet-avatar="koi"><img src="./pet-v-lucky-koi.svg?v=20260815" alt=""><span><strong>小引鲤</strong><small>带来好运与引力</small></span><i data-lucide="check"></i></button>
+      <button type="button" role="menuitemradio" aria-checked="false" data-pet-avatar="sheep"><img src="./pet-w-sailing-sheep.svg?v=20260815" alt=""><span><strong>帆帆羊</strong><small>向着前程扬帆</small></span><i data-lucide="check"></i></button>
+      <button type="button" role="menuitemradio" aria-checked="false" data-pet-avatar="turtle"><img src="./pet-z-homebound-turtle.svg?v=20260815" alt=""><span><strong>归途龟</strong><small>记得方向与归途</small></span><i data-lucide="check"></i></button>
+    </div>
+
+    <button class="cyber-pet-toggle" id="cyberPetToggle" type="button" aria-label="打开鹭小引助手" aria-expanded="false" aria-controls="cyberPetPanel" aria-haspopup="menu" title="左键打开助手，右键切换伙伴">
+      <img class="cyber-pet-mascot" src="./pet-t-egret-guide.svg?v=20260815" alt="" aria-hidden="true" draggable="false" data-pet-avatar-image>
+      <span class="cyber-pet-bubbles" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="cyber-pet-glint" aria-hidden="true"></span>
       <span class="cyber-pet-presence" aria-hidden="true"></span>
     </button>
   </div>
