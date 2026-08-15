@@ -18,7 +18,7 @@
 <link rel="apple-touch-icon" href="./favicon-180.png">
 
 <!-- 本地化的轻量图标脚本（替代外部 CDN） -->
-<script src="./lib/lucide-lite.js?v=6" defer></script>
+<script src="./lib/lucide-lite.js?v=7" defer></script>
 
 <!-- 本地 app.js（确保在 lucide-lite 后加载） -->
 <script src="./app.js" defer></script>
@@ -277,9 +277,9 @@
           <section class="content-section" id="experienceSection">
             <div class="section-heading">
               <div>
-                <div class="section-kicker">院校与经验库</div>
-                <h1>一条内容，先看来源，再做判断</h1>
-                <p>先看学校与公开信息，再结合学生真实经验，不替你做决定。</p>
+                <div class="section-kicker">院校与经验</div>
+                <h1>先查清学校，再参考真实经验</h1>
+                <p>院校资料与个人经验分开查看，需要时再相互对照。</p>
               </div>
               <div class="experience-heading-actions">
                 <div class="experience-layout-switch" role="group" aria-label="院校与经验页面布局">
@@ -293,57 +293,159 @@
                 <button class="text-button" data-view-target="compare">查看我的候选 <i data-lucide="arrow-up-right"></i></button>
               </div>
             </div>
-            <div class="filter-bar" role="toolbar" aria-label="经验筛选">
-              <div class="filter-group filter-scope-group">
-                <span class="filter-group-label">搜索范围</span>
-                <div class="filter-pills" id="filterScopePills">
-                  <button class="filter-pill active" data-scope-filter="all">全部范围</button>
-                  <button class="filter-pill" data-scope-filter="school">学校相关</button>
-                  <button class="filter-pill" data-scope-filter="major">专业相关</button>
-                  <button class="filter-pill" data-scope-filter="both">学校 + 专业</button>
-                </div>
-              </div>
+            <div class="experience-content-tabs" role="tablist" aria-label="院校与经验内容类型">
+              <button class="experience-content-tab active" type="button" role="tab" data-experience-content-tab="institution" aria-selected="true" aria-controls="institutionGrid"><i data-lucide="landmark"></i>院校信息</button>
+              <button class="experience-content-tab" type="button" role="tab" data-experience-content-tab="experience" aria-selected="false" aria-controls="experienceGrid"><i data-lucide="messages-square"></i>经验库</button>
+            </div>
+            <div class="institution-filter-bar" data-experience-content-panel="institution" role="search" aria-label="院校信息搜索">
               <div class="filter-search-stack">
                 <div class="filter-group">
                   <span class="filter-group-label">学校</span>
                   <div class="filter-search-field">
                     <i data-lucide="school"></i>
-                    <input id="experienceSchoolSearch" type="search" placeholder="搜索学校或城市" autocomplete="off">
+                    <input id="institutionSchoolSearch" type="search" placeholder="搜索学校名称" autocomplete="off">
                   </div>
                 </div>
                 <div class="filter-group">
                   <span class="filter-group-label">专业</span>
-                  <div class="filter-search-field">
-                    <i data-lucide="book-open"></i>
-                    <input id="experienceMajorSearch" type="search" placeholder="搜索专业名称" autocomplete="off">
+                  <div class="library-major-picker" data-major-picker="institution">
+                    <div class="filter-search-field major-picker-field">
+                      <i data-lucide="book-open"></i>
+                      <input id="institutionMajorSearch" type="search" placeholder="输入专业名称或按学科门类查找" autocomplete="off" aria-expanded="false" aria-controls="institutionMajorPanel">
+                      <button class="picker-expand-button" type="button" data-major-toggle="institution" aria-label="展开院校专业索引" tabindex="-1"><i data-lucide="chevron-down"></i></button>
+                    </div>
+                    <div class="major-picker-panel" id="institutionMajorPanel" hidden>
+                      <div class="major-category-list" id="institutionMajorCategories" aria-label="院校专业学科门类"></div>
+                      <div class="major-option-list" id="institutionMajorOptions" aria-live="polite"></div>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div class="filter-group filter-dimension-group">
-                <span class="filter-group-label">关注维度</span>
-                <div class="filter-pills" id="dimensionFilterPills">
-                  <button class="filter-pill active" data-dimension-filter="all">全部</button>
-                  <button class="filter-pill" data-dimension-filter="课程学习">课程学习</button>
-                  <button class="filter-pill" data-dimension-filter="宿舍生活">宿舍生活</button>
-                  <button class="filter-pill" data-dimension-filter="城市环境">城市环境</button>
-                  <button class="filter-pill" data-dimension-filter="就业去向">就业去向</button>
+              <div class="library-region-index" aria-label="院校信息地区索引">
+                <div class="region-picker-entry">
+                  <span class="filter-group-label">地区</span>
+                  <div class="filter-search-field region-search-field">
+                    <i data-lucide="search"></i>
+                    <input id="institutionRegionSearch" type="search" placeholder="输入省份或城市" autocomplete="off" aria-label="搜索院校信息地区" aria-expanded="false" aria-controls="institutionRegionPanel">
+                    <button class="picker-expand-button" type="button" data-region-toggle="institution" aria-label="展开院校地区索引" tabindex="-1"><i data-lucide="chevron-down"></i></button>
+                  </div>
+                </div>
+                <div class="region-picker-panel" id="institutionRegionPanel" hidden>
+                  <div class="region-picker-toolbar">
+                    <span>先选省份，再选择城市或地区</span>
+                    <button class="region-all-button active" type="button" data-library-region="institution" data-region-province="" data-region-city="" aria-pressed="true">不限地区</button>
+                  </div>
+                  <div class="region-picker-body">
+                    <div class="region-option-list" id="institutionRegionOptions" aria-live="polite"></div>
+                    <div class="region-letter-rail" id="institutionRegionLetters" aria-label="按首字母查找院校地区"></div>
+                  </div>
                 </div>
               </div>
-              <div class="filter-group filter-source-group">
-                <span class="filter-group-label">信息来源</span>
-                <div class="filter-pills" id="sourceFilterPills">
-                  <button class="filter-pill active" data-source-filter="all">全部来源</button>
-                  <button class="filter-pill" data-source-filter="official">官方信息</button>
-                  <button class="filter-pill" data-source-filter="student">在读认证</button>
-                  <button class="filter-pill" data-source-filter="expert">教师 / 从业者</button>
+              <button class="clear-filter-button" id="clearInstitutionFilters" type="button"><i data-lucide="rotate-ccw"></i>清空搜索</button>
+            </div>
+            <div class="filter-bar" data-experience-content-panel="experience" role="toolbar" aria-label="经验筛选" hidden>
+              <div class="filter-search-stack">
+                <div class="filter-group">
+                  <span class="filter-group-label">学校</span>
+                  <div class="filter-search-field">
+                    <i data-lucide="school"></i>
+                    <input id="experienceSchoolSearch" type="search" placeholder="搜索学校名称" autocomplete="off">
+                  </div>
+                </div>
+                <div class="filter-group">
+                  <span class="filter-group-label">专业</span>
+                  <div class="library-major-picker" data-major-picker="experience">
+                    <div class="filter-search-field major-picker-field">
+                      <i data-lucide="book-open"></i>
+                      <input id="experienceMajorSearch" type="search" placeholder="输入专业名称或按学科门类查找" autocomplete="off" aria-expanded="false" aria-controls="experienceMajorPanel">
+                      <button class="picker-expand-button" type="button" data-major-toggle="experience" aria-label="展开经验专业索引" tabindex="-1"><i data-lucide="chevron-down"></i></button>
+                    </div>
+                    <div class="major-picker-panel" id="experienceMajorPanel" hidden>
+                      <div class="major-category-list" id="experienceMajorCategories" aria-label="经验专业学科门类"></div>
+                      <div class="major-option-list" id="experienceMajorOptions" aria-live="polite"></div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="filter-actions">
-                <label class="same-school-toggle"><input type="checkbox" id="sameSchoolToggle"><span class="toggle-track"></span>同高中优先</label>
+              <div class="library-region-index" aria-label="经验库地区索引">
+                <div class="region-picker-entry">
+                  <span class="filter-group-label">地区</span>
+                  <div class="filter-search-field region-search-field">
+                    <i data-lucide="search"></i>
+                    <input id="experienceRegionSearch" type="search" placeholder="输入省份或城市" autocomplete="off" aria-label="搜索经验库地区" aria-expanded="false" aria-controls="experienceRegionPanel">
+                    <button class="picker-expand-button" type="button" data-region-toggle="experience" aria-label="展开经验地区索引" tabindex="-1"><i data-lucide="chevron-down"></i></button>
+                  </div>
+                </div>
+                <div class="region-picker-panel" id="experienceRegionPanel" hidden>
+                  <div class="region-picker-toolbar">
+                    <span>先选省份，再选择城市或地区</span>
+                    <button class="region-all-button active" type="button" data-library-region="experience" data-region-province="" data-region-city="" aria-pressed="true">不限地区</button>
+                  </div>
+                  <div class="region-picker-body">
+                    <div class="region-option-list" id="experienceRegionOptions" aria-live="polite"></div>
+                    <div class="region-letter-rail" id="experienceRegionLetters" aria-label="按首字母查找经验地区"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="filter-overview">
+                <div class="filter-quick-summary" aria-label="当前常用筛选">
+                  <button class="filter-summary-button" type="button" data-filter-section="dimension" aria-expanded="false" aria-controls="advancedExperienceFilters"><span>关注维度</span><strong id="dimensionFilterSummary">全部</strong></button>
+                  <button class="filter-summary-button" type="button" data-filter-section="source" aria-expanded="false" aria-controls="advancedExperienceFilters"><span>信息来源</span><strong id="sourceFilterSummary">全部</strong></button>
+                  <button class="filter-summary-button" id="timeFilterTrigger" type="button" data-filter-section="time" aria-expanded="false" aria-controls="advancedExperienceFilters"><span>经验发布时间</span><strong id="timeFilterSummary">不限</strong></button>
+                </div>
+                <button class="filter-expand-button" id="toggleAdvancedFilters" type="button" data-filter-section="all" aria-expanded="false" aria-controls="advancedExperienceFilters">
+                  <i data-lucide="sliders-horizontal"></i><span>更多筛选</span><b id="activeFilterCount">0</b><i class="filter-expand-chevron" data-lucide="chevron-down"></i>
+                </button>
+              </div>
+              <div class="filter-selected-row">
+                <div class="filter-selected-tags" id="experienceSelectedFilters" aria-live="polite"><span class="filter-empty-label">当前未添加筛选条件</span></div>
                 <button class="clear-filter-button" id="clearExperienceFilters" type="button"><i data-lucide="rotate-ccw"></i>清空筛选</button>
               </div>
+              <div class="filter-advanced-panel" id="advancedExperienceFilters" hidden>
+                <div class="filter-group filter-dimension-group" data-filter-section-panel="dimension">
+                  <span class="filter-group-label">关注维度</span>
+                  <div class="filter-pills" id="dimensionFilterPills">
+                    <button class="filter-pill active" data-dimension-filter="all">全部</button>
+                    <button class="filter-pill" data-dimension-filter="课程学习">课程学习</button>
+                    <button class="filter-pill" data-dimension-filter="宿舍生活">宿舍生活</button>
+                    <button class="filter-pill" data-dimension-filter="设施布局">设施布局</button>
+                    <button class="filter-pill" data-dimension-filter="社团活动">社团活动</button>
+                    <button class="filter-pill" data-dimension-filter="校园氛围">校园氛围</button>
+                    <button class="filter-pill" data-dimension-filter="城市环境">城市环境</button>
+                    <button class="filter-pill" data-dimension-filter="就业去向">就业去向</button>
+                  </div>
+                </div>
+                <div class="filter-group filter-source-group" data-filter-section-panel="source">
+                  <span class="filter-group-label">信息来源</span>
+                  <div class="filter-pills" id="sourceFilterPills">
+                    <button class="filter-pill active" data-source-filter="all">全部来源</button>
+                    <button class="filter-pill" data-source-filter="student">在读学生</button>
+                    <button class="filter-pill" data-source-filter="expert">教师 / 从业者</button>
+                  </div>
+                </div>
+                <div class="filter-group filter-time-group" data-filter-section-panel="time">
+                  <span class="filter-group-label">经验发布时间</span>
+                  <div class="filter-pills" id="timeFilterPills">
+                    <button class="filter-pill active" data-time-filter="all">不限</button>
+                    <button class="filter-pill" data-time-filter="6m">近半年</button>
+                    <button class="filter-pill" data-time-filter="1y">近一年</button>
+                    <button class="filter-pill" data-time-filter="3y">近三年</button>
+                  </div>
+                </div>
+                <div class="filter-group filter-sort-group" data-filter-section-panel="extra">
+                  <label class="filter-group-label" for="experienceSort">排序方式</label>
+                  <select class="filter-sort-select" id="experienceSort">
+                    <option value="relevance">综合相关</option>
+                    <option value="newest">最新发布</option>
+                  </select>
+                </div>
+                <div class="filter-actions" data-filter-section-panel="extra">
+                  <label class="same-school-toggle"><input type="checkbox" id="sameSchoolToggle"><span class="toggle-track"></span>同高中优先</label>
+                  <span class="filter-time-note"><i data-lucide="clock-3"></i>发布时间用于判断学生、教师与从业者经验的时效性</span>
+                </div>
+              </div>
             </div>
-            <section class="institution-section" aria-labelledby="institutionHeading">
+            <section class="institution-section" data-experience-content-panel="institution" aria-labelledby="institutionHeading">
               <div class="subsection-heading">
                 <div>
                   <span class="subsection-kicker"><i data-lucide="building-2"></i>院校信息</span>
@@ -354,7 +456,7 @@
               </div>
               <div class="institution-grid" id="institutionGrid"></div>
             </section>
-            <section class="experience-section" aria-labelledby="experienceHeading">
+            <section class="experience-section" data-experience-content-panel="experience" aria-labelledby="experienceHeading" hidden>
               <div class="subsection-heading compact-subsection-heading">
                 <div>
                   <span class="subsection-kicker"><i data-lucide="messages-square"></i><span id="experienceSectionKicker">经验与职业视角</span></span>

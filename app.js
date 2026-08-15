@@ -1,24 +1,27 @@
 const experiences = [
-  { id: "fjnu-cs", school: "福建师范大学", major: "计算机科学与技术", city: "福州", level: "已认证 · 2023级", source: "student", consensus: { recommend: 9, total: 12 }, text: "课程强调理论与工程实践的结合，作业量中等偏上，适合喜欢系统性学习的同学。", tags: ["作业", "实践"], dimensions: ["课程学习"] },
-  { id: "fzu-econ", school: "福州大学", major: "经济学", city: "福州", level: "已认证 · 2022级", source: "student", consensus: { recommend: 8, total: 9 }, text: "考研氛围浓，建议提前准备数学与专业课，社团与实践机会较多。", tags: ["考研", "生活"], dimensions: ["课程学习", "城市环境"] },
-  { id: "xmu-news", school: "厦门大学", major: "新闻传播学", city: "厦门", level: "已认证 · 2024级", source: "student", consensus: { recommend: 14, total: 17 }, text: "课程里有不少实战项目，适合想做媒体与内容生产的同学，实习机会较多。", tags: ["实习", "项目"], dimensions: ["课程学习", "就业去向"] },
-  { id: "hqu-med", school: "华侨大学", major: "临床医学", city: "泉州", level: "已认证 · 2021级", source: "student", consensus: { recommend: 2, total: 2 }, text: "专业学习周期长，临床实践密集，对体力与耐心要求高。", tags: ["临床", "实践"], dimensions: ["课程学习"] },
-  { id: "fafu-land", school: "福建农林大学", major: "风景园林", city: "福州", level: "已认证 · 2023级", source: "student", consensus: { recommend: 6, total: 8 }, text: "项目制作业较多，利于作品集准备，适合偏向设计/景观方向的同学。", tags: ["设计", "作品集"], dimensions: ["课程学习", "就业去向"] },
-  { id: "jmu-nautical", school: "集美大学", major: "航海技术", city: "厦门", level: "已认证 · 2022级", source: "student", consensus: { recommend: 1, total: 1 }, text: "专业路径比较明确，但需要适应海上实训与体能训练。", tags: ["实训", "体能"], dimensions: ["课程学习", "城市环境"] },
-  { id: "fjnu-cs-campus", school: "福建师范大学", major: "计算机科学与技术", city: "福州", level: "已认证 · 2023级", source: "student", consensus: { recommend: 7, total: 10 }, text: "宿舍条件和校区安排需要结合具体学院确认，公共学习空间比较方便，建议提前了解宿舍分配规则。", tags: ["宿舍", "校区"], dimensions: ["宿舍生活"] },
-  { id: "fjnu-education", school: "福建师范大学", major: "教育学", city: "福州", level: "已认证 · 2022级", source: "student", consensus: { recommend: 10, total: 13 }, text: "课程阅读和课堂讨论占比不低，想走教师教育方向的同学可以关注实习安排和教育实践机会。", tags: ["阅读", "教育实践"], dimensions: ["课程学习", "就业去向"] },
-  { id: "fjnu-city", school: "福建师范大学", major: "汉语言文学", city: "福州", level: "已认证 · 2021级", source: "student", consensus: { recommend: 8, total: 11 }, text: "福州生活节奏适中，学校周边日常配套较完整，通勤和生活成本仍要按校区与个人习惯估算。", tags: ["生活成本", "通勤"], dimensions: ["城市环境"] },
-  { id: "fzu-econ-campus", school: "福州大学", major: "经济学", city: "福州", level: "已认证 · 2022级", source: "student", consensus: { recommend: 6, total: 9 }, text: "课程中需要持续阅读和整理案例，期末阶段任务集中，平时做好笔记会比临时突击轻松。", tags: ["案例", "期末"], dimensions: ["课程学习"] },
-  { id: "fzu-engineering", school: "福州大学", major: "机械设计制造及其自动化", city: "福州", level: "已认证 · 2023级", source: "student", consensus: { recommend: 5, total: 7 }, text: "实验和课程设计需要投入连续时间，喜欢动手和工程实践的同学更容易找到学习节奏。", tags: ["实验", "工程实践"], dimensions: ["课程学习", "就业去向"] },
-  { id: "fzu-career", school: "福州大学", major: "经济学", city: "福州", level: "已认证 · 2021级", source: "student", consensus: { recommend: 7, total: 8 }, text: "实习和考研是比较常见的选择，最好在大二前后确定更偏向数据分析、金融或公共部门的方向。", tags: ["实习", "考研"], dimensions: ["就业去向"] },
-  { id: "xmu-news-campus", school: "厦门大学", major: "新闻传播学", city: "厦门", level: "已认证 · 2024级", source: "student", consensus: { recommend: 12, total: 15 }, text: "课程展示和小组项目较多，宿舍与课堂之间的安排需要留出机动时间，适合愿意主动表达和协作的同学。", tags: ["小组项目", "表达"], dimensions: ["宿舍生活", "课程学习"] },
-  { id: "hqu-med-career", school: "华侨大学", major: "临床医学", city: "泉州", level: "已认证 · 2021级", source: "student", consensus: { recommend: 2, total: 3 }, text: "后续升学和规培规划需要较早了解，专业学习投入时间长，不能只用本科阶段的课程数量来判断压力。", tags: ["升学", "规培"], dimensions: ["就业去向"] },
-  { id: "fafu-land-campus", school: "福建农林大学", major: "风景园林", city: "福州", level: "已认证 · 2023级", source: "student", consensus: { recommend: 5, total: 7 }, text: "图纸、模型和软件练习可能集中在同一阶段，宿舍里需要注意桌面空间和作息安排。", tags: ["模型", "作息"], dimensions: ["宿舍生活", "课程学习"] },
-  { id: "jmu-nautical-career", school: "集美大学", major: "航海技术", city: "厦门", level: "已认证 · 2022级", source: "student", consensus: { recommend: 2, total: 3 }, text: "行业路径相对明确，但工作地点和轮班方式与普通办公室岗位不同，报考前应把职业生活方式一起考虑。", tags: ["行业路径", "轮班"], dimensions: ["就业去向"] },
+  { id: "fjnu-cs", school: "福建师范大学", major: "计算机科学与技术", city: "福州", level: "已认证 · 2023级", source: "student", publishedAt: "2026-08-10", consensus: { recommend: 9, total: 12 }, text: "课程强调理论与工程实践的结合，作业量中等偏上，适合喜欢系统性学习的同学。", tags: ["作业", "实践"], dimensions: ["课程学习"] },
+  { id: "fzu-econ", school: "福州大学", major: "经济学", city: "福州", level: "已认证 · 2022级", source: "student", publishedAt: "2026-07-24", consensus: { recommend: 8, total: 9 }, text: "考研氛围浓，建议提前准备数学与专业课，社团与实践机会较多。", tags: ["考研", "生活"], dimensions: ["课程学习", "校园氛围", "城市环境", "社团活动"] },
+  { id: "xmu-news", school: "厦门大学", major: "新闻传播学", city: "厦门", level: "已认证 · 2024级", source: "student", publishedAt: "2026-06-18", consensus: { recommend: 14, total: 17 }, text: "课程里有不少实战项目，适合想做媒体与内容生产的同学，实习机会较多。", tags: ["实习", "项目"], dimensions: ["课程学习", "就业去向"] },
+  { id: "hqu-med", school: "华侨大学", major: "临床医学", city: "泉州", level: "已认证 · 2021级", source: "student", publishedAt: "2026-05-09", consensus: { recommend: 2, total: 2 }, text: "专业学习周期长，临床实践密集，对体力与耐心要求高。", tags: ["临床", "实践"], dimensions: ["课程学习"] },
+  { id: "fafu-land", school: "福建农林大学", major: "风景园林", city: "福州", level: "已认证 · 2023级", source: "student", publishedAt: "2026-04-16", consensus: { recommend: 6, total: 8 }, text: "项目制作业较多，利于作品集准备，适合偏向设计/景观方向的同学。", tags: ["设计", "作品集"], dimensions: ["课程学习", "就业去向"] },
+  { id: "jmu-nautical", school: "集美大学", major: "航海技术", city: "厦门", level: "已认证 · 2022级", source: "student", publishedAt: "2026-02-11", consensus: { recommend: 1, total: 1 }, text: "专业路径比较明确，但需要适应海上实训与体能训练。", tags: ["实训", "体能"], dimensions: ["课程学习", "城市环境"] },
+  { id: "fjnu-cs-campus", school: "福建师范大学", major: "计算机科学与技术", city: "福州", level: "已认证 · 2023级", source: "student", publishedAt: "2026-01-22", consensus: { recommend: 7, total: 10 }, text: "宿舍条件和校区安排需要结合具体学院确认，公共学习空间比较方便，建议提前了解宿舍分配规则。", tags: ["宿舍", "校区"], dimensions: ["宿舍生活"] },
+  { id: "fjnu-education", school: "福建师范大学", major: "教育学", city: "福州", level: "已认证 · 2022级", source: "student", publishedAt: "2025-12-02", consensus: { recommend: 10, total: 13 }, text: "课程阅读和课堂讨论占比不低，想走教师教育方向的同学可以关注实习安排和教育实践机会。", tags: ["阅读", "教育实践"], dimensions: ["课程学习", "就业去向"] },
+  { id: "fjnu-city", school: "福建师范大学", major: "汉语言文学", city: "福州", level: "已认证 · 2021级", source: "student", publishedAt: "2025-10-18", consensus: { recommend: 8, total: 11 }, text: "福州生活节奏适中，学校周边日常配套较完整，通勤和生活成本仍要按校区与个人习惯估算。", tags: ["生活成本", "通勤"], dimensions: ["城市环境"] },
+  { id: "fzu-econ-campus", school: "福州大学", major: "经济学", city: "福州", level: "已认证 · 2022级", source: "student", publishedAt: "2025-08-26", consensus: { recommend: 6, total: 9 }, text: "课程中需要持续阅读和整理案例，期末阶段任务集中，平时做好笔记会比临时突击轻松。", tags: ["案例", "期末"], dimensions: ["课程学习"] },
+  { id: "fzu-engineering", school: "福州大学", major: "机械设计制造及其自动化", city: "福州", level: "已认证 · 2023级", source: "student", publishedAt: "2025-06-12", consensus: { recommend: 5, total: 7 }, text: "实验和课程设计需要投入连续时间，喜欢动手和工程实践的同学更容易找到学习节奏。", tags: ["实验", "工程实践"], dimensions: ["课程学习", "就业去向"] },
+  { id: "fzu-career", school: "福州大学", major: "经济学", city: "福州", level: "已认证 · 2021级", source: "student", publishedAt: "2025-02-03", consensus: { recommend: 7, total: 8 }, text: "实习和考研是比较常见的选择，最好在大二前后确定更偏向数据分析、金融或公共部门的方向。", tags: ["实习", "考研"], dimensions: ["就业去向"] },
+  { id: "xmu-news-campus", school: "厦门大学", major: "新闻传播学", city: "厦门", level: "已认证 · 2024级", source: "student", publishedAt: "2024-11-28", consensus: { recommend: 12, total: 15 }, text: "课程展示和小组项目较多，宿舍与课堂之间的安排需要留出机动时间，适合愿意主动表达和协作的同学。", tags: ["小组项目", "表达"], dimensions: ["宿舍生活", "课程学习"] },
+  { id: "hqu-med-career", school: "华侨大学", major: "临床医学", city: "泉州", level: "已认证 · 2021级", source: "student", publishedAt: "2024-06-14", consensus: { recommend: 2, total: 3 }, text: "后续升学和规培规划需要较早了解，专业学习投入时间长，不能只用本科阶段的课程数量来判断压力。", tags: ["升学", "规培"], dimensions: ["就业去向"] },
+  { id: "fafu-land-campus", school: "福建农林大学", major: "风景园林", city: "福州", level: "已认证 · 2023级", source: "student", publishedAt: "2023-12-08", consensus: { recommend: 5, total: 7 }, text: "图纸、模型和软件练习可能集中在同一阶段，宿舍里需要注意桌面空间和作息安排。", tags: ["模型", "作息"], dimensions: ["宿舍生活", "课程学习"] },
+  { id: "jmu-nautical-career", school: "集美大学", major: "航海技术", city: "厦门", level: "已认证 · 2022级", source: "student", publishedAt: "2023-04-20", consensus: { recommend: 2, total: 3 }, text: "行业路径相对明确，但工作地点和轮班方式与普通办公室岗位不同，报考前应把职业生活方式一起考虑。", tags: ["行业路径", "轮班"], dimensions: ["就业去向"] },
+  { id: "fjnu-campus-route", school: "福建师范大学", major: "地理科学", city: "福州", level: "已认证 · 2023级", source: "student", publishedAt: "2026-08-06", text: "旗山校区不同宿舍区到食堂、快递站和教学楼的步行时间差异较大，选宿舍与校区信息时最好把日常动线一起确认。", tags: ["食堂", "快递站", "步行动线"], dimensions: ["设施布局"] },
+  { id: "fafu-campus-culture", school: "福建农林大学", major: "风景园林", city: "福州", level: "已认证 · 2023级", source: "student", publishedAt: "2026-07-12", text: "学院项目协作较多，同学之间常会交流软件、模型和作品集经验，但不同年级与工作室的节奏可能不一样。", tags: ["同学互助", "项目协作"], dimensions: ["校园氛围"] },
   { id: "fjnu-data", school: "福建师范大学", major: "计算机科学与技术", city: "福州", source: "data", title: "招生与录取数据入口", value: "录取位次 · 招生计划 · 专业目录", text: "用于查看公开招生计划、历年录取信息和专业目录，具体数据以当年度发布页面为准。", tags: ["公开数据", "年度更新"], dimensions: ["录取信息"], sourceName: "阳光高考信息平台", sourceUrl: "https://gaokao.chsi.com.cn/" },
   { id: "fjnu-official", school: "福建师范大学", major: "计算机科学与技术", city: "福州", source: "official", title: "学校官方招生与培养信息", value: "招生简章 · 培养方案 · 校方通知", text: "学校官网提供招生政策、院系介绍和培养相关信息，适合与学生经验对照阅读。", tags: ["官方发布", "学校信息"], dimensions: ["课程学习", "录取信息"], sourceName: "福建师范大学官网", sourceUrl: "https://www.fjnu.edu.cn/" },
   { id: "fzu-official", school: "福州大学", major: "经济学", city: "福州", source: "official", title: "学校官方招生信息", value: "招生政策 · 院校介绍 · 官方通知", text: "优先查看学校公开发布的招生与院校信息，具体专业要求以当年度官方页面为准。", tags: ["官方发布", "招生信息"], dimensions: ["录取信息"], sourceName: "福州大学官网", sourceUrl: "https://www.fzu.edu.cn/" },
-  { id: "career-expert", school: "福建师范大学", major: "计算机科学与技术", city: "福州", source: "expert", title: "计算机专业就业能力从哪里开始积累？", value: "课程基础 · 项目实践 · 岗位要求", text: "从业视角更关注技能如何对应真实岗位，建议把课程、项目和实习经历放在一起判断。", tags: ["职业路径", "技能要求"], dimensions: ["就业去向"], sourceName: "人力资源和社会保障部", sourceUrl: "https://www.mohrss.gov.cn/" }
+  { id: "career-expert", school: "福建师范大学", major: "计算机科学与技术", city: "福州", source: "expert", publishedAt: "2026-07-05", title: "计算机专业就业能力从哪里开始积累？", value: "课程基础 · 项目实践 · 岗位要求", text: "从业视角更关注技能如何对应真实岗位，建议把课程、项目和实习经历放在一起判断。", tags: ["职业路径", "技能要求"], dimensions: ["就业去向"], sourceName: "人力资源和社会保障部", sourceUrl: "https://www.mohrss.gov.cn/" },
+  { id: "fjnu-teacher-culture", school: "福建师范大学", major: "教育学", city: "福州", level: "教师身份已核验", source: "expert", publishedAt: "2026-06-26", title: "如何判断学院的学习与交流氛围？", text: "可以观察课堂讨论、导师交流、学生组织与跨年级互助是否稳定，不要只根据一次活动或宣传材料判断整个学院。", tags: ["师生交流", "学习氛围"], dimensions: ["校园氛围"] }
 ];
 
 const institutions = [
@@ -36,6 +39,7 @@ const institutions = [
     educationLevel: "本科 / 研究生教育",
     campuses: "旗山校区、仓山校区",
     updatedAt: "2026年8月",
+    updatedAtISO: "2026-08-01",
     intro: "学校以教师教育为特色，同时覆盖文、理、工、经、管等多个学科方向。平台先把学校概况、招生线索和专业培养信息整理成摘要，方便你建立整体认识。",
     majors: ["计算机科学与技术", "汉语言文学", "教育学"],
     majorPrograms: [
@@ -84,7 +88,7 @@ const institutions = [
     officialUrl: "https://www.fjnu.edu.cn/",
     dataSource: "阳光高考信息平台",
     dataUrl: "https://gaokao.chsi.com.cn/",
-    dimensions: ["课程学习", "录取信息", "城市环境", "就业去向"]
+    dimensions: ["课程学习", "录取信息", "设施布局", "城市环境"]
   },
   {
     id: "fzu",
@@ -100,6 +104,7 @@ const institutions = [
     educationLevel: "本科 / 研究生教育",
     campuses: "旗山校区等",
     updatedAt: "2026年8月",
+    updatedAtISO: "2026-08-01",
     intro: "学校是一所以工为主、理工结合，兼有经济、管理、人文等学科的综合性大学。平台将院校层面的基本信息与具体专业经验分开呈现，避免只看到一个官网入口。",
     majors: ["经济学", "机械设计制造及其自动化", "计算机科学与技术"],
     majorPrograms: [
@@ -148,7 +153,7 @@ const institutions = [
     officialUrl: "https://www.fzu.edu.cn/",
     dataSource: "阳光高考信息平台",
     dataUrl: "https://gaokao.chsi.com.cn/",
-    dimensions: ["课程学习", "录取信息", "城市环境", "就业去向"]
+    dimensions: ["课程学习", "录取信息", "设施布局", "城市环境"]
   },
   {
     id: "fafu",
@@ -164,6 +169,7 @@ const institutions = [
     educationLevel: "本科 / 研究生教育",
     campuses: "金山校区等",
     updatedAt: "2026年8月",
+    updatedAtISO: "2026-08-01",
     intro: "学校以农林学科和生命科学为特色，同时覆盖工、理、经、管、文、法、艺等学科方向。平台将学校概况、专业培养、招生资料和校园体验分开整理，便于进一步核对不同专业所在学院与培养安排。",
     majors: ["风景园林", "食品科学与工程", "植物保护"],
     majorPrograms: [
@@ -212,7 +218,7 @@ const institutions = [
     officialUrl: "https://www.fafu.edu.cn/",
     dataSource: "阳光高考信息平台",
     dataUrl: "https://gaokao.chsi.com.cn/",
-    dimensions: ["课程学习", "录取信息", "城市环境", "就业去向"]
+    dimensions: ["课程学习", "录取信息", "设施布局", "城市环境"]
   }
 ];
 
@@ -286,14 +292,55 @@ const REGION_CITIES = {
   "台湾省": ["台北市", "新北市", "桃园市", "台中市", "台南市", "高雄市", "基隆市", "新竹市", "嘉义市", "新竹县", "苗栗县", "彰化县", "南投县", "云林县", "嘉义县", "屏东县", "宜兰县", "花莲县", "台东县", "澎湖县", "金门县", "连江县"],
   "海外": ["亚洲其他地区", "欧洲", "北美洲", "南美洲", "大洋洲", "非洲", "其他海外地区"]
 };
+const REGION_INITIAL_BY_PROVINCE = {
+  "北京市": "B", "天津市": "T", "河北省": "H", "山西省": "S", "内蒙古自治区": "N",
+  "辽宁省": "L", "吉林省": "J", "黑龙江省": "H", "上海市": "S", "江苏省": "J",
+  "浙江省": "Z", "安徽省": "A", "福建省": "F", "江西省": "J", "山东省": "S",
+  "河南省": "H", "湖北省": "H", "湖南省": "H", "广东省": "G", "广西壮族自治区": "G",
+  "海南省": "H", "重庆市": "C", "四川省": "S", "贵州省": "G", "云南省": "Y",
+  "西藏自治区": "X", "陕西省": "S", "甘肃省": "G", "青海省": "Q", "宁夏回族自治区": "N",
+  "新疆维吾尔自治区": "X", "香港特别行政区": "X", "澳门特别行政区": "A", "台湾省": "T", "海外": "H"
+};
+const REGION_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+const POPULAR_REGIONS = [
+  { label: "北京", province: "北京市", city: "" }, { label: "上海", province: "上海市", city: "" },
+  { label: "广州", province: "广东省", city: "广州市" }, { label: "深圳", province: "广东省", city: "深圳市" },
+  { label: "杭州", province: "浙江省", city: "杭州市" }, { label: "武汉", province: "湖北省", city: "武汉市" },
+  { label: "厦门", province: "福建省", city: "厦门市" }, { label: "西安", province: "陕西省", city: "西安市" },
+  { label: "成都", province: "四川省", city: "成都市" }, { label: "重庆", province: "重庆市", city: "" }
+];
+const MUNICIPALITIES = new Set(["北京市", "上海市", "天津市", "重庆市"]);
+const MAJOR_CATEGORIES = ["工学", "理学", "文学", "教育学", "经济学", "管理学", "农学", "医学", "法学", "艺术学"];
+const MAJOR_CATEGORY_BY_NAME = {
+  "计算机科学与技术": "工学", "机械设计制造及其自动化": "工学", "电气工程及其自动化": "工学",
+  "化学工程与工艺": "工学", "食品科学与工程": "工学", "风景园林": "工学", "航海技术": "工学",
+  "数学与应用数学": "理学", "地理科学": "理学", "汉语言文学": "文学", "新闻传播学": "文学",
+  "教育学": "教育学", "经济学": "经济学", "农学": "农学", "植物保护": "农学", "临床医学": "医学"
+};
 let currentStage = "gaokao";
 let stageAutoplayTimer = null;
 let stageAutoplayLocked = false;
 let currentSchoolSearch = "";
 let currentMajorSearch = "";
-let currentDimensionFilter = "all";
+let currentInstitutionSchoolSearch = "";
+let currentInstitutionMajorSearch = "";
+let currentInstitutionRegion = "all";
+let currentExperienceRegion = "all";
+let currentInstitutionRegionSearch = "";
+let currentExperienceRegionSearch = "";
+let currentInstitutionRegionLetter = "";
+let currentExperienceRegionLetter = "";
+let currentInstitutionRegionOpen = false;
+let currentExperienceRegionOpen = false;
+let currentInstitutionMajorCategory = "";
+let currentExperienceMajorCategory = "";
+let currentInstitutionMajorOpen = false;
+let currentExperienceMajorOpen = false;
+let currentExperienceContentTab = "institution";
+const currentDimensionFilters = new Set();
 let currentSourceFilter = "all";
-let currentScopeFilter = "all";
+let currentTimeFilter = "all";
+let currentExperienceSort = "relevance";
 let currentSearch = "";
 let currentSchoolDetail = "fjnu";
 let currentCandidateTab = "school";
@@ -314,6 +361,13 @@ let currentSchoolCandidateResults = [];
 let currentMajorCandidateResults = [];
 let decisionCalendarView = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 let selectedDecisionDate = "";
+
+const EXPERIENCE_DIMENSIONS_BY_SOURCE = {
+  all: ["课程学习", "宿舍生活", "设施布局", "社团活动", "校园氛围", "城市环境", "就业去向"],
+  student: ["课程学习", "宿舍生活", "设施布局", "社团活动", "校园氛围", "城市环境", "就业去向"],
+  official: ["课程学习", "设施布局", "城市环境"],
+  expert: ["课程学习", "校园氛围", "城市环境", "就业去向"]
+};
 let cyberPetSuppressClick = false;
 
 const $ = (selector, root = document) => root.querySelector(selector);
@@ -476,6 +530,33 @@ function applyExperienceLayout(layout, { persist = true, notify = false } = {}) 
   });
   if (persist) localStorage.setItem(STORE.experienceLayout, nextLayout);
   if (notify) showToast(`已切换为${nextLayout === "vertical" ? "竖版" : "横版"}布局`);
+}
+
+function switchExperienceContentTab(tab, { focusSearch = false } = {}) {
+  const nextTab = tab === "experience" ? "experience" : "institution";
+  currentExperienceContentTab = nextTab;
+  currentInstitutionRegionOpen = false;
+  currentExperienceRegionOpen = false;
+  currentInstitutionMajorOpen = false;
+  currentExperienceMajorOpen = false;
+  $$('[data-experience-content-tab]').forEach((button) => {
+    const active = button.dataset.experienceContentTab === nextTab;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-selected", String(active));
+  });
+  $$('[data-experience-content-panel]').forEach((panel) => {
+    panel.hidden = panel.dataset.experienceContentPanel !== nextTab;
+  });
+  if (nextTab === "institution") {
+    const advancedFilters = $("#advancedExperienceFilters");
+    if (advancedFilters) advancedFilters.hidden = true;
+    $("#toggleAdvancedFilters")?.classList.remove("open");
+  }
+  renderExperiences();
+  if (focusSearch) {
+    const input = nextTab === "institution" ? $("#institutionSchoolSearch") : $("#experienceSchoolSearch");
+    input?.focus();
+  }
 }
 
 function updateThemeControls(theme) {
@@ -1327,13 +1408,125 @@ function useStageControl(callback) {
   callback();
 }
 
-function setExperienceFilters({ scope = "all", dimension = "all", source = "all" } = {}) {
-  currentScopeFilter = scope;
-  currentDimensionFilter = dimension;
+function setExperienceFilters({ dimension = "all", dimensions = null, source = "all", time = "all", sort = "relevance" } = {}) {
   currentSourceFilter = source;
-  $$('[data-scope-filter]').forEach((item) => item.classList.toggle("active", item.dataset.scopeFilter === scope));
-  $$('[data-dimension-filter]').forEach((item) => item.classList.toggle("active", item.dataset.dimensionFilter === dimension));
+  const availableDimensions = EXPERIENCE_DIMENSIONS_BY_SOURCE[source] || EXPERIENCE_DIMENSIONS_BY_SOURCE.all;
+  const requestedDimensions = Array.isArray(dimensions) ? dimensions : dimension === "all" ? [] : [dimension];
+  currentDimensionFilters.clear();
+  requestedDimensions.filter((item) => availableDimensions.includes(item)).forEach((item) => currentDimensionFilters.add(item));
+  currentTimeFilter = source === "official" ? "all" : time;
+  currentExperienceSort = sort;
+  updateDimensionFilterButtons();
   $$('[data-source-filter]').forEach((item) => item.classList.toggle("active", item.dataset.sourceFilter === source));
+  $$('[data-time-filter]').forEach((item) => item.classList.toggle("active", item.dataset.timeFilter === time));
+  const sortSelect = $("#experienceSort");
+  if (sortSelect) sortSelect.value = sort;
+  updateExperienceFilterUi();
+}
+
+function formatContentDate(value) {
+  if (!value) return "时间待补充";
+  const date = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return value;
+  return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+}
+
+function matchesContentTime(value) {
+  if (currentTimeFilter === "all") return true;
+  if (!value) return false;
+  const date = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return false;
+  const cutoff = new Date();
+  cutoff.setHours(0, 0, 0, 0);
+  if (currentTimeFilter === "6m") cutoff.setMonth(cutoff.getMonth() - 6);
+  if (currentTimeFilter === "1y") cutoff.setFullYear(cutoff.getFullYear() - 1);
+  if (currentTimeFilter === "3y") cutoff.setFullYear(cutoff.getFullYear() - 3);
+  return date >= cutoff;
+}
+
+function updateExperienceFilterUi() {
+  const dimensionLabels = { all: "全部", "课程学习": "课程学习", "宿舍生活": "宿舍生活", "设施布局": "设施布局", "社团活动": "社团活动", "校园氛围": "校园氛围", "城市环境": "城市环境", "就业去向": "就业去向" };
+  const sourceLabels = { all: "全部", official: "官方信息", student: "在读学生", expert: "教师 / 从业者" };
+  const timeLabels = { all: "不限", "6m": "近半年", "1y": "近一年", "3y": "近三年" };
+  const dimensionSummary = $("#dimensionFilterSummary");
+  const sourceSummary = $("#sourceFilterSummary");
+  const timeSummary = $("#timeFilterSummary");
+  if (dimensionSummary) {
+    const selectedDimensions = [...currentDimensionFilters];
+    dimensionSummary.textContent = selectedDimensions.length === 0 ? "全部" : selectedDimensions.length === 1 ? dimensionLabels[selectedDimensions[0]] : `已选 ${selectedDimensions.length} 项`;
+  }
+  if (sourceSummary) sourceSummary.textContent = sourceLabels[currentSourceFilter] || "全部";
+  if (timeSummary) timeSummary.textContent = currentSourceFilter === "official" ? "不适用" : timeLabels[currentTimeFilter] || "不限";
+  const timeFilterTrigger = $("#timeFilterTrigger");
+  if (timeFilterTrigger) {
+    timeFilterTrigger.disabled = currentSourceFilter === "official";
+    timeFilterTrigger.setAttribute("aria-disabled", String(currentSourceFilter === "official"));
+  }
+  syncDimensionFilterAvailability();
+
+  const selected = [];
+  if (currentSearch.trim()) selected.push({ key: "keyword", label: `关键词：${currentSearch.trim()}` });
+  if (currentSchoolSearch.trim()) selected.push({ key: "school", label: `学校：${currentSchoolSearch.trim()}` });
+  if (currentMajorSearch.trim()) selected.push({ key: "major", label: `专业：${currentMajorSearch.trim()}` });
+  if (currentExperienceRegion !== "all") selected.push({ key: "region", label: `地区：${regionSelectionLabel(currentExperienceRegion)}` });
+  currentDimensionFilters.forEach((dimension) => selected.push({ key: "dimension", value: dimension, label: dimensionLabels[dimension] }));
+  if (currentSourceFilter !== "all") selected.push({ key: "source", label: sourceLabels[currentSourceFilter] });
+  if (currentTimeFilter !== "all") selected.push({ key: "time", label: timeLabels[currentTimeFilter] });
+  if (currentExperienceSort === "newest") selected.push({ key: "sort", label: "最新发布" });
+  if ($("#sameSchoolToggle")?.checked) selected.push({ key: "same-school", label: "同高中优先" });
+  const selectedFilters = $("#experienceSelectedFilters");
+  if (selectedFilters) {
+    selectedFilters.innerHTML = selected.length
+      ? selected.map((item) => `<button class="filter-selected-tag" type="button" data-clear-filter-key="${item.key}"${item.value ? ` data-filter-value="${escapeHtml(item.value)}"` : ""} title="移除${escapeHtml(item.label)}">${escapeHtml(item.label)}<i data-lucide="x"></i></button>`).join("")
+      : `<span class="filter-empty-label">当前未添加筛选条件</span>`;
+  }
+  const activeFilterCount = $("#activeFilterCount");
+  if (activeFilterCount) activeFilterCount.textContent = String(selected.length);
+  const clearButton = $("#clearExperienceFilters");
+  if (clearButton) clearButton.disabled = selected.length === 0;
+  syncAdvancedExperienceFilterPanels();
+  hydrateIcons();
+}
+
+function syncDimensionFilterAvailability() {
+  const availableDimensions = EXPERIENCE_DIMENSIONS_BY_SOURCE[currentSourceFilter] || EXPERIENCE_DIMENSIONS_BY_SOURCE.all;
+  $$('[data-dimension-filter]').forEach((button) => {
+    const dimension = button.dataset.dimensionFilter;
+    button.hidden = dimension !== "all" && !availableDimensions.includes(dimension);
+  });
+}
+
+function updateDimensionFilterButtons() {
+  $$('[data-dimension-filter]').forEach((button) => {
+    const dimension = button.dataset.dimensionFilter;
+    const active = dimension === "all" ? currentDimensionFilters.size === 0 : currentDimensionFilters.has(dimension);
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+}
+
+function syncAdvancedExperienceFilterPanels() {
+  const panel = $("#advancedExperienceFilters");
+  if (!panel || panel.hidden) return;
+  const activeSection = panel.dataset.activeSection || "all";
+  $$('[data-filter-section-panel]').forEach((sectionPanel) => {
+    const isTimePanel = sectionPanel.dataset.filterSectionPanel === "time";
+    const matchesSection = activeSection === "all" || sectionPanel.dataset.filterSectionPanel === activeSection;
+    sectionPanel.hidden = !matchesSection || (isTimePanel && currentSourceFilter === "official");
+  });
+}
+
+function toggleAdvancedExperienceFilters(section) {
+  const panel = $("#advancedExperienceFilters");
+  if (!panel || (section === "time" && currentSourceFilter === "official")) return;
+  const shouldOpen = panel.hidden || panel.dataset.activeSection !== section;
+  panel.hidden = !shouldOpen;
+  panel.dataset.activeSection = shouldOpen ? section : "";
+  $$('[data-filter-section]').forEach((button) => {
+    button.setAttribute("aria-expanded", String(shouldOpen && button.dataset.filterSection === section));
+  });
+  $("#toggleAdvancedFilters")?.classList.toggle("open", shouldOpen);
+  syncAdvancedExperienceFilterPanels();
 }
 
 function runStageSearch(slide) {
@@ -1341,8 +1534,13 @@ function runStageSearch(slide) {
   currentSearch = input?.value.trim() || "";
   currentSchoolSearch = "";
   currentMajorSearch = "";
+  currentExperienceRegion = "all";
+  currentExperienceRegionSearch = "";
+  currentExperienceRegionLetter = "";
+  currentExperienceRegionOpen = false;
   setExperienceFilters();
   switchView("experience");
+  switchExperienceContentTab("experience");
 }
 
 function runStageTask(task) {
@@ -1355,11 +1553,8 @@ function runStageTask(task) {
     $("#questionInputPreview")?.focus();
     return;
   }
+  const institutionTasks = ["school", "major", "admission", "progression"];
   const taskFilters = {
-    school: { scope: "school" },
-    major: { scope: "major" },
-    admission: { scope: "school", source: "official" },
-    progression: { scope: "school", source: "official" },
     course: { dimension: "课程学习" },
     career: { dimension: "就业去向" },
     expert: { source: "expert" },
@@ -1369,19 +1564,249 @@ function runStageTask(task) {
   currentSearch = "";
   currentSchoolSearch = "";
   currentMajorSearch = "";
+  if (institutionTasks.includes(task)) {
+    currentInstitutionRegion = "all";
+    currentInstitutionRegionSearch = "";
+    currentInstitutionRegionLetter = "";
+    currentInstitutionRegionOpen = false;
+  } else {
+    currentExperienceRegion = "all";
+    currentExperienceRegionSearch = "";
+    currentExperienceRegionLetter = "";
+    currentExperienceRegionOpen = false;
+  }
   setExperienceFilters(taskFilters[task] || {});
   switchView("experience");
+  switchExperienceContentTab(institutionTasks.includes(task) ? "institution" : "experience");
+  if (task === "school") $("#institutionSchoolSearch")?.focus();
+  if (task === "major") $("#institutionMajorSearch")?.focus();
+}
+
+function makeRegionSelection(province = "", city = "") {
+  if (city) return `city:${province}|${city}`;
+  return province ? `province:${province}` : "all";
+}
+
+function parseRegionSelection(selection) {
+  if (!selection || selection === "all") return { province: "", city: "" };
+  if (selection.startsWith("city:")) {
+    const [province = "", city = ""] = selection.slice(5).split("|");
+    return { province, city };
+  }
+  return { province: selection.startsWith("province:") ? selection.slice(9) : selection, city: "" };
+}
+
+function regionSelectionLabel(selection) {
+  const { province, city } = parseRegionSelection(selection);
+  return city ? `${province} / ${city}` : province;
+}
+
+function majorCategoryForName(name = "") {
+  const program = institutions.flatMap((item) => item.majorPrograms || []).find((item) => item.name === name);
+  return program?.category || MAJOR_CATEGORY_BY_NAME[name] || "";
+}
+
+function libraryMajorOptions(library) {
+  const entries = library === "institution"
+    ? institutions.flatMap((institution) => (institution.majorPrograms || []).map((program) => ({ name: program.name, category: program.category || majorCategoryForName(program.name), school: institution.school })))
+    : experiences.filter((item) => (item.source === "student" || item.source === "expert") && item.major).map((item) => ({ name: item.major, category: majorCategoryForName(item.major), school: item.school }));
+  const grouped = new Map();
+  entries.forEach((item) => {
+    if (!grouped.has(item.name)) grouped.set(item.name, { name: item.name, category: item.category, schools: new Set(), count: 0 });
+    const option = grouped.get(item.name);
+    option.count += 1;
+    if (item.school) option.schools.add(item.school);
+  });
+  return [...grouped.values()].sort((a, b) => a.category.localeCompare(b.category, "zh-CN") || a.name.localeCompare(b.name, "zh-CN"));
+}
+
+function libraryMajorUi(library) {
+  if (library === "institution") return { query: currentInstitutionMajorSearch, category: currentInstitutionMajorCategory, open: currentInstitutionMajorOpen };
+  return { query: currentMajorSearch, category: currentExperienceMajorCategory, open: currentExperienceMajorOpen };
+}
+
+function renderLibraryMajorPicker(library) {
+  const prefix = library === "institution" ? "institution" : "experience";
+  const panel = $(`#${prefix}MajorPanel`);
+  const categoriesContainer = $(`#${prefix}MajorCategories`);
+  const optionsContainer = $(`#${prefix}MajorOptions`);
+  const input = $(`#${prefix}MajorSearch`);
+  const toggle = $(`[data-major-toggle="${library}"]`);
+  const picker = $(`[data-major-picker="${library}"]`);
+  if (!panel || !categoriesContainer || !optionsContainer || !input || !toggle || !picker) return;
+  const { query, category, open } = libraryMajorUi(library);
+  const options = libraryMajorOptions(library);
+  const categoryCounts = new Map(MAJOR_CATEGORIES.map((item) => [item, options.filter((option) => option.category === item).length]));
+  const keyword = query.trim().toLowerCase();
+  const visibleOptions = options.filter((option) => (!category || option.category === category) && (!keyword || option.name.toLowerCase().includes(keyword)));
+  panel.hidden = !open;
+  picker.classList.toggle("open", open);
+  toggle.classList.toggle("open", open);
+  input.setAttribute("aria-expanded", String(open));
+  if (input.value !== query) input.value = query;
+  categoriesContainer.innerHTML = MAJOR_CATEGORIES.map((item) => {
+    const active = category === item;
+    return `<button class="major-category-button${active ? " active" : ""}" type="button" data-major-category="${escapeHtml(item)}" data-major-library="${library}" aria-pressed="${active}"><span>${escapeHtml(item)}</span><small>${categoryCounts.get(item) || 0}</small></button>`;
+  }).join("");
+  const emptyText = category ? `${category}在当前${library === "institution" ? "院校样本" : "经验样本"}中暂无数据` : "未找到匹配的专业";
+  optionsContainer.innerHTML = visibleOptions.length ? visibleOptions.map((option) => {
+    const meta = library === "institution" ? `${option.schools.size} 所样本院校开设` : `${option.count} 条相关经验`;
+    return `<button class="major-option-button" type="button" data-major-option="${escapeHtml(option.name)}" data-major-library="${library}"><span><strong>${escapeHtml(option.name)}</strong><small>${escapeHtml(option.category || "门类待补充")}</small></span><em>${meta}</em></button>`;
+  }).join("") : `<div class="major-picker-empty"><strong>${escapeHtml(emptyText)}</strong><span>更多专业数据将在接入可靠资料后补充</span></div>`;
+}
+
+function normalizeProvinceName(value = "") {
+  return String(value).replace(/(壮族自治区|回族自治区|维吾尔自治区|特别行政区|自治区|省|市)$/u, "");
+}
+
+function normalizeCityName(value = "") {
+  return String(value).replace(/(自治州|综合实验区|地区|新区|市|盟|区|县)$/u, "");
+}
+
+function provinceForCity(city = "") {
+  const normalizedCity = normalizeCityName(city);
+  return Object.keys(REGION_CITIES).find((province) => {
+    if (normalizeProvinceName(province) === normalizedCity) return true;
+    return REGION_CITIES[province].some((item) => normalizeCityName(item) === normalizedCity);
+  }) || "";
+}
+
+function isCityLevelRegion(value = "") {
+  return /(市|自治州|地区|盟)$/u.test(value);
+}
+
+function isMunicipality(value = "") {
+  return MUNICIPALITIES.has(value);
+}
+
+function matchesRegionSelection(item, selection) {
+  if (!selection || selection === "all") return true;
+  const selected = parseRegionSelection(selection);
+  const itemCity = item.city || "";
+  if (selected.city) return normalizeCityName(itemCity) === normalizeCityName(selected.city);
+  const itemProvince = item.province || provinceForCity(itemCity);
+  return itemProvince === selected.province || normalizeProvinceName(itemCity) === normalizeProvinceName(selected.province);
+}
+
+function regionTypeLabel(province, city = "") {
+  if (city) {
+    if (city.endsWith("自治州")) return "州";
+    if (city.endsWith("地区")) return "地";
+    if (city.endsWith("盟")) return "盟";
+    if (city.endsWith("区") || city.endsWith("县")) return "区";
+    return "市";
+  }
+  if (province === "海外") return "外";
+  if (province.endsWith("特别行政区")) return "特";
+  if (province.endsWith("自治区")) return "区";
+  if (province.endsWith("市")) return "直";
+  return "省";
+}
+
+function regionWholeAreaLabel(province = "") {
+  if (province.endsWith("特别行政区")) return "全特别行政区";
+  if (province.endsWith("自治区")) return "全自治区";
+  if (province.endsWith("市")) return "全市";
+  if (province === "海外") return "全部海外地区";
+  return "全省";
+}
+
+function libraryRegionUi(library) {
+  if (library === "institution") {
+    return { selection: currentInstitutionRegion, query: currentInstitutionRegionSearch, letter: currentInstitutionRegionLetter, open: currentInstitutionRegionOpen };
+  }
+  return { selection: currentExperienceRegion, query: currentExperienceRegionSearch, letter: currentExperienceRegionLetter, open: currentExperienceRegionOpen };
+}
+
+function renderLibraryRegionPicker(library) {
+  const isInstitution = library === "institution";
+  const prefix = isInstitution ? "institution" : "experience";
+  const lettersContainer = $(`#${prefix}RegionLetters`);
+  const optionsContainer = $(`#${prefix}RegionOptions`);
+  const searchInput = $(`#${prefix}RegionSearch`);
+  const panel = $(`#${prefix}RegionPanel`);
+  const toggle = $(`[data-region-toggle="${library}"]`);
+  const allButton = $(`[data-library-region="${library}"][data-region-province=""][data-region-city=""]`);
+  if (!lettersContainer || !optionsContainer || !panel || !toggle) return;
+  const { selection, query, letter, open } = libraryRegionUi(library);
+  const selected = parseRegionSelection(selection);
+  const availableLetters = new Set(Object.values(REGION_INITIAL_BY_PROVINCE));
+  panel.hidden = !open;
+  toggle.classList.toggle("open", open);
+  toggle.setAttribute("aria-expanded", String(open));
+  if (searchInput) {
+    const displayValue = query || regionSelectionLabel(selection);
+    if (searchInput.value !== displayValue) searchInput.value = displayValue;
+    searchInput.setAttribute("aria-expanded", String(open));
+  }
+  if (allButton) {
+    const active = selection === "all";
+    allButton.classList.toggle("active", active);
+    allButton.setAttribute("aria-pressed", String(active));
+  }
+  lettersContainer.innerHTML = REGION_LETTERS.map((item) => {
+    const disabled = !availableLetters.has(item);
+    const active = letter === item;
+    return `<button class="region-letter-button${active ? " active" : ""}" type="button" data-region-letter="${item}" data-region-library="${library}" aria-pressed="${active}"${disabled ? " disabled" : ""}>${item}</button>`;
+  }).join("");
+
+  const keyword = query.trim();
+  let results = [];
+  if (keyword) {
+    Object.entries(REGION_CITIES).forEach(([province, cities]) => {
+      if (province.includes(keyword)) results.push({ province, city: "" });
+      cities.filter((city) => isCityLevelRegion(city) && city.includes(keyword)).forEach((city) => results.push({ province, city }));
+    });
+    results = results.slice(0, 24);
+  } else if (letter) {
+    results = Object.keys(REGION_CITIES)
+      .filter((province) => REGION_INITIAL_BY_PROVINCE[province] === letter)
+      .map((province) => ({ province, city: "" }));
+  } else {
+    results = Object.keys(REGION_CITIES)
+      .sort((a, b) => REGION_INITIAL_BY_PROVINCE[a].localeCompare(REGION_INITIAL_BY_PROVINCE[b]) || a.localeCompare(b, "zh-CN"))
+      .map((province) => ({ province, city: "" }));
+  }
+
+  const resultButton = ({ province, city }, compact = false) => {
+    const value = makeRegionSelection(province, city);
+    const active = selection === value;
+    return `<button class="region-result-button${compact ? " compact" : ""}${active ? " active" : ""}" type="button" data-library-region="${library}" data-region-province="${escapeHtml(province)}" data-region-city="${escapeHtml(city)}" aria-pressed="${active}"><strong>${escapeHtml(city || province)}</strong>${city ? `<small>${escapeHtml(province)}</small>` : ""}</button>`;
+  };
+  let resultButtons = "";
+  if (keyword) {
+    resultButtons = `<div class="region-search-results">${results.map((item) => resultButton(item)).join("")}</div>`;
+  } else {
+    const groupedResults = REGION_LETTERS.map((initial) => {
+      const provinces = results.filter((item) => REGION_INITIAL_BY_PROVINCE[item.province] === initial);
+      if (!provinces.length) return "";
+      return `<section class="region-province-group"><b>${initial}</b><div>${provinces.map((item) => resultButton(item, true)).join("")}</div></section>`;
+    }).join("");
+    const popularCities = !letter ? `<section class="region-popular-section"><span>热门城市</span><div>${POPULAR_REGIONS.map((item) => {
+      const active = selection === makeRegionSelection(item.province, item.city);
+      return `<button class="region-popular-button${active ? " active" : ""}" type="button" data-library-region="${library}" data-region-province="${escapeHtml(item.province)}" data-region-city="${escapeHtml(item.city)}"${item.city ? "" : " data-region-scope-all"} aria-pressed="${active}">${escapeHtml(item.label)}</button>`;
+    }).join("")}</div></section>` : "";
+    resultButtons = `${popularCities}<div class="region-province-groups">${groupedResults}</div>`;
+  }
+
+  const showSelectedProvinceCities = selected.province && !isMunicipality(selected.province) && !keyword && (!letter || REGION_INITIAL_BY_PROVINCE[selected.province] === letter);
+  const cityOptions = showSelectedProvinceCities ? `<div class="region-city-panel"><div class="region-city-heading"><strong>${escapeHtml(selected.province)}</strong><span>城市</span></div><div class="region-city-options"><button class="region-city-button${selected.city ? "" : " active"}" type="button" data-library-region="${library}" data-region-province="${escapeHtml(selected.province)}" data-region-city="" data-region-scope-all aria-pressed="${String(!selected.city)}">${escapeHtml(regionWholeAreaLabel(selected.province))}</button>${(REGION_CITIES[selected.province] || []).filter(isCityLevelRegion).map((city) => `<button class="region-city-button${selected.city === city ? " active" : ""}" type="button" data-library-region="${library}" data-region-province="${escapeHtml(selected.province)}" data-region-city="${escapeHtml(city)}" aria-pressed="${String(selected.city === city)}">${escapeHtml(city)}</button>`).join("")}</div></div>` : "";
+  optionsContainer.hidden = false;
+  optionsContainer.innerHTML = `${results.length ? resultButtons : `<div class="region-no-results">未找到匹配地区</div>`}${cityOptions}`;
+}
+
+function renderExperienceInstitutionSummary(item) {
+  const institution = institutions.find((school) => school.school === item.school);
+  if (!institution) {
+    return `<div class="experience-institution-summary pending"><div class="experience-institution-heading"><span><i data-lucide="landmark"></i>院校摘要</span><strong>${escapeHtml(item.school || "未命名学校")}</strong></div><div class="experience-institution-meta"><span><i data-lucide="map-pin"></i>${escapeHtml(item.city || "地区待补充")}</span><span class="experience-institution-pending">院校资料待补充</span></div></div>`;
+  }
+  const identityTags = Array.isArray(institution.identityTags) ? institution.identityTags.map((tag) => `<span class="experience-institution-tag">${escapeHtml(tag)}</span>`).join("") : "";
+  return `<div class="experience-institution-summary"><div class="experience-institution-heading"><span><i data-lucide="landmark"></i>院校摘要</span><strong>${escapeHtml(institution.school)}</strong></div><div class="experience-institution-meta"><span><i data-lucide="map-pin"></i>${escapeHtml(institution.city || item.city || "地区待补充")}</span><span>${escapeHtml(institution.type || "院校类型待补充")}</span></div>${identityTags ? `<div class="experience-institution-tags">${identityTags}</div>` : ""}</div>`;
 }
 
 function renderExperiences() {
   const grid = $("#experienceGrid");
   if (!grid) return;
-  const institutionSection = $(".institution-section");
-  const experienceSection = $(".experience-section");
-  const showInstitutions = currentSourceFilter === "all" || currentSourceFilter === "data" || currentSourceFilter === "official";
-  const showExperiences = currentSourceFilter === "all" || currentSourceFilter === "student" || currentSourceFilter === "expert";
-  institutionSection?.classList.toggle("hidden", !showInstitutions);
-  experienceSection?.classList.toggle("hidden", !showExperiences);
   const experienceSectionCopy = {
     all: { kicker: "经验与职业视角", heading: "来自学生、教师与从业者的真实补充", empty: "当前筛选下暂无匹配的经验或职业视角内容" },
     student: { kicker: "学生经验", heading: "来自在读学生的真实经历", empty: "当前筛选下暂无匹配的在读学生经验" },
@@ -1395,59 +1820,75 @@ function renderExperiences() {
   const query = currentSearch.trim().toLowerCase();
   const schoolQuery = currentSchoolSearch.trim().toLowerCase();
   const majorQuery = currentMajorSearch.trim().toLowerCase();
+  const institutionSchoolQuery = currentInstitutionSchoolSearch.trim().toLowerCase();
+  const institutionMajorQuery = currentInstitutionMajorSearch.trim().toLowerCase();
+  const experienceItems = experiences.filter((item) => item.source === "student" || item.source === "expert");
+  renderLibraryMajorPicker("institution");
+  renderLibraryMajorPicker("experience");
+  renderLibraryRegionPicker("institution");
+  renderLibraryRegionPicker("experience");
   const sameSchool = $("#sameSchoolToggle")?.checked;
   const matchesFilters = (item) => {
     const dimensions = Array.isArray(item.dimensions) ? item.dimensions : [];
     const itemTags = Array.isArray(item.tags) ? item.tags.join("") : "";
-    const schoolText = `${item.school || ""}${item.city || ""}`.toLowerCase();
+    const schoolText = (item.school || "").toLowerCase();
     const majorText = (item.major || "").toLowerCase();
     const schoolMatches = !schoolQuery || schoolText.includes(schoolQuery);
     const majorMatches = !majorQuery || majorText.includes(majorQuery);
-    const matchesScope = currentScopeFilter === "school" ? schoolMatches : currentScopeFilter === "major" ? majorMatches : currentScopeFilter === "both" ? schoolMatches && majorMatches : schoolMatches && majorMatches;
-    const matchesDimension = currentDimensionFilter === "all" || dimensions.includes(currentDimensionFilter);
+    const matchesDimension = currentDimensionFilters.size === 0 || dimensions.some((dimension) => currentDimensionFilters.has(dimension));
     const matchesSource = currentSourceFilter === "all" || item.source === currentSourceFilter;
     const matchesSearch = !query || `${item.school || ""}${item.major || ""}${item.city || ""}${item.text || ""}${itemTags}${dimensions.join("")}`.toLowerCase().includes(query);
-    return matchesScope && matchesDimension && matchesSource && matchesSearch;
+    const regionMatches = matchesRegionSelection(item, currentExperienceRegion);
+    return schoolMatches && majorMatches && regionMatches && matchesDimension && matchesSource && matchesSearch && matchesContentTime(item.publishedAt);
   };
-  const filtered = experiences.filter((item) => (item.source === "student" || item.source === "expert") && matchesFilters(item));
+  const filtered = experienceItems.filter(matchesFilters);
   const filteredInstitutions = institutions.filter((item) => {
-    const dimensions = Array.isArray(item.dimensions) ? item.dimensions : [];
-    const schoolText = `${item.school || ""}${item.city || ""}`.toLowerCase();
-    const majorText = (item.majors || []).join("").toLowerCase();
-    const schoolMatches = !schoolQuery || schoolText.includes(schoolQuery);
-    const majorMatches = !majorQuery || majorText.includes(majorQuery);
-    const matchesScope = currentScopeFilter === "school" ? schoolMatches : currentScopeFilter === "major" ? majorMatches : currentScopeFilter === "both" ? schoolMatches && majorMatches : schoolMatches && majorMatches;
-    const matchesDimension = currentDimensionFilter === "all" || dimensions.includes(currentDimensionFilter);
-    const matchesSource = currentSourceFilter === "all" || currentSourceFilter === "data" || currentSourceFilter === "official";
-    const matchesSearch = !query || `${item.school}${item.city}${item.type}${item.intro}${item.majors.join("")}${item.highlights.join("")}`.toLowerCase().includes(query);
-    return matchesScope && matchesDimension && matchesSource && matchesSearch;
+    const schoolText = (item.school || "").toLowerCase();
+    const majorText = [...(item.majors || []), ...(item.majorPrograms || []).map((program) => program.name)].join("").toLowerCase();
+    const schoolMatches = !institutionSchoolQuery || schoolText.includes(institutionSchoolQuery);
+    const majorMatches = !institutionMajorQuery || majorText.includes(institutionMajorQuery);
+    const regionMatches = matchesRegionSelection(item, currentInstitutionRegion);
+    return schoolMatches && majorMatches && regionMatches;
   });
   const institutionGrid = $("#institutionGrid");
   if (institutionGrid) {
-    institutionGrid.innerHTML = filteredInstitutions.length ? filteredInstitutions.map(renderInstitutionCard).join("") : `<div class="empty-state institution-empty"><i data-lucide="building-2"></i><p>当前筛选下暂无匹配的院校信息</p></div>`;
+    const institutionEmptyText = currentInstitutionRegion === "all" ? "当前筛选下暂无匹配的院校信息" : `${regionSelectionLabel(currentInstitutionRegion)}暂无匹配的院校信息`;
+    institutionGrid.innerHTML = filteredInstitutions.length ? filteredInstitutions.map(renderInstitutionCard).join("") : `<div class="empty-state institution-empty"><i data-lucide="building-2"></i><p>${escapeHtml(institutionEmptyText)}</p></div>`;
     $("#institutionResultNote") && ($("#institutionResultNote").textContent = `${filteredInstitutions.length} 所学校`);
   }
+  const clearInstitutionFilters = $("#clearInstitutionFilters");
+  if (clearInstitutionFilters) clearInstitutionFilters.disabled = !currentInstitutionSchoolSearch.trim() && !currentInstitutionMajorSearch.trim() && !currentInstitutionRegionSearch.trim() && currentInstitutionRegion === "all";
   $("#experienceResultNote") && ($("#experienceResultNote").textContent = `${filtered.length} 条内容`);
-  const ordered = sameSchool ? [...filtered].sort((a, b) => ((a.school || "").includes("师范") ? -1 : 0) - ((b.school || "").includes("师范") ? -1 : 0)) : filtered;
+  const ordered = [...filtered].sort((a, b) => {
+    if (sameSchool) {
+      const schoolPriority = Number((b.school || "").includes("师范")) - Number((a.school || "").includes("师范"));
+      if (schoolPriority) return schoolPriority;
+    }
+    return currentExperienceSort === "newest" ? String(b.publishedAt || "").localeCompare(String(a.publishedAt || "")) : 0;
+  });
   const favorites = userFavorites();
   const sourceLabels = { student: { cls: "level-student", icon: "user-check", text: "在读认证" }, official: { cls: "level-official", icon: "landmark", text: "官方信息" }, data: { cls: "level-data", icon: "database", text: "客观数据" }, expert: { cls: "level-expert", icon: "users", text: "教师/从业者" } };
+  const experienceEmptyText = currentExperienceRegion === "all" ? sectionCopy.empty : `${regionSelectionLabel(currentExperienceRegion)}暂无匹配的经验内容`;
   grid.innerHTML = ordered.length ? ordered.map((item) => {
     const src = sourceLabels[item.source] || sourceLabels.student;
     const saved = favorites.includes(item.id);
     const tagsHtml = Array.isArray(item.tags) ? item.tags.map((tag) => `<span class="content-tag">${tag}</span>`).join("") : "";
     const dimensionsHtml = Array.isArray(item.dimensions) ? item.dimensions.map((dimension) => `<span class="content-tag">${dimension}</span>`).join("") : "";
     const sourceDetail = item.sourceUrl ? `<a class="source-link" href="${item.sourceUrl}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link"></i>查看来源 · ${item.sourceName}</a>` : `<span class="source-link source-link-muted"><i data-lucide="shield-check"></i>平台认证记录 · ${item.level || "身份已核验"}</span>`;
+    const publishedAt = `<time class="experience-published-at" datetime="${item.publishedAt || ""}"><i data-lucide="clock-3"></i>发布于 ${formatContentDate(item.publishedAt)}</time>`;
     const valueHtml = item.value ? `<div class="source-value"><strong>${item.value}</strong><small>来源内容摘要</small></div>` : "";
     const titleHtml = item.title ? `<h3 class="experience-card-title">${item.title}</h3>` : "";
+    const institutionSummary = renderExperienceInstitutionSummary(item);
     return `<article class="experience-card">
       <div class="experience-top"><span class="school-avatar">${(item.school || "").slice(0, 1)}</span><div class="experience-school"><strong>${item.school || "未命名学校"}</strong><small>${item.major || "未分类专业"} · ${item.city || "未标注城市"}</small></div><span class="source-level-tag ${src.cls}">${src.text}</span></div>
       <div class="experience-divider"></div>
-      ${valueHtml}${titleHtml}
+      ${institutionSummary}${valueHtml}${titleHtml}
       <p>${item.text || ""}</p>
       <div class="tag-row">${dimensionsHtml}${tagsHtml}</div>
-      <div class="experience-card-footer">${sourceDetail}<button class="save-experience ${saved ? "saved" : ""}" data-favorite="${item.id}"><i data-lucide="${saved ? "bookmark-check" : "bookmark-plus"}"></i>${saved ? "已加入候选" : "加入我的候选"}</button></div>
+      <div class="experience-card-footer"><div class="experience-source-meta">${sourceDetail}${publishedAt}</div><div class="experience-card-actions"><button class="save-experience ${saved ? "saved" : ""}" data-favorite="${item.id}"><i data-lucide="${saved ? "bookmark-check" : "bookmark-plus"}"></i>${saved ? "已加入候选" : "加入我的候选"}</button></div></div>
     </article>`;
-  }).join("") : `<div class="empty-state"><i data-lucide="search-x"></i><p>${sectionCopy.empty}</p><button class="quiet-button" data-clear-search>清空筛选</button></div>`;
+  }).join("") : `<div class="empty-state"><i data-lucide="search-x"></i><p>${escapeHtml(experienceEmptyText)}</p><button class="quiet-button" data-clear-search>清空筛选</button></div>`;
+  updateExperienceFilterUi();
   hydrateIcons();
 }
 
@@ -1475,7 +1916,7 @@ function renderInstitutionCard(item) {
     <div class="institution-highlights">${highlightHtml}</div>
     <div class="institution-card-block"><span>重点关注专业</span><div class="tag-row">${majorHtml}</div></div>
     <div class="institution-evidence"><span><i data-lucide="database"></i>客观数据已整理</span><span><i data-lucide="landmark"></i>官方资料已整理</span></div>
-    <div class="institution-card-footer"><span class="institution-note">平台摘要 · 来源可核验</span><div class="institution-card-actions"><button class="text-button" data-school-detail="${item.id}">全面了解 <i data-lucide="arrow-up-right"></i></button><button class="save-experience ${saved ? "saved" : ""}" data-favorite="school-${item.id}"><i data-lucide="${saved ? "bookmark-check" : "bookmark-plus"}"></i>${saved ? "已加入候选" : "加入候选"}</button></div></div>
+    <div class="institution-card-footer"><span class="institution-note"><i data-lucide="clock-3"></i>资料更新于 ${item.updatedAt || "时间待补充"} · 来源可核验</span><div class="institution-card-actions"><button class="text-button" data-school-detail="${item.id}">全面了解 <i data-lucide="arrow-up-right"></i></button><button class="save-experience ${saved ? "saved" : ""}" data-favorite="school-${item.id}"><i data-lucide="${saved ? "bookmark-check" : "bookmark-plus"}"></i>${saved ? "已加入候选" : "加入候选"}</button></div></div>
   </article>`;
 }
 
@@ -2523,6 +2964,116 @@ document.addEventListener("click", (event) => {
   if (petAction) { handleCyberPetAction(petAction.dataset.petAction); return; }
   const experienceLayout = event.target.closest("[data-experience-layout]");
   if (experienceLayout) { applyExperienceLayout(experienceLayout.dataset.experienceLayout, { notify: true }); return; }
+  const experienceContentTab = event.target.closest("[data-experience-content-tab]");
+  if (experienceContentTab) { switchExperienceContentTab(experienceContentTab.dataset.experienceContentTab); return; }
+  const regionToggle = event.target.closest("[data-region-toggle]");
+  if (regionToggle) {
+    const library = regionToggle.dataset.regionToggle;
+    if (library === "institution") {
+      currentInstitutionRegionOpen = !currentInstitutionRegionOpen;
+      currentInstitutionMajorOpen = false;
+    } else {
+      currentExperienceRegionOpen = !currentExperienceRegionOpen;
+      currentExperienceMajorOpen = false;
+    }
+    renderLibraryRegionPicker(library);
+    renderLibraryMajorPicker(library);
+    if ((library === "institution" ? currentInstitutionRegionOpen : currentExperienceRegionOpen)) {
+      window.setTimeout(() => $(`#${library}RegionSearch`)?.focus(), 0);
+    }
+    return;
+  }
+  const regionLetter = event.target.closest("[data-region-letter]");
+  if (regionLetter) {
+    const library = regionLetter.dataset.regionLibrary;
+    if (library === "institution") {
+      currentInstitutionRegionLetter = regionLetter.dataset.regionLetter;
+      currentInstitutionRegionSearch = "";
+      currentInstitutionRegionOpen = true;
+    } else {
+      currentExperienceRegionLetter = regionLetter.dataset.regionLetter;
+      currentExperienceRegionSearch = "";
+      currentExperienceRegionOpen = true;
+    }
+    renderLibraryRegionPicker(library);
+    return;
+  }
+  const libraryRegion = event.target.closest("[data-library-region]");
+  if (libraryRegion) {
+    const library = libraryRegion.dataset.libraryRegion;
+    const province = libraryRegion.dataset.regionProvince || "";
+    const city = libraryRegion.dataset.regionCity || "";
+    const selection = makeRegionSelection(province, city);
+    const shouldClose = Boolean(city || isMunicipality(province) || libraryRegion.hasAttribute("data-region-scope-all") || !province);
+    if (library === "institution") {
+      currentInstitutionRegion = selection;
+      currentInstitutionRegionSearch = "";
+      currentInstitutionRegionLetter = province ? REGION_INITIAL_BY_PROVINCE[province] || "" : "";
+      currentInstitutionRegionOpen = !shouldClose;
+    } else {
+      currentExperienceRegion = selection;
+      currentExperienceRegionSearch = "";
+      currentExperienceRegionLetter = province ? REGION_INITIAL_BY_PROVINCE[province] || "" : "";
+      currentExperienceRegionOpen = !shouldClose;
+    }
+    renderExperiences();
+    return;
+  }
+  const majorToggle = event.target.closest("[data-major-toggle]");
+  if (majorToggle) {
+    const library = majorToggle.dataset.majorToggle;
+    if (library === "institution") {
+      currentInstitutionMajorOpen = !currentInstitutionMajorOpen;
+      currentInstitutionRegionOpen = false;
+    } else {
+      currentExperienceMajorOpen = !currentExperienceMajorOpen;
+      currentExperienceRegionOpen = false;
+    }
+    renderLibraryMajorPicker(library);
+    renderLibraryRegionPicker(library);
+    if (library === "institution" ? currentInstitutionMajorOpen : currentExperienceMajorOpen) window.setTimeout(() => $(`#${library}MajorSearch`)?.focus(), 0);
+    return;
+  }
+  const majorCategory = event.target.closest("[data-major-category]");
+  if (majorCategory) {
+    const library = majorCategory.dataset.majorLibrary;
+    const category = majorCategory.dataset.majorCategory;
+    if (library === "institution") {
+      currentInstitutionMajorCategory = currentInstitutionMajorCategory === category ? "" : category;
+      currentInstitutionMajorOpen = true;
+    } else {
+      currentExperienceMajorCategory = currentExperienceMajorCategory === category ? "" : category;
+      currentExperienceMajorOpen = true;
+    }
+    renderLibraryMajorPicker(library);
+    return;
+  }
+  const majorOption = event.target.closest("[data-major-option]");
+  if (majorOption) {
+    const library = majorOption.dataset.majorLibrary;
+    const value = majorOption.dataset.majorOption;
+    if (library === "institution") {
+      currentInstitutionMajorSearch = value;
+      currentInstitutionMajorOpen = false;
+      currentInstitutionMajorCategory = majorCategoryForName(value);
+    } else {
+      currentMajorSearch = value;
+      currentExperienceMajorOpen = false;
+      currentExperienceMajorCategory = majorCategoryForName(value);
+    }
+    renderExperiences();
+    return;
+  }
+  if ((currentInstitutionRegionOpen || currentExperienceRegionOpen || currentInstitutionMajorOpen || currentExperienceMajorOpen) && !event.target.closest(".library-region-index") && !event.target.closest(".library-major-picker")) {
+    currentInstitutionRegionOpen = false;
+    currentExperienceRegionOpen = false;
+    currentInstitutionMajorOpen = false;
+    currentExperienceMajorOpen = false;
+    renderLibraryRegionPicker("institution");
+    renderLibraryRegionPicker("experience");
+    renderLibraryMajorPicker("institution");
+    renderLibraryMajorPicker("experience");
+  }
   const calendarShift = event.target.closest("[data-calendar-shift]");
   if (calendarShift) { shiftDecisionCalendar(Number(calendarShift.dataset.calendarShift)); return; }
   const calendarDate = event.target.closest("[data-calendar-date]");
@@ -2596,7 +3147,7 @@ document.addEventListener("click", (event) => {
   if (event.target.closest("[data-start-verify]")) { requestVerification(); return; }
   if (event.target.closest("[data-report-comment]")) { showToast("已记录举报，正式版本将进入内容审核流程"); return; }
   if (event.target.closest("[data-share-candidates]")) { showToast("候选清单分享功能将在正式后端版本开放"); return; }
-  if (event.target.closest("[data-clear-search]")) { currentSearch = ""; $$("[data-stage-search]").forEach((input) => { input.value = ""; }); renderExperiences(); return; }
+  if (event.target.closest("[data-clear-search]")) { $("#clearExperienceFilters")?.click(); return; }
   const authTab = event.target.closest("[data-auth-tab]"); if (authTab) { $$(".auth-tab").forEach((tab) => tab.classList.toggle("active", tab === authTab)); $("#loginForm").classList.toggle("hidden"); $("#registerForm").classList.toggle("hidden"); return; }
   const qaTab = event.target.closest("[data-qa-tab]"); if (qaTab) { switchQaTab(qaTab.dataset.qaTab); return; }
 });
@@ -2728,33 +3279,128 @@ document.addEventListener("visibilitychange", () => {
   else startStageAutoplay();
 });
 $$('[data-dimension-filter]').forEach((button) => button.addEventListener("click", () => {
-  currentDimensionFilter = button.dataset.dimensionFilter;
-  $$('[data-dimension-filter]').forEach((item) => item.classList.toggle("active", item === button));
+  const dimension = button.dataset.dimensionFilter;
+  if (dimension === "all") currentDimensionFilters.clear();
+  else if (currentDimensionFilters.has(dimension)) currentDimensionFilters.delete(dimension);
+  else currentDimensionFilters.add(dimension);
+  updateDimensionFilterButtons();
   renderExperiences();
 }));
 $$('[data-source-filter]').forEach((button) => button.addEventListener("click", () => {
   currentSourceFilter = button.dataset.sourceFilter;
+  const availableDimensions = EXPERIENCE_DIMENSIONS_BY_SOURCE[currentSourceFilter] || EXPERIENCE_DIMENSIONS_BY_SOURCE.all;
+  [...currentDimensionFilters].filter((dimension) => !availableDimensions.includes(dimension)).forEach((dimension) => currentDimensionFilters.delete(dimension));
+  if (currentSourceFilter === "official") currentTimeFilter = "all";
   $$('[data-source-filter]').forEach((item) => item.classList.toggle("active", item === button));
+  updateDimensionFilterButtons();
+  $$('[data-time-filter]').forEach((item) => item.classList.toggle("active", item.dataset.timeFilter === currentTimeFilter));
   renderExperiences();
 }));
-$$('[data-scope-filter]').forEach((button) => button.addEventListener("click", () => {
-  currentScopeFilter = button.dataset.scopeFilter;
-  $$('[data-scope-filter]').forEach((item) => item.classList.toggle("active", item === button));
+$$('[data-time-filter]').forEach((button) => button.addEventListener("click", () => {
+  currentTimeFilter = button.dataset.timeFilter;
+  $$('[data-time-filter]').forEach((item) => item.classList.toggle("active", item === button));
   renderExperiences();
 }));
 const experienceSchoolSearch = $("#experienceSchoolSearch"); if (experienceSchoolSearch) experienceSchoolSearch.addEventListener("input", (event) => { currentSchoolSearch = event.target.value; renderExperiences(); });
-const experienceMajorSearch = $("#experienceMajorSearch"); if (experienceMajorSearch) experienceMajorSearch.addEventListener("input", (event) => { currentMajorSearch = event.target.value; renderExperiences(); });
+const experienceMajorSearch = $("#experienceMajorSearch"); if (experienceMajorSearch) {
+  experienceMajorSearch.addEventListener("focus", () => { currentExperienceMajorOpen = true; currentExperienceRegionOpen = false; renderLibraryMajorPicker("experience"); renderLibraryRegionPicker("experience"); });
+  experienceMajorSearch.addEventListener("input", (event) => { currentMajorSearch = event.target.value; currentExperienceMajorCategory = ""; currentExperienceMajorOpen = true; renderExperiences(); });
+  experienceMajorSearch.addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); $("#experienceMajorOptions [data-major-option]")?.click(); } });
+}
+const institutionSchoolSearch = $("#institutionSchoolSearch"); if (institutionSchoolSearch) institutionSchoolSearch.addEventListener("input", (event) => { currentInstitutionSchoolSearch = event.target.value; renderExperiences(); });
+const institutionMajorSearch = $("#institutionMajorSearch"); if (institutionMajorSearch) {
+  institutionMajorSearch.addEventListener("focus", () => { currentInstitutionMajorOpen = true; currentInstitutionRegionOpen = false; renderLibraryMajorPicker("institution"); renderLibraryRegionPicker("institution"); });
+  institutionMajorSearch.addEventListener("input", (event) => { currentInstitutionMajorSearch = event.target.value; currentInstitutionMajorCategory = ""; currentInstitutionMajorOpen = true; renderExperiences(); });
+  institutionMajorSearch.addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); $("#institutionMajorOptions [data-major-option]")?.click(); } });
+}
+const institutionRegionSearch = $("#institutionRegionSearch"); if (institutionRegionSearch) {
+  institutionRegionSearch.addEventListener("focus", () => {
+    currentInstitutionRegionOpen = true;
+    currentInstitutionMajorOpen = false;
+    renderLibraryRegionPicker("institution");
+    renderLibraryMajorPicker("institution");
+    if (currentInstitutionRegion !== "all") window.setTimeout(() => institutionRegionSearch.select(), 0);
+  });
+  institutionRegionSearch.addEventListener("input", (event) => {
+    currentInstitutionRegionSearch = event.target.value;
+    currentInstitutionRegion = "all";
+    currentInstitutionRegionLetter = "";
+    currentInstitutionRegionOpen = true;
+    renderExperiences();
+  });
+  institutionRegionSearch.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    $("#institutionRegionOptions [data-library-region]")?.click();
+  });
+}
+const experienceRegionSearch = $("#experienceRegionSearch"); if (experienceRegionSearch) {
+  experienceRegionSearch.addEventListener("focus", () => {
+    currentExperienceRegionOpen = true;
+    currentExperienceMajorOpen = false;
+    renderLibraryRegionPicker("experience");
+    renderLibraryMajorPicker("experience");
+    if (currentExperienceRegion !== "all") window.setTimeout(() => experienceRegionSearch.select(), 0);
+  });
+  experienceRegionSearch.addEventListener("input", (event) => {
+    currentExperienceRegionSearch = event.target.value;
+    currentExperienceRegion = "all";
+    currentExperienceRegionLetter = "";
+    currentExperienceRegionOpen = true;
+    renderExperiences();
+  });
+  experienceRegionSearch.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    $("#experienceRegionOptions [data-library-region]")?.click();
+  });
+}
+const clearInstitutionFilters = $("#clearInstitutionFilters"); if (clearInstitutionFilters) clearInstitutionFilters.addEventListener("click", () => {
+  currentInstitutionSchoolSearch = "";
+  currentInstitutionMajorSearch = "";
+  currentInstitutionRegion = "all";
+  currentInstitutionRegionSearch = "";
+  currentInstitutionRegionLetter = "";
+  currentInstitutionRegionOpen = false;
+  currentInstitutionMajorCategory = "";
+  currentInstitutionMajorOpen = false;
+  if (institutionSchoolSearch) institutionSchoolSearch.value = "";
+  if (institutionMajorSearch) institutionMajorSearch.value = "";
+  renderExperiences();
+});
+const experienceSort = $("#experienceSort"); if (experienceSort) experienceSort.addEventListener("change", (event) => { currentExperienceSort = event.target.value; renderExperiences(); });
+$$('[data-filter-section]').forEach((button) => button.addEventListener("click", () => toggleAdvancedExperienceFilters(button.dataset.filterSection)));
+const experienceSelectedFilters = $("#experienceSelectedFilters"); if (experienceSelectedFilters) experienceSelectedFilters.addEventListener("click", (event) => {
+  const tag = event.target.closest("[data-clear-filter-key]");
+  if (!tag) return;
+  const key = tag.dataset.clearFilterKey;
+  if (key === "keyword") { currentSearch = ""; $$('[data-stage-search]').forEach((input) => { input.value = ""; }); }
+  if (key === "school") { currentSchoolSearch = ""; if (experienceSchoolSearch) experienceSchoolSearch.value = ""; }
+  if (key === "major") { currentMajorSearch = ""; currentExperienceMajorCategory = ""; if (experienceMajorSearch) experienceMajorSearch.value = ""; }
+  if (key === "region") currentExperienceRegion = "all";
+  if (key === "dimension") currentDimensionFilters.delete(tag.dataset.filterValue);
+  if (key === "source") currentSourceFilter = "all";
+  if (key === "time") currentTimeFilter = "all";
+  if (key === "sort") currentExperienceSort = "relevance";
+  if (key === "same-school" && sameSchoolToggle) sameSchoolToggle.checked = false;
+  setExperienceFilters({ dimensions: [...currentDimensionFilters], source: currentSourceFilter, time: currentTimeFilter, sort: currentExperienceSort });
+  renderExperiences();
+});
 const clearExperienceFilters = $("#clearExperienceFilters"); if (clearExperienceFilters) clearExperienceFilters.addEventListener("click", () => {
+  currentSearch = "";
   currentSchoolSearch = "";
   currentMajorSearch = "";
-  currentDimensionFilter = "all";
-  currentSourceFilter = "all";
-  currentScopeFilter = "all";
+  currentExperienceRegion = "all";
+  currentExperienceRegionSearch = "";
+  currentExperienceRegionLetter = "";
+  currentExperienceRegionOpen = false;
+  currentExperienceMajorCategory = "";
+  currentExperienceMajorOpen = false;
+  $$('[data-stage-search]').forEach((input) => { input.value = ""; });
   if (experienceSchoolSearch) experienceSchoolSearch.value = "";
   if (experienceMajorSearch) experienceMajorSearch.value = "";
-  $$('[data-dimension-filter]').forEach((item) => item.classList.toggle("active", item.dataset.dimensionFilter === "all"));
-  $$('[data-source-filter]').forEach((item) => item.classList.toggle("active", item.dataset.sourceFilter === "all"));
-  $$('[data-scope-filter]').forEach((item) => item.classList.toggle("active", item.dataset.scopeFilter === "all"));
+  if (sameSchoolToggle) sameSchoolToggle.checked = false;
+  setExperienceFilters();
   renderExperiences();
 });
 
@@ -2771,6 +3417,10 @@ document.addEventListener("keydown", (event) => {
     return;
   }
   if (event.key === "Escape") {
+    currentInstitutionRegionOpen = false;
+    currentExperienceRegionOpen = false;
+    renderLibraryRegionPicker("institution");
+    renderLibraryRegionPicker("experience");
     closeModal("questionModal");
     closeModal("accountModal");
     closeModal("decisionCalendarModal");
