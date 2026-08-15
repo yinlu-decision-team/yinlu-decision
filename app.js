@@ -229,7 +229,12 @@ const demoAnswers = [
 
 const stageNames = { gaokao: "高考志愿", graduate: "考研择校", career: "职业选择", adapt: "大学适应" };
 const stageOrder = ["gaokao", "graduate", "career", "adapt"];
-const STORE = { users: "yinlu_users", session: "yinlu_session", questions: "yinlu_questions", answers: "yinlu_answers", favorites: "yinlu_favorites", candidateStatus: "yinlu_candidate_status", compareHistory: "yinlu_compare_history", family: "yinlu_family", verification: "yinlu_verification", theme: "yinlu_theme", experienceLayout: "yinlu_experience_layout" };
+const STORE = { users: "yinlu_users", session: "yinlu_session", questions: "yinlu_questions", answers: "yinlu_answers", favorites: "yinlu_favorites", candidateStatus: "yinlu_candidate_status", compareHistory: "yinlu_compare_history", family: "yinlu_family", verification: "yinlu_verification", theme: "yinlu_theme", experienceLayout: "yinlu_experience_layout", decisionEvents: "yinlu_decision_events", petPosition: "yinlu_pet_position", petAvatar: "yinlu_pet_avatar", pageFeedback: "yinlu_page_feedback" };
+const CYBER_PET_AVATARS = {
+  guide: { name: "引路灯灵", src: "./pixel-guide-light.svg?v=20260815" },
+  cat: { name: "书包猫", src: "./pixel-backpack-cat.svg?v=20260815" },
+  dog: { name: "路标犬", src: "./pixel-sign-dog.svg?v=20260815" }
+};
 const THEME_NAMES = {
   spring: "春野同行",
   milestone: "金鱼气泡水",
@@ -305,6 +310,9 @@ let candidateMajorSearchQuery = "";
 let activeHistoryComparison = null;
 let currentSchoolCandidateResults = [];
 let currentMajorCandidateResults = [];
+let decisionCalendarView = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+let selectedDecisionDate = "";
+let cyberPetSuppressClick = false;
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -507,6 +515,376 @@ function showToast(message) {
 function openModal(id) { const modal = $(`#${id}`); if (!modal) return; modal.classList.add("open"); modal.setAttribute("aria-hidden", "false"); window.setTimeout(() => $("textarea, input, select, button", modal)?.focus?.(), 300); }
 function closeModal(id) { const modal = $(`#${id}`); if (!modal) return; modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true"); }
 
+function parseDecisionDate(value) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value || "");
+  if (!match) return null;
+  const [, yearText, monthText, dayText] = match;
+  const year = Number(yearText);
+  const month = Number(monthText) - 1;
+  const day = Number(dayText);
+  const date = new Date(year, month, day);
+  return date.getFullYear() === year && date.getMonth() === month && date.getDate() === day ? date : null;
+}
+
+function decisionDateValue(date) {
+  const pad = (value) => String(value).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+function daysUntilDecision(value) {
+  const date = parseDecisionDate(value);
+  if (!date) return Number.POSITIVE_INFINITY;
+  const today = new Date();
+  const targetUtc = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+  const todayUtc = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+  return Math.round((targetUtc - todayUtc) / 86400000);
+}
+
+function formatDecisionDate(value) {
+  const date = parseDecisionDate(value);
+  if (!date) return "日期未设置";
+  const weekdays = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+  return `${date.getMonth() + 1}月${date.getDate()}日 · ${weekdays[date.getDay()]}`;
+}
+
+function decisionEvents() {
+  return read(STORE.decisionEvents, [])
+    .filter((item) => item && item.id && String(item.title || "").trim() && parseDecisionDate(item.date))
+    .sort((a, b) => a.date.localeCompare(b.date) || String(a.createdAt || "").localeCompare(String(b.createdAt || "")));
+}
+
+function decisionDistanceText(distance) {
+  if (distance === 0) return "就是今天";
+  if (distance > 0) return `还有 ${distance} 天`;
+  return `已过 ${Math.abs(distance)} 天`;
+}
+
+function renderDecisionCountdown() {
+  const container = $("#decisionCountdown");
+  const trigger = $("#decisionCalendarButton");
+  const label = $("#decisionCountdownLabel");
+  const value = $("#decisionCountdownValue");
+  if (!container || !trigger || !label || !value) return;
+  const nextEvent = decisionEvents().find((item) => daysUntilDecision(item.date) >= 0);
+  container.classList.toggle("empty", !nextEvent);
+  if (!nextEvent) {
+    label.textContent = "设置决策时间";
+    value.textContent = "添加时间点";
+    trigger.setAttribute("aria-label", "打开决策日历设置时间点");
+    return;
+  }
+  const distance = daysUntilDecision(nextEvent.date);
+  label.textContent = `距${nextEvent.title}`;
+  value.textContent = decisionDistanceText(distance);
+  trigger.setAttribute("aria-label", `${label.textContent}${value.textContent}，打开决策日历`);
+}
+
+function renderDecisionEventList() {
+  const list = $("#decisionEventList");
+  const count = $("#decisionEventCount");
+  if (!list || !count) return;
+  const events = decisionEvents();
+  count.textContent = `${events.length} 项`;
+  list.innerHTML = events.length ? events.map((item) => {
+    const distance = daysUntilDecision(item.date);
+    return `<article class="decision-event-item ${distance < 0 ? "past" : ""}"><span class="decision-event-date"><strong>${escapeHtml(String(parseDecisionDate(item.date).getDate()).padStart(2, "0"))}</strong><small>${escapeHtml(`${parseDecisionDate(item.date).getMonth() + 1}月`)}</small></span><div><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(formatDecisionDate(item.date))}</small></div><span class="decision-event-distance">${escapeHtml(decisionDistanceText(distance))}</span><button class="icon-button" type="button" data-delete-decision-event="${escapeHtml(item.id)}" aria-label="删除${escapeHtml(item.title)}"><i data-lucide="trash-2"></i></button></article>`;
+  }).join("") : `<div class="decision-event-empty"><i data-lucide="calendar-plus"></i><strong>还没有时间点</strong><span>选择日期后添加第一项</span></div>`;
+  hydrateIcons();
+}
+
+function renderDecisionCalendar() {
+  const monthTitle = $("#decisionCalendarMonth");
+  const grid = $("#decisionCalendarGrid");
+  const dateInput = $("#decisionEventDate");
+  if (!monthTitle || !grid || !dateInput) return;
+  const year = decisionCalendarView.getFullYear();
+  const month = decisionCalendarView.getMonth();
+  monthTitle.textContent = `${year}年${month + 1}月`;
+  const firstDay = new Date(year, month, 1);
+  const gridStart = new Date(year, month, 1 - firstDay.getDay());
+  const today = decisionDateValue(new Date());
+  const eventDates = new Set(decisionEvents().map((item) => item.date));
+  grid.replaceChildren();
+  for (let index = 0; index < 42; index += 1) {
+    const date = new Date(gridStart.getFullYear(), gridStart.getMonth(), gridStart.getDate() + index);
+    const value = decisionDateValue(date);
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "decision-calendar-day";
+    button.textContent = date.getDate();
+    button.dataset.calendarDate = value;
+    button.setAttribute("aria-label", `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`);
+    button.classList.toggle("other-month", date.getMonth() !== month);
+    button.classList.toggle("today", value === today);
+    button.classList.toggle("selected", value === selectedDecisionDate);
+    button.classList.toggle("has-event", eventDates.has(value));
+    grid.appendChild(button);
+  }
+  dateInput.min = today;
+  dateInput.value = selectedDecisionDate;
+  renderDecisionEventList();
+}
+
+function selectDecisionDate(value) {
+  const date = parseDecisionDate(value);
+  if (!date) return;
+  selectedDecisionDate = value;
+  decisionCalendarView = new Date(date.getFullYear(), date.getMonth(), 1);
+  renderDecisionCalendar();
+}
+
+function shiftDecisionCalendar(months) {
+  decisionCalendarView = new Date(decisionCalendarView.getFullYear(), decisionCalendarView.getMonth() + months, 1);
+  renderDecisionCalendar();
+}
+
+function openDecisionCalendar() {
+  const nextEvent = decisionEvents().find((item) => daysUntilDecision(item.date) >= 0);
+  const initialDate = nextEvent?.date || decisionDateValue(new Date());
+  selectDecisionDate(initialDate);
+  openModal("decisionCalendarModal");
+}
+
+function addDecisionEvent(event) {
+  event.preventDefault();
+  const title = $("#decisionEventName")?.value.trim() || "";
+  const date = $("#decisionEventDate")?.value || "";
+  if (!title) { showToast("请填写时间点名称"); return; }
+  if (!parseDecisionDate(date) || daysUntilDecision(date) < 0) { showToast("请选择今天或之后的日期"); return; }
+  const events = decisionEvents();
+  if (events.some((item) => item.title === title && item.date === date)) { showToast("这个时间点已经添加过了"); return; }
+  events.push({ id: uid("decision"), title, date, createdAt: new Date().toISOString() });
+  write(STORE.decisionEvents, events);
+  $("#decisionEventName").value = "";
+  selectedDecisionDate = date;
+  renderDecisionCalendar();
+  renderDecisionCountdown();
+  showToast(`已添加${title}`);
+}
+
+function deleteDecisionEvent(id) {
+  const events = decisionEvents();
+  const target = events.find((item) => item.id === id);
+  if (!target) return;
+  write(STORE.decisionEvents, events.filter((item) => item.id !== id));
+  renderDecisionCalendar();
+  renderDecisionCountdown();
+  showToast(`已删除${target.title}`);
+}
+
+function cyberPetContextLabel() {
+  const activeView = $(".view.active")?.id.replace("view-", "") || "home";
+  if (activeView === "school-detail") return institutions.find((item) => item.id === currentSchoolDetail)?.school || "学校详情";
+  return ({ home: "首页", experience: "院校与经验", questions: "问答中心", compare: "我的候选", trust: "信任与认证" })[activeView] || "当前页面";
+}
+
+function renderCyberPetContext() {
+  const context = $("#cyberPetContext");
+  if (context) context.textContent = cyberPetContextLabel();
+}
+
+function setCyberPetAvatar(id, { persist = true, notify = false } = {}) {
+  const avatarId = CYBER_PET_AVATARS[id] ? id : "guide";
+  const avatar = CYBER_PET_AVATARS[avatarId];
+  $$('[data-pet-avatar-image]').forEach((image) => { image.src = avatar.src; });
+  const name = $("#cyberPetAvatarName");
+  if (name) name.textContent = avatar.name;
+  $$('[data-pet-avatar]').forEach((button) => {
+    const selected = button.dataset.petAvatar === avatarId;
+    button.classList.toggle("active", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  });
+  if (persist) write(STORE.petAvatar, avatarId);
+  if (notify) showToast(`已切换为${avatar.name}`);
+}
+
+function setCyberPetAvatarPicker(open) {
+  const picker = $("#cyberPetAvatarPicker");
+  const button = $("#cyberPetAvatarButton");
+  if (!picker || !button) return;
+  picker.hidden = !open;
+  button.setAttribute("aria-expanded", String(open));
+  window.requestAnimationFrame(positionCyberPetPanel);
+}
+
+function appendCyberPetMessage(role, text) {
+  const messages = $("#cyberPetMessages");
+  if (!messages) return;
+  const message = document.createElement("div");
+  message.className = `cyber-pet-message ${role === "user" ? "user" : "assistant"}`;
+  message.textContent = text;
+  messages.appendChild(message);
+  while (messages.children.length > 8) messages.firstElementChild?.remove();
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function positionCyberPetPanel() {
+  const pet = $("#cyberPet");
+  const panel = $("#cyberPetPanel");
+  if (!pet || !panel || panel.hidden) return;
+  const petRect = pet.getBoundingClientRect();
+  const panelWidth = panel.offsetWidth;
+  const panelHeight = panel.offsetHeight;
+  let left = petRect.right - panelWidth;
+  let top = petRect.top - panelHeight - 12;
+  if (top < 12) top = petRect.bottom + 12;
+  left = Math.max(12, Math.min(left, window.innerWidth - panelWidth - 12));
+  top = Math.max(12, Math.min(top, window.innerHeight - panelHeight - 12));
+  panel.style.left = `${left}px`;
+  panel.style.top = `${top}px`;
+  panel.style.right = "auto";
+  panel.style.bottom = "auto";
+}
+
+function setCyberPetOpen(open) {
+  const panel = $("#cyberPetPanel");
+  const toggle = $("#cyberPetToggle");
+  const pet = $("#cyberPet");
+  if (!panel || !toggle) return;
+  panel.hidden = !open;
+  pet?.classList.toggle("panel-open", open);
+  toggle.setAttribute("aria-expanded", String(open));
+  toggle.setAttribute("aria-label", open ? "收起小引助手" : "打开小引助手");
+  if (!open) setCyberPetAvatarPicker(false);
+  renderCyberPetContext();
+  if (open) window.requestAnimationFrame(positionCyberPetPanel);
+}
+
+function clampCyberPetPosition(x, y) {
+  const pet = $("#cyberPet");
+  const width = pet?.offsetWidth || 64;
+  const height = pet?.offsetHeight || 64;
+  return {
+    x: Math.max(8, Math.min(x, window.innerWidth - width - 8)),
+    y: Math.max(8, Math.min(y, window.innerHeight - height - 8))
+  };
+}
+
+function setCyberPetPosition(x, y, persist = false) {
+  const pet = $("#cyberPet");
+  if (!pet) return;
+  const next = clampCyberPetPosition(x, y);
+  pet.style.left = `${next.x}px`;
+  pet.style.top = `${next.y}px`;
+  pet.style.right = "auto";
+  pet.style.bottom = "auto";
+  if (persist) write(STORE.petPosition, next);
+  positionCyberPetPanel();
+}
+
+function restoreCyberPetPosition() {
+  const pet = $("#cyberPet");
+  const saved = read(STORE.petPosition, null);
+  const fallback = {
+    x: window.innerWidth - (pet?.offsetWidth || 78) - 24,
+    y: window.innerHeight - (pet?.offsetHeight || 88) - 24
+  };
+  setCyberPetPosition(Number(saved?.x ?? fallback.x), Number(saved?.y ?? fallback.y));
+}
+
+function initializeCyberPetDrag() {
+  const toggle = $("#cyberPetToggle");
+  const header = $(".cyber-pet-header");
+  const pet = $("#cyberPet");
+  if (!toggle || !header || !pet) return;
+  let drag = null;
+
+  const startDrag = (event) => {
+    if (event.button !== 0) return;
+    if (event.currentTarget === header && event.target.closest("button, input, textarea, select, a")) return;
+    const rect = pet.getBoundingClientRect();
+    drag = { handle: event.currentTarget, pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, left: rect.left, top: rect.top, moved: false };
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+    pet.classList.add("dragging");
+  };
+
+  const moveDrag = (event) => {
+    if (!drag || event.pointerId !== drag.pointerId) return;
+    const deltaX = event.clientX - drag.startX;
+    const deltaY = event.clientY - drag.startY;
+    if (!drag.moved && Math.hypot(deltaX, deltaY) < 5) return;
+    drag.moved = true;
+    event.preventDefault();
+    setCyberPetPosition(drag.left + deltaX, drag.top + deltaY);
+  };
+
+  const finishDrag = (event) => {
+    if (!drag || event.pointerId !== drag.pointerId) return;
+    if (drag.moved) {
+      if (drag.handle === toggle) {
+        cyberPetSuppressClick = true;
+        window.setTimeout(() => { cyberPetSuppressClick = false; }, 250);
+      }
+      const rect = pet.getBoundingClientRect();
+      write(STORE.petPosition, { x: Math.round(rect.left), y: Math.round(rect.top) });
+    }
+    drag.handle.releasePointerCapture?.(event.pointerId);
+    drag = null;
+    pet.classList.remove("dragging");
+  };
+
+  [toggle, header].forEach((handle) => {
+    handle.addEventListener("pointerdown", startDrag);
+    handle.addEventListener("pointermove", moveDrag);
+    handle.addEventListener("pointerup", finishDrag);
+    handle.addEventListener("pointercancel", finishDrag);
+  });
+}
+
+function handleCyberPetAction(action) {
+  const report = $("#cyberPetReport");
+  const input = $("#cyberPetInput");
+  if (action === "ask-current") {
+    appendCyberPetMessage("assistant", `已带入${cyberPetContextLabel()}。你想先问哪一部分？`);
+    input?.focus();
+    return;
+  }
+  if (action === "anonymous") {
+    const questionInput = $("#questionInput");
+    if (questionInput && input?.value.trim()) questionInput.value = input.value.trim();
+    openModal("questionModal");
+    window.setTimeout(() => questionInput?.focus(), 320);
+    return;
+  }
+  if (action === "compare") { switchView("compare"); return; }
+  if (action === "calendar") { openDecisionCalendar(); return; }
+  if (action === "report") {
+    if (report) report.hidden = false;
+    $("#cyberPetReportInput")?.focus();
+    positionCyberPetPanel();
+    return;
+  }
+  if (action === "cancel-report") {
+    if (report) report.hidden = true;
+    positionCyberPetPanel();
+  }
+}
+
+function submitCyberPetQuestion(event) {
+  event.preventDefault();
+  const input = $("#cyberPetInput");
+  const question = input?.value.trim() || "";
+  if (!question) return;
+  appendCyberPetMessage("user", question);
+  input.value = "";
+  appendCyberPetMessage("assistant", "这个问题已准备好。可以继续补充，或通过匿名提问发布到问答中心。");
+}
+
+function submitCyberPetReport(event) {
+  event.preventDefault();
+  const input = $("#cyberPetReportInput");
+  const description = input?.value.trim() || "";
+  if (!description) { showToast("请描述遇到的页面问题"); return; }
+  const feedback = read(STORE.pageFeedback, []);
+  feedback.unshift({ id: uid("feedback"), page: cyberPetContextLabel(), description, createdAt: new Date().toISOString() });
+  write(STORE.pageFeedback, feedback.slice(0, 20));
+  event.target.reset();
+  event.target.hidden = true;
+  appendCyberPetMessage("assistant", "已记录当前页面的问题。");
+  positionCyberPetPanel();
+  showToast("页面问题已记录在本机");
+}
+
 function switchView(name) {
   $$(".view").forEach((view) => view.classList.toggle("active", view.id === `view-${name}`));
   $$(".nav-item").forEach((button) => button.classList.toggle("active", button.dataset.view === name));
@@ -518,6 +896,7 @@ function switchView(name) {
   if (name === "compare") { renderCompare(); renderFamily(); }
   if (name === "trust") renderTrust();
   if (name === "school-detail") renderSchoolDetail();
+  renderCyberPetContext();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -1693,8 +2072,18 @@ function switchQaTab(name) {
 
 // 事件委托保留，但同时安全绑定核心按钮以避免空引用错误
 document.addEventListener("click", (event) => {
+  const petAvatar = event.target.closest("[data-pet-avatar]");
+  if (petAvatar) { setCyberPetAvatar(petAvatar.dataset.petAvatar, { notify: true }); setCyberPetAvatarPicker(false); return; }
+  const petAction = event.target.closest("[data-pet-action]");
+  if (petAction) { handleCyberPetAction(petAction.dataset.petAction); return; }
   const experienceLayout = event.target.closest("[data-experience-layout]");
   if (experienceLayout) { applyExperienceLayout(experienceLayout.dataset.experienceLayout, { notify: true }); return; }
+  const calendarShift = event.target.closest("[data-calendar-shift]");
+  if (calendarShift) { shiftDecisionCalendar(Number(calendarShift.dataset.calendarShift)); return; }
+  const calendarDate = event.target.closest("[data-calendar-date]");
+  if (calendarDate) { selectDecisionDate(calendarDate.dataset.calendarDate); return; }
+  const deleteDecision = event.target.closest("[data-delete-decision-event]");
+  if (deleteDecision) { deleteDecisionEvent(deleteDecision.dataset.deleteDecisionEvent); return; }
   const nav = event.target.closest("[data-view]"); if (nav) { switchView(nav.dataset.view); return; }
   const targetView = event.target.closest("[data-view-target]"); if (targetView) { switchView(targetView.dataset.viewTarget); return; }
   const schoolDetail = event.target.closest("[data-school-detail]"); if (schoolDetail) {
@@ -1781,6 +2170,10 @@ document.addEventListener("input", (event) => {
 });
 
 document.addEventListener("change", (event) => {
+  if (event.target.id === "decisionEventDate") {
+    selectDecisionDate(event.target.value);
+    return;
+  }
   if (event.target.matches("[data-select-school-candidate]")) {
     toggleSchoolCandidateSelection(event.target.dataset.selectSchoolCandidate, event.target.checked);
     return;
@@ -1803,6 +2196,18 @@ document.addEventListener("change", (event) => {
 });
 
 document.addEventListener("submit", (event) => {
+  if (event.target.id === "cyberPetComposer") {
+    submitCyberPetQuestion(event);
+    return;
+  }
+  if (event.target.id === "cyberPetReport") {
+    submitCyberPetReport(event);
+    return;
+  }
+  if (event.target.id === "decisionEventForm") {
+    addDecisionEvent(event);
+    return;
+  }
   if (event.target.id === "candidateMajorSearchForm") {
     event.preventDefault();
     applyMajorSearch(new FormData(event.target).get("major") || "");
@@ -1815,6 +2220,13 @@ document.addEventListener("submit", (event) => {
 const menuButton = $("#menuButton"); if (menuButton) menuButton.addEventListener("click", () => $("#sidebar").classList.toggle("open"));
 const accountButton = $("#accountButton"); if (accountButton) accountButton.addEventListener("click", showAccount);
 const notifyButton = $("#notifyButton"); if (notifyButton) notifyButton.addEventListener("click", () => showToast(currentUser() ? "暂无新的认证回答" : "登录后可查看你的通知"));
+const decisionCalendarButton = $("#decisionCalendarButton"); if (decisionCalendarButton) decisionCalendarButton.addEventListener("click", openDecisionCalendar);
+const cyberPetToggle = $("#cyberPetToggle"); if (cyberPetToggle) cyberPetToggle.addEventListener("click", () => {
+  if (cyberPetSuppressClick) { cyberPetSuppressClick = false; return; }
+  setCyberPetOpen($("#cyberPetPanel")?.hidden !== false);
+});
+const cyberPetClose = $("#cyberPetClose"); if (cyberPetClose) cyberPetClose.addEventListener("click", () => setCyberPetOpen(false));
+const cyberPetAvatarButton = $("#cyberPetAvatarButton"); if (cyberPetAvatarButton) cyberPetAvatarButton.addEventListener("click", () => setCyberPetAvatarPicker(cyberPetAvatarButton.getAttribute("aria-expanded") !== "true"));
 const themeButton = $("#themeButton"); if (themeButton) themeButton.addEventListener("click", (event) => { event.stopPropagation(); setThemeMenu(themeButton.getAttribute("aria-expanded") !== "true"); });
 $$('[data-theme-option]').forEach((button) => button.addEventListener("click", () => { applyTheme(button.dataset.themeOption, { persist: true, notify: true }); setThemeMenu(false); }));
 document.addEventListener("click", (event) => { if (!event.target.closest(".theme-control")) setThemeMenu(false); });
@@ -1887,10 +2299,17 @@ const clearExperienceFilters = $("#clearExperienceFilters"); if (clearExperience
   renderExperiences();
 });
 
-document.addEventListener("keydown", (event) => { if (event.key === "Escape") { closeModal("questionModal"); closeModal("accountModal"); setThemeMenu(false); } });
+document.addEventListener("keydown", (event) => { if (event.key === "Escape") { closeModal("questionModal"); closeModal("accountModal"); closeModal("decisionCalendarModal"); setCyberPetOpen(false); setThemeMenu(false); } });
 
 applyTheme(localStorage.getItem(STORE.theme) || document.documentElement.dataset.theme || "apple");
 applyExperienceLayout(localStorage.getItem(STORE.experienceLayout) || "horizontal", { persist: false });
+renderDecisionCountdown(); renderDecisionCalendar();
+setCyberPetAvatar(read(STORE.petAvatar, "guide"), { persist: false });
+restoreCyberPetPosition(); initializeCyberPetDrag(); renderCyberPetContext();
+window.addEventListener("resize", () => {
+  const pet = $("#cyberPet");
+  if (pet) setCyberPetPosition(pet.getBoundingClientRect().left, pet.getBoundingClientRect().top);
+});
 setStage(currentStage); updateAccountHeader(); hydrateIcons();
 switchQaTab("ask");
 if (!currentUser() && !localStorage.getItem("yinlu_guest_seen")) window.setTimeout(showAccount, 500);

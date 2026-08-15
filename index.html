@@ -18,7 +18,7 @@
 <link rel="apple-touch-icon" href="./favicon-180.png">
 
 <!-- 本地化的轻量图标脚本（替代外部 CDN） -->
-<script src="./lib/lucide-lite.js" defer></script>
+<script src="./lib/lucide-lite.js?v=6" defer></script>
 
 <!-- 本地 app.js（确保在 lucide-lite 后加载） -->
 <script src="./app.js" defer></script>
@@ -44,7 +44,7 @@
       <nav class="sidebar-nav" aria-label="主导航">
         <button class="nav-item active" data-view="home"><i data-lucide="compass"></i><span>首页</span></button>
         <button class="nav-item" data-view="experience"><i data-lucide="library"></i><span>院校与经验</span></button>
-        <button class="nav-item" data-view="questions"><i data-lucide="message-circle-question"></i><span>问答中心</span><span class="nav-count" id="questionsCount">0</span></button>
+        <button class="nav-item" data-view="questions"><span class="nav-dot-icon" aria-hidden="true"></span><span>问答中心</span><span class="nav-count" id="questionsCount">0</span></button>
         <button class="nav-item" data-view="compare"><i data-lucide="square-kanban"></i><span>我的候选</span></button>
         <button class="nav-item" data-view="trust"><i data-lucide="badge-check"></i><span>信任与认证</span></button>
       </nav>
@@ -140,7 +140,10 @@
           <button class="icon-button" id="notifyButton" aria-label="消息"><i data-lucide="bell"></i><span class="notification-dot"></span></button>
           <button class="avatar-button" id="accountButton" aria-label="打开账户">访</button>
           <span class="profile-name" id="profileName">访客浏览</span>
-          <button class="icon-button" aria-label="更多选项"><i data-lucide="more-horizontal"></i></button>
+          <div class="decision-countdown empty" id="decisionCountdown" aria-live="polite">
+            <div class="decision-countdown-copy"><span id="decisionCountdownLabel">设置决策时间</span><strong id="decisionCountdownValue">添加时间点</strong></div>
+            <button class="icon-button decision-calendar-button" id="decisionCalendarButton" type="button" aria-label="打开决策日历设置时间点" title="决策日历"><i data-lucide="calendar-days"></i></button>
+          </div>
         </div>
       </header>
 
@@ -470,6 +473,74 @@
       <div class="modal-kicker">家庭协同边界</div><h2 id="familyPrivacyTitle">共享由学生主动授权</h2><p class="modal-description">家庭成员只看到用于共同决策的内容，个人记录默认保持私密。</p>
       <div class="family-privacy-grid"><section><span class="privacy-section-icon shared"><i data-lucide="users"></i></span><h3>可以共享</h3><ul><li><i data-lucide="check"></i>授权的候选院校与专业</li><li><i data-lucide="check"></i>院校和专业对比结果</li><li><i data-lucide="check"></i>候选判断状态</li></ul></section><section><span class="privacy-section-icon private"><i data-lucide="lock-keyhole"></i></span><h3>保持私密</h3><ul><li><i data-lucide="check"></i>匿名提问与回答</li><li><i data-lucide="check"></i>搜索和浏览记录</li><li><i data-lucide="check"></i>未授权收藏与账户资料</li></ul></section></div>
     </div>
+  </div>
+
+  <div class="modal-backdrop" id="decisionCalendarModal" aria-hidden="true">
+    <div class="modal decision-calendar-modal" role="dialog" aria-modal="true" aria-labelledby="decisionCalendarTitle">
+      <button class="modal-close icon-button" data-close-modal="decisionCalendarModal" aria-label="关闭"><i data-lucide="x"></i></button>
+      <div class="modal-kicker">决策日历</div><h2 id="decisionCalendarTitle">关键时间点</h2>
+      <div class="decision-calendar-layout">
+        <section class="decision-calendar-panel" aria-label="选择日期">
+          <header class="decision-calendar-toolbar">
+            <button class="icon-button" type="button" data-calendar-shift="-1" aria-label="上一个月"><i data-lucide="chevron-left"></i></button>
+            <strong id="decisionCalendarMonth"></strong>
+            <button class="icon-button" type="button" data-calendar-shift="1" aria-label="下一个月"><i data-lucide="chevron-right"></i></button>
+          </header>
+          <div class="decision-calendar-weekdays" aria-hidden="true"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
+          <div class="decision-calendar-grid" id="decisionCalendarGrid"></div>
+        </section>
+        <section class="decision-event-panel">
+          <form class="decision-event-form" id="decisionEventForm">
+            <label><span>时间点名称</span><input id="decisionEventName" type="text" maxlength="24" placeholder="例如：高考报名" required></label>
+            <label><span>日期</span><input id="decisionEventDate" type="date" required></label>
+            <button class="primary-button" type="submit"><i data-lucide="calendar-plus"></i>添加时间点</button>
+          </form>
+          <div class="decision-event-list-heading"><strong>时间点</strong><span id="decisionEventCount">0 项</span></div>
+          <div class="decision-event-list" id="decisionEventList"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="cyber-pet" id="cyberPet">
+    <section class="cyber-pet-panel" id="cyberPetPanel" aria-label="引路小助手" hidden>
+      <header class="cyber-pet-header">
+        <div class="cyber-pet-identity"><span class="cyber-pet-header-mascot"><img src="./pixel-guide-light.svg?v=20260815" alt="" aria-hidden="true" draggable="false" data-pet-avatar-image><span class="cyber-pet-status"></span></span><div><strong>小引</strong><small id="cyberPetAvatarName">引路灯灵</small></div></div>
+        <div class="cyber-pet-header-actions"><button class="icon-button" id="cyberPetAvatarButton" type="button" aria-label="更换小引形象" aria-expanded="false" title="更换形象"><i data-lucide="refresh-cw"></i></button><button class="icon-button" id="cyberPetClose" type="button" aria-label="收起小助手"><i data-lucide="x"></i></button></div>
+      </header>
+      <div class="cyber-pet-avatar-picker" id="cyberPetAvatarPicker" hidden>
+        <div><strong>选择形象</strong><small>选择保存在本机</small></div>
+        <div class="cyber-pet-avatar-options">
+          <button type="button" data-pet-avatar="guide" aria-pressed="true"><img src="./pixel-guide-light.svg?v=20260815" alt=""><span>引路灯灵</span></button>
+          <button type="button" data-pet-avatar="cat" aria-pressed="false"><img src="./pixel-backpack-cat.svg?v=20260815" alt=""><span>书包猫</span></button>
+          <button type="button" data-pet-avatar="dog" aria-pressed="false"><img src="./pixel-sign-dog.svg?v=20260815" alt=""><span>路标犬</span></button>
+        </div>
+      </div>
+      <div class="cyber-pet-context"><i data-lucide="scan-search"></i><span>正在查看</span><strong id="cyberPetContext">首页</strong></div>
+      <div class="cyber-pet-messages" id="cyberPetMessages" aria-live="polite">
+        <div class="cyber-pet-message assistant">今天想先处理哪项选择？</div>
+      </div>
+      <div class="cyber-pet-actions" aria-label="快捷功能">
+        <button type="button" data-pet-action="ask-current"><i data-lucide="sparkles"></i><span>问问当前页面</span></button>
+        <button type="button" data-pet-action="anonymous"><i data-lucide="message-circle-question"></i><span>匿名提问</span></button>
+        <button type="button" data-pet-action="compare"><i data-lucide="git-compare-arrows"></i><span>比较候选</span></button>
+        <button type="button" data-pet-action="calendar"><i data-lucide="calendar-days"></i><span>设置决策时间</span></button>
+      </div>
+      <button class="cyber-pet-report-trigger" type="button" data-pet-action="report"><i data-lucide="bug"></i>反馈当前页面问题</button>
+      <form class="cyber-pet-report" id="cyberPetReport" hidden>
+        <label for="cyberPetReportInput">页面问题</label>
+        <textarea id="cyberPetReportInput" maxlength="300" placeholder="哪里显示不对，或者哪个按钮无法使用？" required></textarea>
+        <div><button class="quiet-button" type="button" data-pet-action="cancel-report">取消</button><button class="primary-button" type="submit">记录反馈</button></div>
+      </form>
+      <form class="cyber-pet-composer" id="cyberPetComposer">
+        <input id="cyberPetInput" type="text" maxlength="200" autocomplete="off" placeholder="问问学校、专业或当前页面">
+        <button class="icon-button" type="submit" aria-label="发送问题"><i data-lucide="send"></i></button>
+      </form>
+    </section>
+    <button class="cyber-pet-toggle" id="cyberPetToggle" type="button" aria-label="打开小引助手" aria-expanded="false">
+      <img class="cyber-pet-mascot" src="./pixel-guide-light.svg?v=20260815" alt="" aria-hidden="true" draggable="false" data-pet-avatar-image>
+      <span class="cyber-pet-presence" aria-hidden="true"></span>
+    </button>
   </div>
 
   <div class="toast" id="toast" role="status"><i data-lucide="check-circle-2"></i><span></span></div>
