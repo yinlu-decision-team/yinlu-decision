@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>引路 | 回答中心</title>
+  <script>
+    const routes = new Set(["gaokao", "kaoyan", "jiuye"]);
+    const params = new URLSearchParams(window.location.search);
+    let stage = params.get("answerStage");
+    try { if (!routes.has(stage)) stage = localStorage.getItem("yinlu_answerer_stage"); } catch (error) {}
+    if (!routes.has(stage)) stage = "gaokao";
+    params.delete("answerStage");
+    window.location.replace(`./${stage}/index.html${params.toString() ? `?${params}` : ""}`);
+  </script>
+</head>
+<body></body>
+</html>

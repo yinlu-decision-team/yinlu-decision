@@ -21,8 +21,8 @@
 <script src="./lib/lucide-lite.js?v=7" defer></script>
 
 <!-- 本地 app.js（确保在 lucide-lite 后加载） -->
-<script src="./app.js" defer></script>
-  <link rel="stylesheet" href="styles.css">
+<script src="./app.js?v=20260816-stage-collapse-1" defer></script>
+  <link rel="stylesheet" href="styles.css?v=20260816-stage-collapse-1">
 </head>
 <body>
   <div class="app-shell">
@@ -40,22 +40,36 @@
         </div>
       </div>
 
-      <div class="sidebar-label">决策工作台</div>
-      <nav class="sidebar-nav" aria-label="主导航">
-        <button class="nav-item active" data-view="home"><i data-lucide="compass"></i><span>首页</span></button>
-        <button class="nav-item" data-view="experience"><i data-lucide="library"></i><span>院校与经验</span></button>
-        <button class="nav-item" data-view="questions"><span class="nav-dot-icon" aria-hidden="true"></span><span>问答中心</span><span class="nav-count" id="questionsCount">0</span></button>
-        <button class="nav-item" data-view="compare"><i data-lucide="square-kanban"></i><span>我的候选</span></button>
-        <button class="nav-item" data-view="trust"><i data-lucide="badge-check"></i><span>信任与认证</span></button>
+      <div class="sidebar-label" id="workbenchModeLabel">决策工作台</div>
+      <nav class="sidebar-nav" id="plannerNav" aria-label="决策者导航" data-identity-nav="planner">
+        <a class="nav-item active" href="./index.html?view=home" data-view="home"><span class="nav-dot-icon" aria-hidden="true"></span><span>首页</span></a>
+        <a class="nav-item" href="./index.html?view=experience" data-view="experience"><span class="nav-dot-icon" aria-hidden="true"></span><span id="experienceNavLabel">院校与经验</span></a>
+        <a class="nav-item" href="./index.html?view=questions" data-view="questions"><span class="nav-dot-icon" aria-hidden="true"></span><span>匿名提问</span><span class="nav-count" id="questionsCount">0</span></a>
+        <a class="nav-item" id="compareNavItem" href="./index.html?view=compare" data-view="compare"><span class="nav-dot-icon" aria-hidden="true"></span><span>我的候选</span></a>
+        <a class="nav-item" href="./index.html?view=trust" data-view="trust"><span class="nav-dot-icon" aria-hidden="true"></span><span>信任与认证</span></a>
+      </nav>
+      <nav class="sidebar-nav answerer-nav" id="answererNav" aria-label="回答者导航" data-identity-nav="answerer" hidden>
+        <a class="nav-item" href="./answerer/gaokao/index.html" data-view="answerer" data-answerer-entry="true"><span class="nav-dot-icon" aria-hidden="true"></span><span>回答中心</span><span class="nav-count" id="answererQuestionsCount">0</span></a>
+        <a class="nav-item" href="./index.html?view=trust" data-view="trust"><span class="nav-dot-icon" aria-hidden="true"></span><span>信任与认证</span></a>
       </nav>
 
-      <div class="sidebar-divider"></div>
-      <div class="sidebar-label">我的信息源</div>
-      <div class="source-list">
+      <div class="sidebar-divider" id="sourceDivider"></div>
+      <div class="sidebar-label" id="sourceLabel">我的信息源</div>
+      <div class="source-list" id="sourceList">
         <span><b class="dot blue"></b>在读认证</span>
         <span><b class="dot teal"></b>官方信息</span>
         <span><b class="dot amber"></b>客观数据</span>
         <span><b class="dot cyan"></b>教师 / 从业者</span>
+      </div>
+
+      <div class="identity-switcher" id="identitySwitcher">
+        <div class="identity-switcher-copy">
+          <span class="identity-switcher-kicker">当前身份</span>
+          <strong id="identityModeLabel">决策者</strong>
+        </div>
+        <button class="identity-switcher-button" id="identityModeToggle" type="button" aria-label="切换身份" aria-pressed="false" title="切换身份">
+          <i data-lucide="repeat-2"></i><span>切换</span>
+        </button>
       </div>
 
       <div class="sidebar-footer">
@@ -148,6 +162,38 @@
         </div>
       </header>
 
+      <nav class="global-stage-bar" aria-label="全局决策阶段">
+        <div class="global-stage-track">
+          <div class="global-stage-stop" data-global-stage-stop="gaokao">
+            <a class="global-stage-link" href="./index.html?view=home&stage=gaokao" data-global-planner-stage="gaokao">
+              <span class="global-stage-flag" aria-hidden="true"><i data-lucide="flag"></i></span>
+              <span class="global-stage-node">01</span><span>高考志愿</span>
+            </a>
+            <a class="global-answer-stage-control" href="./answerer/gaokao/index.html" data-global-answer-stage="gaokao" aria-label="回答高考阶段问题" title="回答高考阶段问题"><i data-lucide="message-circle"></i></a>
+          </div>
+          <div class="global-stage-stop" data-global-stage-stop="graduate">
+            <a class="global-stage-link" href="./index.html?view=home&stage=graduate" data-global-planner-stage="graduate">
+              <span class="global-stage-flag" aria-hidden="true"><i data-lucide="flag"></i></span>
+              <span class="global-stage-node">02</span><span>考研择校</span>
+            </a>
+            <a class="global-answer-stage-control" href="./answerer/kaoyan/index.html" data-global-answer-stage="graduate" aria-label="回答考研阶段问题" title="回答考研阶段问题"><i data-lucide="message-circle"></i></a>
+          </div>
+          <div class="global-stage-stop" data-global-stage-stop="career">
+            <a class="global-stage-link" href="./index.html?view=home&stage=career" data-global-planner-stage="career">
+              <span class="global-stage-flag" aria-hidden="true"><i data-lucide="flag"></i></span>
+              <span class="global-stage-node">03</span><span>就业选择</span>
+            </a>
+            <a class="global-answer-stage-control" href="./answerer/jiuye/index.html" data-global-answer-stage="career" aria-label="回答就业阶段问题" title="回答就业阶段问题"><i data-lucide="message-circle"></i></a>
+          </div>
+        </div>
+        <div class="global-stage-compact" aria-hidden="true">
+          <span>当前阶段</span><strong id="globalStageCompactLabel">高考志愿</strong>
+        </div>
+        <button class="global-stage-toggle" id="globalStageToggle" type="button" aria-label="收起决策阶段栏" aria-expanded="true" title="收起决策阶段栏">
+          <i data-lucide="chevron-up"></i>
+        </button>
+      </nav>
+
       <div class="view-stack">
         <section class="view active" id="view-home" aria-labelledby="homeTitle">
           <div class="hero-grid">
@@ -162,7 +208,7 @@
               </h1>
               <p class="hero-subtitle">从学校、专业到未来去向，把官方信息和真实经验放到同一张决策桌面上。</p>
               <div class="hero-actions">
-                <button class="primary-button" data-view-target="experience"><i data-lucide="search"></i>查看院校与经验</button>
+                <button class="primary-button" data-view-target="experience"><i data-lucide="search"></i><span id="homeExperienceActionLabel">查看院校与经验</span></button>
                 <button class="quiet-button" data-view-target="questions"><i data-lucide="message-square-plus"></i>去问答中心</button>
               </div>
               <div class="hero-proof">
@@ -282,9 +328,9 @@
           <section class="content-section" id="experienceSection">
             <div class="section-heading">
               <div>
-                <div class="section-kicker">院校与经验</div>
-                <h1>先查清学校，再参考真实经验</h1>
-                <p>院校资料与个人经验分开查看，需要时再相互对照。</p>
+                <div class="section-kicker" id="experiencePageKicker">院校与经验</div>
+                <h1 id="experiencePageTitle">先查清学校，再参考真实经验</h1>
+                <p id="experiencePageDescription">院校资料与个人经验分开查看，需要时再相互对照。</p>
               </div>
               <div class="experience-heading-actions">
                 <div class="experience-layout-switch" role="group" aria-label="院校与经验页面布局">
@@ -295,24 +341,24 @@
                     <span class="layout-glyph vertical" aria-hidden="true"></span>竖版
                   </button>
                 </div>
-                <button class="text-button" data-view-target="compare">查看我的候选 <i data-lucide="arrow-up-right"></i></button>
+                <button class="text-button" id="experienceCandidateAction" data-view-target="compare">查看我的候选 <i data-lucide="arrow-up-right"></i></button>
               </div>
             </div>
             <div class="experience-content-tabs" role="tablist" aria-label="院校与经验内容类型">
-              <button class="experience-content-tab active" type="button" role="tab" data-experience-content-tab="institution" aria-selected="true" aria-controls="institutionGrid"><i data-lucide="landmark"></i>院校信息</button>
-              <button class="experience-content-tab" type="button" role="tab" data-experience-content-tab="experience" aria-selected="false" aria-controls="experienceGrid"><i data-lucide="messages-square"></i>经验库</button>
+              <button class="experience-content-tab active" type="button" role="tab" data-experience-content-tab="institution" aria-selected="true" aria-controls="institutionGrid"><i data-lucide="landmark"></i><span id="institutionTabLabel">院校信息</span></button>
+              <button class="experience-content-tab" type="button" role="tab" data-experience-content-tab="experience" aria-selected="false" aria-controls="experienceGrid"><i data-lucide="messages-square"></i><span id="experienceTabLabel">经验库</span></button>
             </div>
             <div class="institution-filter-bar" data-experience-content-panel="institution" role="search" aria-label="院校信息搜索">
               <div class="filter-search-stack">
                 <div class="filter-group">
-                  <span class="filter-group-label">学校</span>
+                  <span class="filter-group-label" id="institutionPrimaryFilterLabel">学校</span>
                   <div class="filter-search-field">
                     <i data-lucide="school"></i>
                     <input id="institutionSchoolSearch" type="search" placeholder="搜索学校名称" autocomplete="off">
                   </div>
                 </div>
                 <div class="filter-group">
-                  <span class="filter-group-label">专业</span>
+                  <span class="filter-group-label" id="institutionSecondaryFilterLabel">专业</span>
                   <div class="library-major-picker" data-major-picker="institution">
                     <div class="filter-search-field major-picker-field">
                       <i data-lucide="book-open"></i>
@@ -351,14 +397,14 @@
             <div class="filter-bar" data-experience-content-panel="experience" role="toolbar" aria-label="经验筛选" hidden>
               <div class="filter-search-stack">
                 <div class="filter-group">
-                  <span class="filter-group-label">学校</span>
+                  <span class="filter-group-label" id="experiencePrimaryFilterLabel">学校</span>
                   <div class="filter-search-field">
                     <i data-lucide="school"></i>
                     <input id="experienceSchoolSearch" type="search" placeholder="搜索学校名称" autocomplete="off">
                   </div>
                 </div>
                 <div class="filter-group">
-                  <span class="filter-group-label">专业</span>
+                  <span class="filter-group-label" id="experienceSecondaryFilterLabel">专业</span>
                   <div class="library-major-picker" data-major-picker="experience">
                     <div class="filter-search-field major-picker-field">
                       <i data-lucide="book-open"></i>
@@ -418,14 +464,28 @@
                     <button class="filter-pill" data-dimension-filter="校园氛围">校园氛围</button>
                     <button class="filter-pill" data-dimension-filter="城市环境">城市环境</button>
                     <button class="filter-pill" data-dimension-filter="就业去向">就业去向</button>
+                    <button class="filter-pill" data-dimension-filter="招生与报录">招生与报录</button>
+                    <button class="filter-pill" data-dimension-filter="初试备考">初试备考</button>
+                    <button class="filter-pill" data-dimension-filter="复试准备">复试准备</button>
+                    <button class="filter-pill" data-dimension-filter="培养方向">培养方向</button>
+                    <button class="filter-pill" data-dimension-filter="导师与科研">导师与科研</button>
+                    <button class="filter-pill" data-dimension-filter="调剂信息">调剂信息</button>
+                    <button class="filter-pill" data-dimension-filter="研究生生活">研究生生活</button>
+                    <button class="filter-pill" data-dimension-filter="岗位内容">岗位内容</button>
+                    <button class="filter-pill" data-dimension-filter="能力要求">能力要求</button>
+                    <button class="filter-pill" data-dimension-filter="实习准备">实习准备</button>
+                    <button class="filter-pill" data-dimension-filter="工作环境">工作环境</button>
+                    <button class="filter-pill" data-dimension-filter="职业发展">职业发展</button>
+                    <button class="filter-pill" data-dimension-filter="专业关联">专业关联</button>
+                    <button class="filter-pill" data-dimension-filter="行业变化">行业变化</button>
                   </div>
                 </div>
                 <div class="filter-group filter-source-group" data-filter-section-panel="source">
                   <span class="filter-group-label">信息来源</span>
                   <div class="filter-pills" id="sourceFilterPills">
                     <button class="filter-pill active" data-source-filter="all">全部来源</button>
-                    <button class="filter-pill" data-source-filter="student">在读学生</button>
-                    <button class="filter-pill" data-source-filter="expert">教师 / 从业者</button>
+                    <button class="filter-pill" id="studentSourceFilter" data-source-filter="student">在读学生</button>
+                    <button class="filter-pill" id="expertSourceFilter" data-source-filter="expert">教师 / 从业者</button>
                   </div>
                 </div>
                 <div class="filter-group filter-time-group" data-filter-section-panel="time">
@@ -445,17 +505,17 @@
                   </select>
                 </div>
                 <div class="filter-actions" data-filter-section-panel="extra">
-                  <label class="same-school-toggle"><input type="checkbox" id="sameSchoolToggle"><span class="toggle-track"></span>同高中优先</label>
-                  <span class="filter-time-note"><i data-lucide="clock-3"></i>发布时间用于判断学生、教师与从业者经验的时效性</span>
+                  <label class="same-school-toggle" id="sameSchoolFilter"><input type="checkbox" id="sameSchoolToggle"><span class="toggle-track"></span><span id="sameSchoolFilterLabel">同高中优先</span></label>
+                  <span class="filter-time-note" id="experienceTimeNote"><i data-lucide="clock-3"></i>发布时间用于判断学生、教师与从业者经验的时效性</span>
                 </div>
               </div>
             </div>
             <section class="institution-section" data-experience-content-panel="institution" aria-labelledby="institutionHeading">
               <div class="subsection-heading">
                 <div>
-                  <span class="subsection-kicker"><i data-lucide="building-2"></i>院校信息</span>
+                  <span class="subsection-kicker"><i data-lucide="building-2"></i><span id="institutionSectionKicker">院校信息</span></span>
                   <h2 id="institutionHeading">先了解学校，再深入具体专业</h2>
-                  <p>平台将学校简介、招生信息和公开数据整理成摘要，原始来源用于核验和继续查阅。</p>
+                  <p id="institutionDescription">平台将学校简介、招生信息和公开数据整理成摘要，原始来源用于核验和继续查阅。</p>
                 </div>
                 <span class="result-note" id="institutionResultNote"></span>
               </div>
@@ -513,7 +573,7 @@
                   <div class="answering-stats"><span><strong>48h</strong><small>回答目标</small></span><span><strong>认证</strong><small>身份来源</small></span><span><strong>匿名</strong><small>表达边界</small></span></div>
                 </div>
                 <div class="panel-heading qa-subheading"><h2>待回答问题池</h2><span class="count-badge">匹配中</span></div>
-                <div class="question-list">
+                <div class="question-list" id="answerQuestionPool">
                   <article class="question-list-item"><header><strong>软件工程和计算机科学差别大吗？</strong><span class="question-status waiting">待回答</span></header><p>同专业优先 · 课程学习</p></article>
                   <article class="question-list-item"><header><strong>新闻传播专业实习机会多吗？</strong><span class="question-status waiting">待回答</span></header><p>同院校优先 · 就业去向</p></article>
                   <article class="question-list-item"><header><strong>医学专业学习压力具体体现在哪里？</strong><span class="question-status waiting">待回答</span></header><p>认证答主优先 · 学习体验</p></article>
@@ -529,6 +589,46 @@
                 </div>
               </section>
             </div>
+          </div>
+        </section>
+
+        <section class="view" id="view-answerer" aria-labelledby="answererTitle">
+          <div class="page-header">
+            <div>
+              <div class="section-kicker">回答者工作台</div>
+              <h1 id="answererTitle">把你的经历，交给正在选择的人</h1>
+              <p>只查看当前回答方向的问题，按学校、专业和时间边界补充真实经验。</p>
+            </div>
+            <span class="mvp-badge answerer-workbench-badge"><i data-lucide="messages-square"></i>经验贡献</span>
+          </div>
+          <section class="answerer-stage-banner" aria-live="polite">
+            <span class="answerer-stage-icon"><i data-lucide="route"></i></span>
+            <div>
+              <span class="section-kicker">当前回答方向</span>
+              <strong id="answererStageLabel">高考志愿</strong>
+              <p id="answererStageDescription">优先回答自己真正经历过的阶段问题。</p>
+            </div>
+            <span class="answerer-stage-limit"><i data-lucide="shield-check"></i>仅回答对应阶段</span>
+          </section>
+          <div class="answerer-workbench-grid">
+            <section class="answerer-inbox-panel">
+              <div class="panel-heading"><div><span class="section-kicker">待处理问题</span><h2>适合你的问题</h2></div><span class="count-badge" id="answererQuestionCount">0 条匹配</span></div>
+              <p class="answerer-panel-intro">回答中可以明确学校、专业、年级和经验发生的时间，方便提问者判断信息是否适合自己。</p>
+              <div class="question-list" id="answererQuestionList"></div>
+            </section>
+            <aside class="answerer-side-stack">
+              <section class="answerer-trust-panel">
+                <div class="answerer-panel-icon"><i data-lucide="badge-check"></i></div>
+                <span class="section-kicker">回答边界</span>
+                <h2>让经验保持可信</h2>
+                <ul><li><i data-lucide="check"></i>只分享亲身经历</li><li><i data-lucide="check"></i>标注经历发生时间</li><li><i data-lucide="check"></i>不代替官方信息下结论</li></ul>
+                <button class="quiet-button" type="button" data-view-target="trust"><i data-lucide="arrow-up-right"></i>查看信任与认证</button>
+              </section>
+              <section class="answerer-history-panel">
+                <div class="panel-heading"><h2>历史回答</h2><span class="count-badge">已保存</span></div>
+                <div class="question-list" id="answererHistoryList"></div>
+              </section>
+            </aside>
           </div>
         </section>
 
@@ -559,6 +659,19 @@
       <label class="field-label" for="questionInput">问题内容</label><textarea id="questionInput" placeholder="例如：这个专业的课程强度和真实学习体验是什么？"></textarea>
       <div class="modal-fields"><label><span>决策阶段</span><select id="questionStage"><option>高考志愿</option><option>考研择校</option><option>职业选择</option><option>大学适应</option></select></label><label><span>关注维度</span><select id="questionTopic"><option>课程学习</option><option>宿舍生活</option><option>就业去向</option><option>城市环境</option></select></label></div>
       <div class="modal-actions"><button class="quiet-button" data-close-modal="questionModal">先不提问</button><button class="primary-button" id="submitQuestion"><i data-lucide="send"></i>发布匿名问题</button></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="switchConfirmModal" aria-hidden="true">
+    <div class="modal switch-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="switchConfirmTitle" aria-describedby="switchConfirmDescription">
+      <button class="modal-close icon-button" data-close-modal="switchConfirmModal" aria-label="关闭"><i data-lucide="x"></i></button>
+      <div class="modal-kicker">切换确认</div>
+      <h2 id="switchConfirmTitle">确认切换吗？</h2>
+      <p class="modal-description" id="switchConfirmDescription"></p>
+      <div class="modal-actions">
+        <button class="quiet-button" type="button" data-close-modal="switchConfirmModal">暂不切换</button>
+        <button class="primary-button" type="button" id="switchConfirmProceed">确认切换</button>
+      </div>
     </div>
   </div>
 
