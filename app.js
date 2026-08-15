@@ -287,6 +287,8 @@ const REGION_CITIES = {
   "海外": ["亚洲其他地区", "欧洲", "北美洲", "南美洲", "大洋洲", "非洲", "其他海外地区"]
 };
 let currentStage = "gaokao";
+let stageAutoplayTimer = null;
+let stageAutoplayLocked = false;
 let currentSchoolSearch = "";
 let currentMajorSearch = "";
 let currentDimensionFilter = "all";
@@ -896,6 +898,8 @@ function switchView(name) {
   if (name === "compare") { renderCompare(); renderFamily(); }
   if (name === "trust") renderTrust();
   if (name === "school-detail") renderSchoolDetail();
+  if (name === "home") startStageAutoplay();
+  else pauseStageAutoplay();
   renderCyberPetContext();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -922,11 +926,32 @@ function setStage(stage) {
   });
   const position = $("#stagePosition");
   if (position) position.textContent = `${activeIndex + 1} / ${stageOrder.length}`;
+  const progress = $("#stageProgressFill");
+  if (progress) progress.style.width = `${((activeIndex + 1) / stageOrder.length) * 100}%`;
 }
 
 function moveStage(direction) {
   const currentIndex = stageOrder.indexOf(currentStage);
   setStage(stageOrder[(currentIndex + direction + stageOrder.length) % stageOrder.length]);
+}
+
+function pauseStageAutoplay({ lock = false } = {}) {
+  if (stageAutoplayTimer) window.clearInterval(stageAutoplayTimer);
+  stageAutoplayTimer = null;
+  if (lock) stageAutoplayLocked = true;
+}
+
+function startStageAutoplay() {
+  const carousel = $("#stageCarousel");
+  const homeIsActive = $("#view-home")?.classList.contains("active");
+  const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  if (!carousel || !homeIsActive || document.hidden || reduceMotion || stageAutoplayLocked || stageAutoplayTimer) return;
+  stageAutoplayTimer = window.setInterval(() => moveStage(1), 7000);
+}
+
+function useStageControl(callback) {
+  pauseStageAutoplay({ lock: true });
+  callback();
 }
 
 function setExperienceFilters({ scope = "all", dimension = "all", source = "all" } = {}) {
@@ -2247,9 +2272,9 @@ const logoutButton = $("#logoutButton"); if (logoutButton) logoutButton.addEvent
 const continueGuestBtn = $("#continueGuest"); if (continueGuestBtn) continueGuestBtn.addEventListener("click", () => { localStorage.setItem("yinlu_guest_seen", "1"); closeModal("accountModal"); showToast("已进入访客试用，可随时注册保存数据"); });
 
 // stage & init
-$("#previousStage")?.addEventListener("click", () => moveStage(-1));
-$("#nextStage")?.addEventListener("click", () => moveStage(1));
-$$("[data-stage-dot]").forEach((button) => button.addEventListener("click", () => setStage(button.dataset.stageDot)));
+$$("[data-stage-dot]").forEach((button) => button.addEventListener("click", () => useStageControl(() => setStage(button.dataset.stageDot))));
+$("#previousStage")?.addEventListener("click", () => useStageControl(() => moveStage(-1)));
+$("#nextStage")?.addEventListener("click", () => useStageControl(() => moveStage(1)));
 $$("[data-stage-search-submit]").forEach((button) => button.addEventListener("click", () => runStageSearch(button.closest(".stage-slide"))));
 $$("[data-stage-search]").forEach((input) => input.addEventListener("keydown", (event) => { if (event.key === "Enter") runStageSearch(input.closest(".stage-slide")); }));
 $$("[data-stage-task]").forEach((button) => button.addEventListener("click", () => runStageTask(button.dataset.stageTask)));
@@ -2257,17 +2282,30 @@ const stageCarousel = $("#stageCarousel");
 if (stageCarousel) {
   stageCarousel.addEventListener("keydown", (event) => {
     if (event.target.matches("input, button")) return;
-    if (event.key === "ArrowLeft") { event.preventDefault(); moveStage(-1); }
-    if (event.key === "ArrowRight") { event.preventDefault(); moveStage(1); }
+    if (event.key === "ArrowLeft") { event.preventDefault(); useStageControl(() => moveStage(-1)); }
+    if (event.key === "ArrowRight") { event.preventDefault(); useStageControl(() => moveStage(1)); }
   });
   let touchStartX = 0;
-  stageCarousel.addEventListener("touchstart", (event) => { touchStartX = event.changedTouches[0]?.clientX || 0; }, { passive: true });
+  stageCarousel.addEventListener("pointerenter", () => pauseStageAutoplay());
+  stageCarousel.addEventListener("pointerleave", startStageAutoplay);
+  stageCarousel.addEventListener("focusin", (event) => pauseStageAutoplay({ lock: event.target.matches("[data-stage-search]") }));
+  stageCarousel.addEventListener("focusout", () => window.setTimeout(() => {
+    if (!stageCarousel.contains(document.activeElement)) startStageAutoplay();
+  }, 0));
+  stageCarousel.addEventListener("touchstart", (event) => {
+    pauseStageAutoplay({ lock: true });
+    touchStartX = event.changedTouches[0]?.clientX || 0;
+  }, { passive: true });
   stageCarousel.addEventListener("touchend", (event) => {
     const distance = (event.changedTouches[0]?.clientX || 0) - touchStartX;
     if (Math.abs(distance) < 45) return;
     moveStage(distance > 0 ? -1 : 1);
   }, { passive: true });
 }
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) pauseStageAutoplay();
+  else startStageAutoplay();
+});
 $$('[data-dimension-filter]').forEach((button) => button.addEventListener("click", () => {
   currentDimensionFilter = button.dataset.dimensionFilter;
   $$('[data-dimension-filter]').forEach((item) => item.classList.toggle("active", item === button));
@@ -2310,6 +2348,6 @@ window.addEventListener("resize", () => {
   const pet = $("#cyberPet");
   if (pet) setCyberPetPosition(pet.getBoundingClientRect().left, pet.getBoundingClientRect().top);
 });
-setStage(currentStage); updateAccountHeader(); hydrateIcons();
+setStage(currentStage); startStageAutoplay(); updateAccountHeader(); hydrateIcons();
 switchQaTab("ask");
 if (!currentUser() && !localStorage.getItem("yinlu_guest_seen")) window.setTimeout(showAccount, 500);

@@ -149,28 +149,14 @@
 
       <div class="view-stack">
         <section class="view active" id="view-home" aria-labelledby="homeTitle">
-          <div class="hero-grid">
-            <div class="hero-copy">
-              <div class="eyebrow"><span class="eyebrow-line"></span>青年生涯决策信息平台</div>
-              <h1 id="homeTitle" aria-label="找到学校，也找到真正懂你的人">
-                <span class="headline-line-one">找到<span class="headline-school">学校</span></span>
-                <span class="headline-line-two">
-                  <small>也找到</small>
-                  <strong>真正懂你的人</strong>
-                </span>
-              </h1>
-              <p class="hero-subtitle">从学校、专业到未来去向，把官方信息和真实经验放到同一张决策桌面上。</p>
-              <div class="hero-actions">
-                <button class="primary-button" data-view-target="experience"><i data-lucide="search"></i>查看院校与经验</button>
-                <button class="quiet-button" data-view-target="questions"><i data-lucide="message-square-plus"></i>去问答中心</button>
-              </div>
-              <div class="hero-proof">
-                <div class="proof-avatars"><span>福</span><span>大</span><span>研</span><span>职</span></div>
-                <div><strong>认证经验正在积累</strong><small>身份可核验 · 观点保留分歧</small></div>
-              </div>
-            </div>
+          <header class="home-dashboard-heading">
+            <div class="eyebrow"><span class="eyebrow-line"></span>青年生涯决策信息平台</div>
+            <h1 id="homeTitle">找到学校，也找到真正懂你的人</h1>
+            <p>从当前阶段出发，把官方信息、真实经验和自己的问题放在同一张决策桌面上。</p>
+          </header>
 
-            <div class="decision-card" id="stageCarousel" tabindex="0" aria-label="决策阶段切换">
+          <div class="home-primary-grid">
+            <div class="decision-card stage-showcase" id="stageCarousel" tabindex="0" aria-label="决策阶段展览">
               <div class="decision-card-toolbar">
                 <div class="card-kicker"><span class="status-pulse"></span>你的决策路径</div>
                 <div class="stage-arrows">
@@ -178,11 +164,16 @@
                   <button class="icon-button" id="nextStage" type="button" aria-label="下一个决策阶段"><span class="stage-arrow-symbol right" aria-hidden="true"></span></button>
                 </div>
               </div>
+              <div class="stage-showcase-tabs" role="tablist" aria-label="选择决策阶段">
+                <button class="active" type="button" data-stage-dot="gaokao" role="tab" aria-selected="true"><span>01</span>高考志愿</button>
+                <button type="button" data-stage-dot="graduate" role="tab" aria-selected="false"><span>02</span>考研择校</button>
+                <button type="button" data-stage-dot="career" role="tab" aria-selected="false"><span>03</span>职业选择</button>
+                <button type="button" data-stage-dot="adapt" role="tab" aria-selected="false"><span>04</span>大学适应</button>
+              </div>
               <div class="stage-carousel-viewport">
                 <div class="stage-slide active" data-stage="gaokao" role="tabpanel" aria-label="高考志愿">
                   <span class="stage-slide-edge">高考志愿</span>
-                  <header><span>01 · 高中到大学</span><h2>高考志愿</h2><p>从学校、专业和当年招生政策开始了解。</p></header>
-                  <div class="stage-slide-search"><i data-lucide="search"></i><input type="search" data-stage-search placeholder="搜索学校或专业" autocomplete="off"><button type="button" data-stage-search-submit aria-label="搜索高考志愿相关内容"><i data-lucide="arrow-right"></i></button></div>
+                  <div class="stage-showcase-content"><div class="stage-slide-copy"><header><span>01 · 高中到大学</span><h2>高考志愿</h2><p>从学校、专业和当年招生政策开始了解。</p></header><div class="stage-slide-search"><i data-lucide="search"></i><input type="search" data-stage-search placeholder="搜索学校或专业" autocomplete="off"><button type="button" data-stage-search-submit aria-label="搜索高考志愿相关内容"><i data-lucide="arrow-right"></i></button></div></div><div class="stage-visual" aria-hidden="true"><span>01</span><strong>志</strong><small>志愿选择</small></div></div>
                   <div class="stage-quick-tasks">
                     <button type="button" data-stage-task="school"><i data-lucide="school"></i><span>查院校</span></button>
                     <button type="button" data-stage-task="major"><i data-lucide="book-open"></i><span>查专业</span></button>
@@ -192,8 +183,7 @@
                 </div>
                 <div class="stage-slide" data-stage="graduate" role="tabpanel" aria-label="考研择校">
                   <span class="stage-slide-edge">考研择校</span>
-                  <header><span>02 · 大学到深造</span><h2>考研择校</h2><p>先比较专业培养、升学参考和真实课程体验。</p></header>
-                  <div class="stage-slide-search"><i data-lucide="search"></i><input type="search" data-stage-search placeholder="搜索学校或专业方向" autocomplete="off"><button type="button" data-stage-search-submit aria-label="搜索考研择校相关内容"><i data-lucide="arrow-right"></i></button></div>
+                  <div class="stage-showcase-content"><div class="stage-slide-copy"><header><span>02 · 大学到深造</span><h2>考研择校</h2><p>先比较专业培养、升学参考和真实课程体验。</p></header><div class="stage-slide-search"><i data-lucide="search"></i><input type="search" data-stage-search placeholder="搜索学校或专业方向" autocomplete="off"><button type="button" data-stage-search-submit aria-label="搜索考研择校相关内容"><i data-lucide="arrow-right"></i></button></div></div><div class="stage-visual" aria-hidden="true"><span>02</span><strong>研</strong><small>深造路径</small></div></div>
                   <div class="stage-quick-tasks">
                     <button type="button" data-stage-task="major"><i data-lucide="book-open"></i><span>查专业培养</span></button>
                     <button type="button" data-stage-task="progression"><i data-lucide="trending-up"></i><span>看升学参考</span></button>
@@ -203,8 +193,7 @@
                 </div>
                 <div class="stage-slide" data-stage="career" role="tabpanel" aria-label="职业选择">
                   <span class="stage-slide-edge">职业选择</span>
-                  <header><span>03 · 大学到工作</span><h2>职业选择</h2><p>把专业学习、行业视角和真实岗位要求放在一起看。</p></header>
-                  <div class="stage-slide-search"><i data-lucide="search"></i><input type="search" data-stage-search placeholder="搜索专业或职业方向" autocomplete="off"><button type="button" data-stage-search-submit aria-label="搜索职业选择相关内容"><i data-lucide="arrow-right"></i></button></div>
+                  <div class="stage-showcase-content"><div class="stage-slide-copy"><header><span>03 · 大学到工作</span><h2>职业选择</h2><p>把专业学习、行业视角和真实岗位要求放在一起看。</p></header><div class="stage-slide-search"><i data-lucide="search"></i><input type="search" data-stage-search placeholder="搜索专业或职业方向" autocomplete="off"><button type="button" data-stage-search-submit aria-label="搜索职业选择相关内容"><i data-lucide="arrow-right"></i></button></div></div><div class="stage-visual" aria-hidden="true"><span>03</span><strong>职</strong><small>职业方向</small></div></div>
                   <div class="stage-quick-tasks">
                     <button type="button" data-stage-task="career"><i data-lucide="briefcase-business"></i><span>看就业去向</span></button>
                     <button type="button" data-stage-task="expert"><i data-lucide="users"></i><span>看职业视角</span></button>
@@ -214,8 +203,7 @@
                 </div>
                 <div class="stage-slide" data-stage="adapt" role="tabpanel" aria-label="大学适应">
                   <span class="stage-slide-edge">大学适应</span>
-                  <header><span>04 · 进入新阶段</span><h2>大学适应</h2><p>从课程、宿舍和城市环境了解真实大学生活。</p></header>
-                  <div class="stage-slide-search"><i data-lucide="search"></i><input type="search" data-stage-search placeholder="搜索学校或生活问题" autocomplete="off"><button type="button" data-stage-search-submit aria-label="搜索大学适应相关内容"><i data-lucide="arrow-right"></i></button></div>
+                  <div class="stage-showcase-content"><div class="stage-slide-copy"><header><span>04 · 进入新阶段</span><h2>大学适应</h2><p>从课程、宿舍和城市环境了解真实大学生活。</p></header><div class="stage-slide-search"><i data-lucide="search"></i><input type="search" data-stage-search placeholder="搜索学校或生活问题" autocomplete="off"><button type="button" data-stage-search-submit aria-label="搜索大学适应相关内容"><i data-lucide="arrow-right"></i></button></div></div><div class="stage-visual" aria-hidden="true"><span>04</span><strong>适</strong><small>大学生活</small></div></div>
                   <div class="stage-quick-tasks">
                     <button type="button" data-stage-task="course"><i data-lucide="notebook-tabs"></i><span>看课程学习</span></button>
                     <button type="button" data-stage-task="dorm"><i data-lucide="bed-double"></i><span>看宿舍生活</span></button>
@@ -224,15 +212,22 @@
                   </div>
                 </div>
               </div>
-              <div class="stage-pagination" role="tablist" aria-label="选择决策阶段">
-                <button class="active" type="button" data-stage-dot="gaokao" role="tab" aria-label="高考志愿" aria-selected="true"></button>
-                <button type="button" data-stage-dot="graduate" role="tab" aria-label="考研择校" aria-selected="false"></button>
-                <button type="button" data-stage-dot="career" role="tab" aria-label="职业选择" aria-selected="false"></button>
-                <button type="button" data-stage-dot="adapt" role="tab" aria-label="大学适应" aria-selected="false"></button>
+              <div class="stage-pagination" aria-live="polite">
+                <div class="stage-progress-track" aria-hidden="true"><span id="stageProgressFill"></span></div>
                 <span id="stagePosition">1 / 4</span>
               </div>
               <div class="decision-note"><i data-lucide="shield-check"></i><span>匿名提问 · 认证回答 · 来源标注</span></div>
             </div>
+
+            <aside class="continue-decision-panel" aria-labelledby="continueDecisionTitle">
+              <div class="continue-decision-heading"><div class="card-kicker"><span class="status-pulse"></span>继续上次进度</div><h2 id="continueDecisionTitle">继续我的决策</h2><p>当前展示前端示例，登录后可承接个人记录。</p></div>
+              <div class="continue-decision-list">
+                <button type="button" data-school-detail="fjnu"><span class="continue-item-mark teal-mark">近</span><span><small>最近查看</small><strong>福建师范大学</strong><em>计算机科学与技术</em></span><b aria-hidden="true">›</b></button>
+                <button type="button" data-view-target="compare"><span class="continue-item-mark blue-mark">候</span><span><small>我的候选</small><strong>3 所学校待比较</strong><em>从院校优先继续</em></span><b aria-hidden="true">›</b></button>
+                <button type="button" data-view-target="questions"><span class="continue-item-mark amber-mark">问</span><span><small>待补充的问题</small><strong>宿舍与校区安排</strong><em>继续增加问题细节</em></span><b aria-hidden="true">›</b></button>
+              </div>
+              <button class="text-button continue-all-button" type="button" data-view-target="compare">查看全部任务<span aria-hidden="true">→</span></button>
+            </aside>
           </div>
 
           <section class="home-path-section" aria-labelledby="homePathTitle">
