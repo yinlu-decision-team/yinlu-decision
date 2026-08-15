@@ -235,11 +235,20 @@ const demoAnswers = [
 
 const stageNames = { gaokao: "高考志愿", graduate: "考研择校", career: "职业选择", adapt: "大学适应" };
 const stageOrder = ["gaokao", "graduate", "career", "adapt"];
-const STORE = { users: "yinlu_users", session: "yinlu_session", questions: "yinlu_questions", answers: "yinlu_answers", favorites: "yinlu_favorites", candidateStatus: "yinlu_candidate_status", compareHistory: "yinlu_compare_history", family: "yinlu_family", verification: "yinlu_verification", theme: "yinlu_theme", experienceLayout: "yinlu_experience_layout", decisionEvents: "yinlu_decision_events", petPosition: "yinlu_pet_position", petAvatar: "yinlu_pet_avatar", pageFeedback: "yinlu_page_feedback", onboarding: "yinlu_onboarding_complete_v1" };
+const STORE = { users: "yinlu_users", session: "yinlu_session", questions: "yinlu_questions", answers: "yinlu_answers", favorites: "yinlu_favorites", candidateStatus: "yinlu_candidate_status", compareHistory: "yinlu_compare_history", family: "yinlu_family", verification: "yinlu_verification", theme: "yinlu_theme", experienceLayout: "yinlu_experience_layout", decisionEvents: "yinlu_decision_events", petPosition: "yinlu_pet_position_v2", petAvatar: "yinlu_pet_avatar", petMotion: "yinlu_pet_reduce_motion", pageFeedback: "yinlu_page_feedback", onboarding: "yinlu_onboarding_complete_v1" };
 const CYBER_PET_AVATARS = {
-  guide: { name: "引路灯灵", src: "./pixel-guide-light.svg?v=20260815" },
-  cat: { name: "书包猫", src: "./pixel-backpack-cat.svg?v=20260815" },
-  dog: { name: "路标犬", src: "./pixel-sign-dog.svg?v=20260815" }
+  egret: { name: "鹭小引", src: "./pet-t-egret-guide.svg?v=20260815" },
+  deer: { name: "不迷鹿", src: "./pet-s-never-lost-deer.svg?v=20260815" },
+  koi: { name: "小引鲤", src: "./pet-v-lucky-koi.svg?v=20260815" },
+  sheep: { name: "帆帆羊", src: "./pet-w-sailing-sheep.svg?v=20260815" },
+  turtle: { name: "归途龟", src: "./pet-z-homebound-turtle.svg?v=20260815" }
+};
+const CYBER_PET_GUIDANCE = {
+  experience: { context: "院校与经验", status: "经验对照中", stage: "经验筛选 · 核实信息", reminder: "先看信息来源和发布时间，再把个人体验与客观事实分开记录。", title: "把相同问题放在一起比较", text: "同一所学校的体验可能因专业、校区和年份不同而变化。优先寻找与你情况接近的经验。" },
+  questions: { context: "问答中心", status: "问题梳理中", stage: "提出问题 · 补充细节", reminder: "说明你的地区、阶段和已经了解的内容，更容易获得真正有用的回答。", title: "把问题问得更具体一点", text: "与其问“这所学校好吗”，不如说明你在意的专业、城市、住宿或就业方向。" },
+  compare: { context: "我的候选", status: "候选比较中", stage: "候选比较 · 聚焦差异", reminder: "一次先比较两个最重要的维度，避免信息太多反而难以判断。", title: "先找出真正影响选择的差异", text: "相似条件可以暂时收起，把注意力放在专业实力、城市机会和录取把握等关键差异上。" },
+  trust: { context: "信任与认证", status: "来源确认中", stage: "信息核验 · 查看来源", reminder: "优先查看认证经历、回答时间和信息来源，过期内容需要再次确认。", title: "先确认这条经验是否适合你", text: "真实经历很重要，但不同年份、专业和校区也会影响结论。把经验放回具体背景里判断。" },
+  "school-detail": { context: "学校详情", status: "资料查看中", stage: "学校详情 · 补齐信息", reminder: "把学校优势、专业情况和录取条件放在一起看，不要只依赖单一排名。", title: "记录一个优点和一个疑问", text: "先写下吸引你的地方，再记录仍需确认的问题，之后比较候选会更清楚。" }
 };
 const THEME_NAMES = {
   spring: "春野同行",
@@ -369,6 +378,8 @@ const EXPERIENCE_DIMENSIONS_BY_SOURCE = {
   expert: ["课程学习", "校园氛围", "城市环境", "就业去向"]
 };
 let cyberPetSuppressClick = false;
+let cyberPetExpressionTimer = 0;
+let cyberPetLongPressTimer = 0;
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -771,34 +782,127 @@ function cyberPetContextLabel() {
   return ({ home: "首页", experience: "院校与经验", questions: "问答中心", compare: "我的候选", trust: "信任与认证" })[activeView] || "当前页面";
 }
 
+function cyberPetGuidance() {
+  const activeView = $(".view.active")?.id.replace("view-", "") || "home";
+  if (activeView === "home") {
+    const guidance = {
+      gaokao: { context: "高考志愿", status: "信息收集中", stage: "志愿填报 · 初选候选", reminder: "先核对分数位次和地区范围，再收集学校与专业。", title: "先确定你最在意什么", text: "城市、专业实力和录取把握很难同时最大化。先选出两个最重要的维度。" },
+      graduate: { context: "考研择校", status: "院校筛选中", stage: "考研择校 · 收集信息", reminder: "先确认专业方向和考试科目，再比较院校难度与培养特点。", title: "先划定适合自己的选择范围", text: "把专业方向、地区偏好和备考基础放在一起考虑，再逐步缩小候选院校。" },
+      career: { context: "职业选择", status: "方向比较中", stage: "职业选择 · 梳理方向", reminder: "先记录感兴趣的工作内容，再核对岗位要求和真实从业体验。", title: "从喜欢做什么开始判断", text: "不要只看职位名称。比较日常工作、成长空间和生活方式，判断哪种方向更适合你。" },
+      adapt: { context: "大学适应", status: "问题梳理中", stage: "大学适应 · 寻找方法", reminder: "把最困扰你的具体场景写下来，再寻找有相似经历的同学。", title: "先处理最影响当下的一件事", text: "课程、社交和生活节奏不必同时解决。先选一个最需要改善的问题，从小行动开始。" }
+    };
+    return guidance[currentStage] || guidance.gaokao;
+  }
+  const guidance = { ...(CYBER_PET_GUIDANCE[activeView] || CYBER_PET_GUIDANCE.experience) };
+  if (activeView === "school-detail") guidance.context = institutions.find((item) => item.id === currentSchoolDetail)?.school || guidance.context;
+  return guidance;
+}
+
 function renderCyberPetContext() {
+  const guidance = cyberPetGuidance();
   const context = $("#cyberPetContext");
-  if (context) context.textContent = cyberPetContextLabel();
+  const status = $("#cyberPetContextStatus");
+  const stage = $("#cyberPetStageName");
+  const reminder = $("#cyberPetStageReminder");
+  const title = $("#cyberPetSuggestionTitle");
+  const text = $("#cyberPetSuggestionText");
+  if (context) context.textContent = guidance.context;
+  if (status) status.textContent = guidance.status;
+  if (stage) stage.textContent = guidance.stage;
+  if (reminder) reminder.textContent = guidance.reminder;
+  if (title) title.textContent = guidance.title;
+  if (text) text.textContent = guidance.text;
 }
 
 function setCyberPetAvatar(id, { persist = true, notify = false } = {}) {
-  const avatarId = CYBER_PET_AVATARS[id] ? id : "guide";
+  const avatarId = CYBER_PET_AVATARS[id] ? id : "egret";
   const avatar = CYBER_PET_AVATARS[avatarId];
   $$('[data-pet-avatar-image]').forEach((image) => { image.src = avatar.src; });
+  const pet = $("#cyberPet");
+  if (pet) {
+    pet.dataset.petAvatar = avatarId;
+    pet.classList.remove("avatar-changing");
+    window.requestAnimationFrame(() => pet.classList.add("avatar-changing"));
+    window.setTimeout(() => pet.classList.remove("avatar-changing"), 420);
+  }
   const name = $("#cyberPetAvatarName");
   if (name) name.textContent = avatar.name;
-  $$('[data-pet-avatar]').forEach((button) => {
+  const toggle = $("#cyberPetToggle");
+  if (toggle) toggle.setAttribute("aria-label", "打开" + avatar.name + "助手");
+  $$("#cyberPetAvatarMenu [data-pet-avatar]").forEach((button) => {
     const selected = button.dataset.petAvatar === avatarId;
     button.classList.toggle("active", selected);
-    button.setAttribute("aria-pressed", String(selected));
+    button.setAttribute("aria-checked", String(selected));
   });
   if (persist) write(STORE.petAvatar, avatarId);
-  if (notify) showToast(`已切换为${avatar.name}`);
+  if (notify) showToast("已切换为" + avatar.name);
 }
 
-function setCyberPetAvatarPicker(open) {
-  const picker = $("#cyberPetAvatarPicker");
-  const button = $("#cyberPetAvatarButton");
-  if (!picker || !button) return;
-  picker.hidden = !open;
-  button.setAttribute("aria-expanded", String(open));
-  window.requestAnimationFrame(positionCyberPetPanel);
+function setCyberPetAvatarMenu(open, point = null, { focus = false } = {}) {
+  const menu = $("#cyberPetAvatarMenu");
+  const pet = $("#cyberPet");
+  if (!menu || !pet) return;
+  if (!open) {
+    menu.hidden = true;
+    return;
+  }
+  menu.hidden = false;
+  menu.style.visibility = "hidden";
+  const petRect = pet.getBoundingClientRect();
+  const width = menu.offsetWidth;
+  const height = menu.offsetHeight;
+  let left = Number(point?.x ?? petRect.left);
+  let top = Number(point?.y ?? (petRect.top - height - 10));
+  if (top < 10) top = petRect.bottom + 10;
+  left = Math.max(10, Math.min(left, window.innerWidth - width - 10));
+  top = Math.max(10, Math.min(top, window.innerHeight - height - 10));
+  menu.style.left = left + "px";
+  menu.style.top = top + "px";
+  menu.style.visibility = "";
+  if (focus) window.requestAnimationFrame(() => menu.querySelector(".active")?.focus());
 }
+
+function setCyberPetTab(tab, { focus = false } = {}) {
+  const next = ["tools", "chat", "plan"].includes(tab) ? tab : "tools";
+  $$("[data-pet-tab]").forEach((button) => {
+    const active = button.dataset.petTab === next;
+    button.setAttribute("aria-selected", String(active));
+    button.tabIndex = active ? 0 : -1;
+    if (active && focus) button.focus();
+  });
+  $$("[data-pet-tab-panel]").forEach((panel) => {
+    const active = panel.dataset.petTabPanel === next;
+    panel.hidden = !active;
+    panel.classList.toggle("active", active);
+  });
+  if (next === "chat") {
+    const messages = $("#cyberPetMessages");
+    if (messages) messages.scrollTop = messages.scrollHeight;
+  }
+}
+
+function setCyberPetMotionReduced(reduced, { persist = true } = {}) {
+  const next = Boolean(reduced);
+  $("#cyberPet")?.classList.toggle("motion-reduced", next);
+  const checkbox = $("#cyberPetReduceMotion");
+  if (checkbox) checkbox.checked = next;
+  if (persist) write(STORE.petMotion, next);
+  scheduleCyberPetExpression();
+}
+
+function scheduleCyberPetExpression() {
+  window.clearTimeout(cyberPetExpressionTimer);
+  const pet = $("#cyberPet");
+  if (!pet || pet.classList.contains("motion-reduced")) return;
+  cyberPetExpressionTimer = window.setTimeout(() => {
+    if (!document.hidden && !pet.classList.contains("dragging")) {
+      pet.classList.add("pet-expressing");
+      window.setTimeout(() => pet.classList.remove("pet-expressing"), 950);
+    }
+    scheduleCyberPetExpression();
+  }, 6000 + Math.random() * 6000);
+}
+
 
 function appendCyberPetMessage(role, text) {
   const messages = $("#cyberPetMessages");
@@ -818,7 +922,7 @@ function positionCyberPetPanel() {
   const petRect = pet.getBoundingClientRect();
   const panelWidth = panel.offsetWidth;
   const panelHeight = panel.offsetHeight;
-  let left = petRect.right - panelWidth;
+  let left = petRect.left < window.innerWidth / 2 ? petRect.right + 14 : petRect.left - panelWidth - 14;
   let top = petRect.top - panelHeight - 12;
   if (top < 12) top = petRect.bottom + 12;
   left = Math.max(12, Math.min(left, window.innerWidth - panelWidth - 12));
@@ -837,8 +941,13 @@ function setCyberPetOpen(open) {
   panel.hidden = !open;
   pet?.classList.toggle("panel-open", open);
   toggle.setAttribute("aria-expanded", String(open));
-  toggle.setAttribute("aria-label", open ? "收起小引助手" : "打开小引助手");
-  if (!open) setCyberPetAvatarPicker(false);
+  toggle.setAttribute("aria-label", open ? "收起小引助手" : "打开" + (CYBER_PET_AVATARS[pet?.dataset.petAvatar]?.name || "鹭小引") + "助手");
+  if (!open) {
+    setCyberPetAvatarMenu(false);
+    const report = $("#cyberPetReport");
+    if (report) report.hidden = true;
+  }
+  if (open) setCyberPetTab("tools");
   renderCyberPetContext();
   if (open) window.requestAnimationFrame(positionCyberPetPanel);
 }
@@ -868,9 +977,10 @@ function setCyberPetPosition(x, y, persist = false) {
 function restoreCyberPetPosition() {
   const pet = $("#cyberPet");
   const saved = read(STORE.petPosition, null);
+  const mobile = window.matchMedia("(max-width: 540px)").matches;
   const fallback = {
-    x: window.innerWidth - (pet?.offsetWidth || 78) - 24,
-    y: window.innerHeight - (pet?.offsetHeight || 88) - 24
+    x: mobile ? 14 : 24,
+    y: window.innerHeight - (pet?.offsetHeight || 92) - (mobile ? 42 : 44)
   };
   setCyberPetPosition(Number(saved?.x ?? fallback.x), Number(saved?.y ?? fallback.y));
 }
@@ -924,10 +1034,77 @@ function initializeCyberPetDrag() {
   });
 }
 
+function initializeCyberPetAvatarInteractions() {
+  const toggle = $("#cyberPetToggle");
+  const menu = $("#cyberPetAvatarMenu");
+  if (!toggle || !menu) return;
+  const openFromPointer = (event) => {
+    event.preventDefault();
+    setCyberPetOpen(false);
+    setCyberPetAvatarMenu(true, { x: event.clientX, y: event.clientY });
+  };
+  toggle.addEventListener("contextmenu", openFromPointer);
+  toggle.addEventListener("keydown", (event) => {
+    if (event.key !== "ContextMenu" && !(event.shiftKey && event.key === "F10")) return;
+    event.preventDefault();
+    setCyberPetOpen(false);
+    setCyberPetAvatarMenu(true, null, { focus: true });
+  });
+
+  let longPressPoint = null;
+  toggle.addEventListener("pointerdown", (event) => {
+    if (event.pointerType !== "touch") return;
+    longPressPoint = { x: event.clientX, y: event.clientY };
+    window.clearTimeout(cyberPetLongPressTimer);
+    cyberPetLongPressTimer = window.setTimeout(() => {
+      cyberPetSuppressClick = true;
+      setCyberPetOpen(false);
+      setCyberPetAvatarMenu(true, longPressPoint);
+    }, 620);
+  });
+  toggle.addEventListener("pointermove", (event) => {
+    if (!longPressPoint || Math.hypot(event.clientX - longPressPoint.x, event.clientY - longPressPoint.y) > 8) {
+      window.clearTimeout(cyberPetLongPressTimer);
+      longPressPoint = null;
+    }
+  });
+  ["pointerup", "pointercancel", "pointerleave"].forEach((type) => toggle.addEventListener(type, () => {
+    window.clearTimeout(cyberPetLongPressTimer);
+    longPressPoint = null;
+  }));
+
+  menu.addEventListener("keydown", (event) => {
+    const items = $$('[role="menuitemradio"]', menu);
+    const current = items.indexOf(document.activeElement);
+    if (event.key === "Escape") {
+      event.preventDefault();
+      setCyberPetAvatarMenu(false);
+      toggle.focus();
+      return;
+    }
+    if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    const next = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1 : (current + (event.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
+    items[next]?.focus();
+  });
+  $$("[data-pet-tab]").forEach((button) => {
+    button.addEventListener("click", () => setCyberPetTab(button.dataset.petTab));
+    button.addEventListener("keydown", (event) => {
+      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+      event.preventDefault();
+      const tabs = $$("[data-pet-tab]");
+      const current = tabs.indexOf(button);
+      const next = event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1 : (current + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
+      setCyberPetTab(tabs[next].dataset.petTab, { focus: true });
+    });
+  });
+}
+
 function handleCyberPetAction(action) {
   const report = $("#cyberPetReport");
   const input = $("#cyberPetInput");
   if (action === "ask-current") {
+    setCyberPetTab("chat");
     appendCyberPetMessage("assistant", `已带入${cyberPetContextLabel()}。你想先问哪一部分？`);
     input?.focus();
     return;
@@ -958,6 +1135,7 @@ function submitCyberPetQuestion(event) {
   const input = $("#cyberPetInput");
   const question = input?.value.trim() || "";
   if (!question) return;
+  setCyberPetTab("chat");
   appendCyberPetMessage("user", question);
   input.value = "";
   appendCyberPetMessage("assistant", "这个问题已准备好。可以继续补充，或通过匿名提问发布到问答中心。");
@@ -973,6 +1151,7 @@ function submitCyberPetReport(event) {
   write(STORE.pageFeedback, feedback.slice(0, 20));
   event.target.reset();
   event.target.hidden = true;
+  setCyberPetTab("chat");
   appendCyberPetMessage("assistant", "已记录当前页面的问题。");
   positionCyberPetPanel();
   showToast("页面问题已记录在本机");
@@ -1382,6 +1561,7 @@ function setStage(stage) {
   if (position) position.textContent = `${activeIndex + 1} / ${stageOrder.length}`;
   const progress = $("#stageProgressFill");
   if (progress) progress.style.width = `${((activeIndex + 1) / stageOrder.length) * 100}%`;
+  renderCyberPetContext();
 }
 
 function moveStage(direction) {
@@ -2958,8 +3138,13 @@ function switchQaTab(name) {
 
 // 事件委托保留，但同时安全绑定核心按钮以避免空引用错误
 document.addEventListener("click", (event) => {
-  const petAvatar = event.target.closest("[data-pet-avatar]");
-  if (petAvatar) { setCyberPetAvatar(petAvatar.dataset.petAvatar, { notify: true }); setCyberPetAvatarPicker(false); return; }
+  const petAvatar = event.target.closest("#cyberPetAvatarMenu [data-pet-avatar]");
+  if (petAvatar) {
+    setCyberPetAvatar(petAvatar.dataset.petAvatar, { notify: true });
+    setCyberPetAvatarMenu(false);
+    if (event.detail === 0) $("#cyberPetToggle")?.focus();
+    return;
+  }
   const petAction = event.target.closest("[data-pet-action]");
   if (petAction) { handleCyberPetAction(petAction.dataset.petAction); return; }
   const experienceLayout = event.target.closest("[data-experience-layout]");
@@ -3166,6 +3351,11 @@ document.addEventListener("input", (event) => {
 });
 
 document.addEventListener("change", (event) => {
+  if (event.target.id === "cyberPetReduceMotion") {
+    setCyberPetMotionReduced(event.target.checked);
+    showToast(event.target.checked ? "已减少宠物动态效果" : "已恢复宠物动态效果");
+    return;
+  }
   if (event.target.id === "decisionEventDate") {
     selectDecisionDate(event.target.value);
     return;
@@ -3220,13 +3410,16 @@ const notifyButton = $("#notifyButton"); if (notifyButton) notifyButton.addEvent
 const decisionCalendarButton = $("#decisionCalendarButton"); if (decisionCalendarButton) decisionCalendarButton.addEventListener("click", openDecisionCalendar);
 const cyberPetToggle = $("#cyberPetToggle"); if (cyberPetToggle) cyberPetToggle.addEventListener("click", () => {
   if (cyberPetSuppressClick) { cyberPetSuppressClick = false; return; }
+  setCyberPetAvatarMenu(false);
   setCyberPetOpen($("#cyberPetPanel")?.hidden !== false);
 });
 const cyberPetClose = $("#cyberPetClose"); if (cyberPetClose) cyberPetClose.addEventListener("click", () => setCyberPetOpen(false));
-const cyberPetAvatarButton = $("#cyberPetAvatarButton"); if (cyberPetAvatarButton) cyberPetAvatarButton.addEventListener("click", () => setCyberPetAvatarPicker(cyberPetAvatarButton.getAttribute("aria-expanded") !== "true"));
 const themeButton = $("#themeButton"); if (themeButton) themeButton.addEventListener("click", (event) => { event.stopPropagation(); setThemeMenu(themeButton.getAttribute("aria-expanded") !== "true"); });
 $$('[data-theme-option]').forEach((button) => button.addEventListener("click", () => { applyTheme(button.dataset.themeOption, { persist: true, notify: true }); setThemeMenu(false); }));
 document.addEventListener("click", (event) => { if (!event.target.closest(".theme-control")) setThemeMenu(false); });
+document.addEventListener("pointerdown", (event) => {
+  if (!event.target.closest("#cyberPetAvatarMenu") && !event.target.closest("#cyberPetToggle")) setCyberPetAvatarMenu(false);
+});
 const sameSchoolToggle = $("#sameSchoolToggle"); if (sameSchoolToggle) sameSchoolToggle.addEventListener("change", renderExperiences);
 const submitQuestionBtn = $("#submitQuestion"); if (submitQuestionBtn) submitQuestionBtn.addEventListener("click", submitQuestion);
 const inviteFamilyBtn = $("#inviteFamily"); if (inviteFamilyBtn) inviteFamilyBtn.addEventListener("click", generateFamilyInvite);
@@ -3425,6 +3618,7 @@ document.addEventListener("keydown", (event) => {
     closeModal("accountModal");
     closeModal("decisionCalendarModal");
     setCyberPetOpen(false);
+    setCyberPetAvatarMenu(false);
     setThemeMenu(false);
   }
 });
@@ -3437,8 +3631,9 @@ $("#backToTopButton")?.addEventListener("click", scrollCurrentPageToTop);
 applyTheme(localStorage.getItem(STORE.theme) || document.documentElement.dataset.theme || "apple");
 applyExperienceLayout(localStorage.getItem(STORE.experienceLayout) || "horizontal", { persist: false });
 renderDecisionCountdown(); renderDecisionCalendar();
-setCyberPetAvatar(read(STORE.petAvatar, "guide"), { persist: false });
-restoreCyberPetPosition(); initializeCyberPetDrag(); renderCyberPetContext();
+setCyberPetAvatar(read(STORE.petAvatar, "egret"), { persist: true });
+setCyberPetMotionReduced(read(STORE.petMotion, window.matchMedia("(prefers-reduced-motion: reduce)").matches), { persist: false });
+restoreCyberPetPosition(); initializeCyberPetDrag(); initializeCyberPetAvatarInteractions(); setCyberPetTab("tools"); renderCyberPetContext();
 window.addEventListener("resize", () => {
   const pet = $("#cyberPet");
   if (pet) setCyberPetPosition(pet.getBoundingClientRect().left, pet.getBoundingClientRect().top);
