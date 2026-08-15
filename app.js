@@ -229,7 +229,7 @@ const demoAnswers = [
 
 const stageNames = { gaokao: "高考志愿", graduate: "考研择校", career: "职业选择", adapt: "大学适应" };
 const stageOrder = ["gaokao", "graduate", "career", "adapt"];
-const STORE = { users: "yinlu_users", session: "yinlu_session", questions: "yinlu_questions", answers: "yinlu_answers", favorites: "yinlu_favorites", candidateStatus: "yinlu_candidate_status", compareHistory: "yinlu_compare_history", family: "yinlu_family", verification: "yinlu_verification", theme: "yinlu_theme", experienceLayout: "yinlu_experience_layout", decisionEvents: "yinlu_decision_events", petPosition: "yinlu_pet_position", petAvatar: "yinlu_pet_avatar", pageFeedback: "yinlu_page_feedback" };
+const STORE = { users: "yinlu_users", session: "yinlu_session", questions: "yinlu_questions", answers: "yinlu_answers", favorites: "yinlu_favorites", candidateStatus: "yinlu_candidate_status", compareHistory: "yinlu_compare_history", family: "yinlu_family", verification: "yinlu_verification", theme: "yinlu_theme", experienceLayout: "yinlu_experience_layout", decisionEvents: "yinlu_decision_events", petPosition: "yinlu_pet_position", petAvatar: "yinlu_pet_avatar", pageFeedback: "yinlu_page_feedback", onboarding: "yinlu_onboarding_complete_v1" };
 const CYBER_PET_AVATARS = {
   guide: { name: "引路灯灵", src: "./pixel-guide-light.svg?v=20260815" },
   cat: { name: "书包猫", src: "./pixel-backpack-cat.svg?v=20260815" },
@@ -515,7 +515,17 @@ function showToast(message) {
 }
 
 function openModal(id) { const modal = $(`#${id}`); if (!modal) return; modal.classList.add("open"); modal.setAttribute("aria-hidden", "false"); window.setTimeout(() => $("textarea, input, select, button", modal)?.focus?.(), 300); }
-function closeModal(id) { const modal = $(`#${id}`); if (!modal) return; modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true"); }
+function closeModal(id) {
+  const modal = $(`#${id}`);
+  if (!modal) return;
+  const wasOpen = modal.classList.contains("open");
+  modal.classList.remove("open");
+  modal.setAttribute("aria-hidden", "true");
+  if (id === "accountModal" && wasOpen) {
+    if (!currentUser()) localStorage.setItem("yinlu_guest_seen", "1");
+    scheduleOnboarding(420);
+  }
+}
 
 function parseDecisionDate(value) {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value || "");
@@ -901,7 +911,370 @@ function switchView(name) {
   if (name === "home") startStageAutoplay();
   else pauseStageAutoplay();
   renderCyberPetContext();
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  suppressBackToTopDuringViewChange();
+  window.scrollTo({ top: 0, behavior: document.body.classList.contains("onboarding-active") ? "auto" : "smooth" });
+}
+
+const BACK_TO_TOP_VIEWS = new Set(["view-experience", "view-compare"]);
+let backToTopFrame = 0;
+let backToTopHiddenUntil = 0;
+
+function updateBackToTopButton() {
+  const button = $("#backToTopButton");
+  if (!button) return;
+  const activeView = $(".view.active");
+  const shouldShow = BACK_TO_TOP_VIEWS.has(activeView?.id)
+    && (activeView?.id === "view-compare" || window.scrollY > 420)
+    && !document.body.classList.contains("onboarding-active")
+    && performance.now() >= backToTopHiddenUntil;
+  button.classList.toggle("is-visible", shouldShow);
+  button.setAttribute("aria-hidden", String(!shouldShow));
+  button.tabIndex = shouldShow ? 0 : -1;
+}
+
+function scheduleBackToTopUpdate() {
+  if (backToTopFrame) return;
+  backToTopFrame = window.requestAnimationFrame(() => {
+    backToTopFrame = 0;
+    updateBackToTopButton();
+  });
+}
+
+function suppressBackToTopDuringViewChange() {
+  backToTopHiddenUntil = performance.now() + 500;
+  updateBackToTopButton();
+  window.setTimeout(scheduleBackToTopUpdate, 520);
+}
+
+function scrollCurrentPageToTop() {
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  window.scrollTo({ top: 0, behavior: reducedMotion ? "auto" : "smooth" });
+}
+
+const ONBOARDING_STEPS = [
+  {
+    view: "home",
+    selector: "#stageCarousel",
+    placement: "bottom",
+    title: "先认识你的决策路径",
+    copy: "切换人生阶段，快速查学校、专业、政策或真实经验。"
+  },
+  {
+    view: "home",
+    selector: "#themeButton",
+    placement: "bottom",
+    title: "选择你喜欢的界面主题",
+    copy: "点击调色图标，可以在 12 套主题之间自由切换。"
+  },
+  {
+    view: "home",
+    selector: "#accountButton",
+    placement: "bottom",
+    title: "管理账户与个人资料",
+    copy: "登录后可以修改头像、昵称、出生日期和地区，并保存你的使用记录。"
+  },
+  {
+    view: "home",
+    selector: ".sidebar-nav",
+    placement: "right",
+    mobileSidebar: true,
+    title: "核心功能都在侧栏",
+    copy: "从院校经验到问答、候选与认证，使用这里随时切换。"
+  },
+  {
+    view: "experience",
+    selector: "#experienceSection .filter-bar",
+    placement: "bottom",
+    title: "先筛选，再比较信息",
+    copy: "按学校、专业、关注维度和信息来源筛选，减少无关内容。"
+  },
+  {
+    view: "questions",
+    selector: "#qaAskLayout",
+    placement: "top",
+    title: "把具体问题交给经历过的人",
+    copy: "匿名发布问题，也可以切换到“我要回答”分享真实经历。"
+  },
+  {
+    view: "compare",
+    selector: ".candidate-tabs",
+    placement: "bottom",
+    title: "整理和比较你的候选",
+    copy: "分别从院校和专业视角管理候选，也可以邀请家长共同查看。"
+  },
+  {
+    view: "trust",
+    selector: ".trust-dashboard",
+    placement: "top",
+    title: "查看经验背后的可信来源",
+    copy: "在这里了解认证规则并申请身份认证，让回答更有依据。"
+  }
+];
+
+let onboardingIndex = -1;
+let onboardingTimer = 0;
+let onboardingPositionFrame = 0;
+let onboardingRenderToken = 0;
+
+function onboardingIsComplete() {
+  return localStorage.getItem(STORE.onboarding) === "1";
+}
+
+function updateOnboardingReplayButton(announce = false) {
+  const button = $("#onboardingReplayButton");
+  if (!button) return;
+  const visible = onboardingIsComplete();
+  button.hidden = !visible;
+  button.classList.remove("is-new");
+  if (visible && announce) {
+    window.requestAnimationFrame(() => button.classList.add("is-new"));
+    window.setTimeout(() => button.classList.remove("is-new"), 2800);
+  }
+}
+
+function onboardingStepCardMarkup() {
+  return `
+    <button class="onboarding-close" type="button" data-onboarding-skip aria-label="跳过新手指引">×</button>
+    <div class="onboarding-label"><span></span><b id="onboardingProgress"></b></div>
+    <h2 id="onboardingTitle"></h2>
+    <p id="onboardingCopy"></p>
+    <div class="onboarding-footer">
+      <span id="onboardingHint">点击页面空白处继续</span>
+      <button type="button" data-onboarding-next aria-label="下一步">›</button>
+    </div>`;
+}
+
+function createOnboardingOverlay() {
+  let overlay = $("#onboardingOverlay");
+  if (overlay) return overlay;
+  overlay = document.createElement("div");
+  overlay.id = "onboardingOverlay";
+  overlay.className = "onboarding-overlay";
+  overlay.hidden = true;
+  overlay.innerHTML = `
+    <div class="onboarding-focus" aria-hidden="true"></div>
+    <div class="onboarding-arrow" aria-hidden="true"></div>
+    <section class="onboarding-card" role="dialog" aria-modal="true" aria-live="polite" tabindex="-1">${onboardingStepCardMarkup()}</section>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener("click", (event) => {
+    if (event.target.closest("[data-onboarding-skip]")) {
+      finishOnboarding({ showComplete: false });
+      return;
+    }
+    if (event.target.closest("[data-onboarding-finish]")) {
+      dismissOnboarding();
+      return;
+    }
+    if (event.target.closest("[data-onboarding-next]")) {
+      advanceOnboarding();
+      return;
+    }
+    if (event.target.closest(".onboarding-card")) return;
+    if (overlay.classList.contains("is-complete")) dismissOnboarding();
+    else advanceOnboarding();
+  });
+  return overlay;
+}
+
+function scheduleOnboarding(delay = 700) {
+  window.clearTimeout(onboardingTimer);
+  if (onboardingIsComplete() || onboardingIndex >= 0) return;
+  onboardingTimer = window.setTimeout(() => {
+    if ($(".modal-backdrop.open")) {
+      scheduleOnboarding(500);
+      return;
+    }
+    startOnboarding();
+  }, delay);
+}
+
+function startOnboarding({ force = false } = {}) {
+  if ((!force && onboardingIsComplete()) || onboardingIndex >= 0) return;
+  onboardingIndex = 0;
+  document.body.classList.add("onboarding-active");
+  showOnboardingStep();
+}
+
+function advanceOnboarding() {
+  if (onboardingIndex < 0) return;
+  if (onboardingIndex >= ONBOARDING_STEPS.length - 1) {
+    finishOnboarding({ showComplete: true });
+    return;
+  }
+  onboardingIndex += 1;
+  showOnboardingStep();
+}
+
+function showOnboardingStep() {
+  const step = ONBOARDING_STEPS[onboardingIndex];
+  if (!step) return;
+  const token = ++onboardingRenderToken;
+  const overlay = createOnboardingOverlay();
+  overlay.hidden = false;
+  overlay.classList.remove("is-complete");
+  overlay.classList.add("is-moving");
+  const card = $(".onboarding-card", overlay);
+  if (card && !$("#onboardingProgress", card)) card.innerHTML = onboardingStepCardMarkup();
+  $("#sidebar")?.classList.toggle("onboarding-open", Boolean(step.mobileSidebar));
+  switchView(step.view);
+  window.scrollTo({ top: 0, behavior: "auto" });
+  $("#onboardingProgress").textContent = `${String(onboardingIndex + 1).padStart(2, "0")} / ${String(ONBOARDING_STEPS.length).padStart(2, "0")}`;
+  $("#onboardingTitle").textContent = step.title;
+  $("#onboardingCopy").textContent = step.copy;
+  $("#onboardingHint").textContent = "点击页面空白处继续";
+  window.requestAnimationFrame(() => {
+    if (token !== onboardingRenderToken || onboardingIndex < 0) return;
+    const target = $(step.selector);
+    if (!target) {
+      advanceOnboarding();
+      return;
+    }
+    const initialRect = target.getBoundingClientRect();
+    if (initialRect.top < 92 || initialRect.bottom > window.innerHeight - 48) {
+      target.scrollIntoView({ block: "center", behavior: "auto" });
+    }
+    window.requestAnimationFrame(() => {
+      if (token !== onboardingRenderToken || onboardingIndex < 0) return;
+      positionOnboarding(step, target);
+      overlay.classList.remove("is-moving");
+      $(".onboarding-card", overlay)?.focus({ preventScroll: true });
+    });
+  });
+}
+
+function positionOnboarding(step, target) {
+  const overlay = $("#onboardingOverlay");
+  const focus = $(".onboarding-focus", overlay);
+  const card = $(".onboarding-card", overlay);
+  const arrow = $(".onboarding-arrow", overlay);
+  if (!overlay || !focus || !card || !arrow || !target) return;
+  const rect = target.getBoundingClientRect();
+  if (!rect.width || !rect.height) return;
+  const focusPadding = window.innerWidth <= 540 ? 5 : 8;
+  const focusLeft = Math.max(5, rect.left - focusPadding);
+  const focusTop = Math.max(5, rect.top - focusPadding);
+  const focusRight = Math.min(window.innerWidth - 5, rect.right + focusPadding);
+  const focusBottom = Math.min(window.innerHeight - 5, rect.bottom + focusPadding);
+  Object.assign(focus.style, {
+    left: `${focusLeft}px`,
+    top: `${focusTop}px`,
+    width: `${Math.max(1, focusRight - focusLeft)}px`,
+    height: `${Math.max(1, focusBottom - focusTop)}px`
+  });
+
+  card.style.left = "16px";
+  card.style.top = "16px";
+  card.style.visibility = "hidden";
+  const cardRect = card.getBoundingClientRect();
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  const margin = 16;
+  const gap = 54;
+  const spaces = {
+    bottom: viewportHeight - focusBottom,
+    top: focusTop,
+    right: viewportWidth - focusRight,
+    left: focusLeft
+  };
+  const allowed = viewportWidth <= 700 ? ["bottom", "top"] : ["bottom", "top", "right", "left"];
+  const ordered = [step.placement, ...allowed].filter((value, index, values) => allowed.includes(value) && values.indexOf(value) === index);
+  const fits = (placement) => ["bottom", "top"].includes(placement)
+    ? spaces[placement] >= cardRect.height + gap
+    : spaces[placement] >= cardRect.width + gap;
+  const placement = ordered.find(fits) || allowed.reduce((best, value) => spaces[value] > spaces[best] ? value : best, allowed[0]);
+  let cardLeft = margin;
+  let cardTop = margin;
+  if (placement === "bottom" || placement === "top") {
+    cardLeft = (rect.left + rect.right - cardRect.width) / 2;
+    cardTop = placement === "bottom" ? focusBottom + gap : focusTop - gap - cardRect.height;
+  } else {
+    cardLeft = placement === "right" ? focusRight + gap : focusLeft - gap - cardRect.width;
+    cardTop = (rect.top + rect.bottom - cardRect.height) / 2;
+  }
+  cardLeft = Math.min(Math.max(margin, cardLeft), viewportWidth - cardRect.width - margin);
+  cardTop = Math.min(Math.max(margin, cardTop), viewportHeight - cardRect.height - margin);
+  Object.assign(card.style, { left: `${cardLeft}px`, top: `${cardTop}px`, visibility: "visible" });
+  positionOnboardingArrow(arrow, placement, rect, { left: cardLeft, top: cardTop, width: cardRect.width, height: cardRect.height });
+}
+
+function positionOnboardingArrow(arrow, placement, target, card) {
+  arrow.dataset.direction = placement === "bottom" ? "up" : placement === "top" ? "down" : placement === "right" ? "left" : "right";
+  if (placement === "bottom" || placement === "top") {
+    const targetEdge = placement === "bottom" ? target.bottom + 5 : target.top - 5;
+    const cardEdge = placement === "bottom" ? card.top : card.top + card.height;
+    Object.assign(arrow.style, {
+      left: `${(target.left + target.right) / 2 - 6}px`,
+      top: `${Math.min(targetEdge, cardEdge)}px`,
+      width: "12px",
+      height: `${Math.max(14, Math.abs(cardEdge - targetEdge))}px`
+    });
+  } else {
+    const targetEdge = placement === "right" ? target.right + 5 : target.left - 5;
+    const cardEdge = placement === "right" ? card.left : card.left + card.width;
+    Object.assign(arrow.style, {
+      left: `${Math.min(targetEdge, cardEdge)}px`,
+      top: `${(target.top + target.bottom) / 2 - 6}px`,
+      width: `${Math.max(14, Math.abs(cardEdge - targetEdge))}px`,
+      height: "12px"
+    });
+  }
+}
+
+function finishOnboarding({ showComplete }) {
+  localStorage.setItem(STORE.onboarding, "1");
+  updateOnboardingReplayButton(false);
+  onboardingIndex = -1;
+  $("#sidebar")?.classList.remove("onboarding-open");
+  if (!showComplete) {
+    dismissOnboarding();
+    return;
+  }
+  const overlay = createOnboardingOverlay();
+  overlay.hidden = false;
+  overlay.classList.remove("is-moving");
+  overlay.classList.add("is-complete");
+  $(".onboarding-focus", overlay).removeAttribute("style");
+  $(".onboarding-arrow", overlay).removeAttribute("style");
+  $(".onboarding-card", overlay).innerHTML = `
+    <div class="onboarding-complete-mark" aria-hidden="true">✓</div>
+    <div class="onboarding-label"><span></span><b>指引完成</b></div>
+    <h2>现在可以开始探索了</h2>
+    <p>我们的新手指引到这里就结束啦，感谢使用我们网站！</p>
+    <p class="onboarding-replay-note">忘记怎么操作的话，可以来右上角的指引按钮这里找到我哟！</p>
+    <button class="onboarding-finish-button" type="button" data-onboarding-finish>开始探索</button>`;
+  $(".onboarding-card", overlay)?.focus({ preventScroll: true });
+}
+
+function dismissOnboarding() {
+  const overlay = $("#onboardingOverlay");
+  if (overlay) {
+    overlay.hidden = true;
+    overlay.classList.remove("is-complete");
+  }
+  onboardingIndex = -1;
+  onboardingRenderToken += 1;
+  $("#sidebar")?.classList.remove("onboarding-open");
+  updateOnboardingReplayButton(true);
+  switchView("home");
+  document.body.classList.remove("onboarding-active");
+  const resetScroll = () => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  };
+  resetScroll();
+  window.requestAnimationFrame(resetScroll);
+  $(".view.active")?.getAnimations().forEach((animation) => animation.cancel());
+}
+
+function refreshOnboardingPosition() {
+  if (onboardingIndex < 0) return;
+  window.cancelAnimationFrame(onboardingPositionFrame);
+  onboardingPositionFrame = window.requestAnimationFrame(() => {
+    const step = ONBOARDING_STEPS[onboardingIndex];
+    const target = step ? $(step.selector) : null;
+    if (step && target) positionOnboarding(step, target);
+  });
 }
 
 function setStage(stage) {
@@ -1729,10 +2102,57 @@ function renderFamily() {
 
 function renderTrust() {
   const user = currentUser();
-  const status = user ? (read(STORE.verification, {})[user.id] || {}).status : null;
   const card = $("#verificationContent");
   if (!card) return;
-  card.innerHTML = `<div class="verification-status"><span class="status-icon"><i data-lucide="shield-check"></i></span><div><span>当前身份</span><strong>${user ? `${escapeHtml(user.role)} · ${escapeHtml(status ? status : "未认证")}` : "未登录"}</strong></div></div>`;
+  const verification = user ? (read(STORE.verification, {})[user.id] || {}) : {};
+  const status = verification.status || "未认证";
+  const isVerified = ["已认证", "认证通过"].includes(status);
+  const isPending = status === "申请中";
+  const completedSteps = !user ? 0 : (isVerified ? 3 : (isPending ? 2 : 1));
+  const progress = [0, 34, 67, 100][completedSteps];
+  const stateClass = isVerified ? "is-verified" : (isPending ? "is-pending" : "");
+  const stateLabel = !user ? "未登录" : (isVerified ? "认证有效" : (isPending ? "审核中" : "待开始"));
+  const publicLabel = isVerified
+    ? (verification.publicLabel || verification.label || [user.school, user.major, user.graduationYear].filter(Boolean).join(" · ") || `${user.role} · 身份已核验`)
+    : "认证后显示学校 · 专业 · 年份";
+  const currentIdentity = user ? `${user.role} · ${isVerified ? "已认证" : status}` : "访客 · 未登录";
+  const step = (index, label) => `<span class="${completedSteps >= index ? "done" : ""}"><i data-lucide="${completedSteps >= index ? "check" : "circle"}"></i>${label}</span>`;
+  let action = `<button class="primary-button full-button verification-action" type="button" data-start-verify><i data-lucide="badge-check"></i>开始认证</button>`;
+  let footnote = `<p class="verify-footnote"><i data-lucide="lock-keyhole"></i>后台实名，前台匿名；材料不会在前台公开</p>`;
+
+  if (!user) {
+    action = `<button class="primary-button full-button verification-action" type="button" data-open-account><i data-lucide="log-in"></i>登录后认证</button>`;
+  } else if (isPending) {
+    action = `<div class="verify-notice pending"><span><i data-lucide="circle"></i></span><div><strong>认证申请审核中</strong><small>审核完成前继续保持未认证状态</small></div></div>`;
+    footnote = `<p class="verify-footnote"><i data-lucide="lock-keyhole"></i>提交于 ${escapeHtml(formatProfileDate(verification.submittedAt || new Date()))} · 材料仅用于后台核验</p>`;
+  } else if (isVerified) {
+    action = `<div class="verify-notice"><span><i data-lucide="shield-check"></i></span><div><strong>认证标签已生效</strong><small>现在可以发布带有认证来源的回答</small></div></div>`;
+    footnote = `<p class="verify-footnote"><i data-lucide="lock-keyhole"></i>完成认证于 ${escapeHtml(formatProfileDate(verification.verifiedAt || verification.submittedAt || new Date()))} · 前台保持匿名</p>`;
+  }
+
+  card.classList.toggle("is-unverified-card", !isVerified && !isPending);
+  card.classList.toggle("is-pending-card", isPending);
+  card.classList.toggle("is-verified-card", isVerified);
+  card.style.setProperty("--verification-progress", `${progress}%`);
+  card.innerHTML = `
+    <div class="credential-top">
+      <div><span>YINLU VERIFIED ID</span><h2>引路可信身份卡</h2></div>
+      <span class="status-icon"><i data-lucide="badge-check"></i></span>
+    </div>
+    <div class="credential-status ${stateClass}">
+      <span>当前状态</span><strong>${escapeHtml(currentIdentity)}</strong><b><i data-lucide="${isVerified ? "check" : "circle"}"></i>${escapeHtml(stateLabel)}</b>
+    </div>
+    <div class="credential-fields">
+      <div><span>${isVerified ? "前台认证标签" : "前台显示"}</span><strong>${escapeHtml(publicLabel)}</strong></div>
+      <div><span>${isVerified ? "隐私状态" : "后台核验"}</span><strong>${isVerified ? "实名信息仅后台可见" : "实名材料 · 身份证明"}</strong></div>
+    </div>
+    <div class="verify-progress">
+      <div class="progress-title"><span>认证进度</span><strong>${completedSteps} / 3</strong></div>
+      <div class="progress-track"><span></span></div>
+      <div class="verify-steps">${step(1, "确认身份")}${step(2, "提交材料")}${step(3, "等待核验")}</div>
+    </div>
+    ${action}
+    ${footnote}`;
   hydrateIcons();
 }
 
@@ -2244,6 +2664,7 @@ document.addEventListener("submit", (event) => {
 // 安全绑定核心交互（检查元素存在后绑定）
 const menuButton = $("#menuButton"); if (menuButton) menuButton.addEventListener("click", () => $("#sidebar").classList.toggle("open"));
 const accountButton = $("#accountButton"); if (accountButton) accountButton.addEventListener("click", showAccount);
+const onboardingReplayButton = $("#onboardingReplayButton"); if (onboardingReplayButton) onboardingReplayButton.addEventListener("click", () => startOnboarding({ force: true }));
 const notifyButton = $("#notifyButton"); if (notifyButton) notifyButton.addEventListener("click", () => showToast(currentUser() ? "暂无新的认证回答" : "登录后可查看你的通知"));
 const decisionCalendarButton = $("#decisionCalendarButton"); if (decisionCalendarButton) decisionCalendarButton.addEventListener("click", openDecisionCalendar);
 const cyberPetToggle = $("#cyberPetToggle"); if (cyberPetToggle) cyberPetToggle.addEventListener("click", () => {
@@ -2337,7 +2758,31 @@ const clearExperienceFilters = $("#clearExperienceFilters"); if (clearExperience
   renderExperiences();
 });
 
-document.addEventListener("keydown", (event) => { if (event.key === "Escape") { closeModal("questionModal"); closeModal("accountModal"); closeModal("decisionCalendarModal"); setCyberPetOpen(false); setThemeMenu(false); } });
+document.addEventListener("keydown", (event) => {
+  const onboardingOverlay = $("#onboardingOverlay");
+  if (onboardingIndex >= 0 || (onboardingOverlay && !onboardingOverlay.hidden)) {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      finishOnboarding({ showComplete: false });
+    } else if (["Enter", "ArrowRight"].includes(event.key) && !event.target.closest("button")) {
+      event.preventDefault();
+      advanceOnboarding();
+    }
+    return;
+  }
+  if (event.key === "Escape") {
+    closeModal("questionModal");
+    closeModal("accountModal");
+    closeModal("decisionCalendarModal");
+    setCyberPetOpen(false);
+    setThemeMenu(false);
+  }
+});
+window.addEventListener("resize", refreshOnboardingPosition);
+window.addEventListener("scroll", refreshOnboardingPosition, true);
+window.addEventListener("scroll", scheduleBackToTopUpdate, { passive: true });
+window.addEventListener("resize", scheduleBackToTopUpdate);
+$("#backToTopButton")?.addEventListener("click", scrollCurrentPageToTop);
 
 applyTheme(localStorage.getItem(STORE.theme) || document.documentElement.dataset.theme || "apple");
 applyExperienceLayout(localStorage.getItem(STORE.experienceLayout) || "horizontal", { persist: false });
@@ -2348,6 +2793,8 @@ window.addEventListener("resize", () => {
   const pet = $("#cyberPet");
   if (pet) setCyberPetPosition(pet.getBoundingClientRect().left, pet.getBoundingClientRect().top);
 });
-setStage(currentStage); startStageAutoplay(); updateAccountHeader(); hydrateIcons();
+setStage(currentStage); startStageAutoplay(); updateAccountHeader(); updateOnboardingReplayButton(); hydrateIcons();
 switchQaTab("ask");
+updateBackToTopButton();
 if (!currentUser() && !localStorage.getItem("yinlu_guest_seen")) window.setTimeout(showAccount, 500);
+else scheduleOnboarding(900);
