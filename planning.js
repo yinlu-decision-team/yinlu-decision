@@ -42,7 +42,9 @@
     simulatorSteps: ["国内硕士 · AI 方向", "就业 · 上海 · 算法工程师", "职业晋升 / 海外深造（可选）"],
     selectedCity: "上海",
     lastAnalysisAt: "",
-    pendingSuggestion: false
+    pendingSuggestion: false,
+    candidateSelection: {},
+    expandedCandidateId: ""
   };
 
   function loadState() {
@@ -82,6 +84,40 @@
     }
   }
 
+  function planningCandidates() {
+    const items = window.YinluCandidateBridge?.list?.() || [];
+    if (!state.candidateSelection || typeof state.candidateSelection !== "object") state.candidateSelection = {};
+    let changed = false;
+    items.forEach((item) => {
+      if (!Object.hasOwn(state.candidateSelection, item.id)) {
+        state.candidateSelection[item.id] = true;
+        changed = true;
+      }
+    });
+    if (changed) saveState();
+    return items;
+  }
+
+  function selectedCandidateCount(items = planningCandidates()) {
+    return items.filter((item) => state.candidateSelection[item.id] !== false).length;
+  }
+
+  function candidateStageMarkup(stage, label, tone, items) {
+    const stageItems = items.filter((item) => item.stage === stage);
+    const selected = selectedCandidateCount(stageItems);
+    return `<section class="planning-candidate-stage tone-${tone}"><header><div><strong>${label}</strong><span>${selected} / ${stageItems.length} 条用于规划</span></div><a href="./index.html?view=experience&stage=${stage}">添加候选<i data-lucide="arrow-up-right"></i></a></header><div class="planning-candidate-list">${stageItems.length ? stageItems.map((item) => {
+      const checked = state.candidateSelection[item.id] !== false;
+      const expanded = state.expandedCandidateId === item.id;
+      return `<article class="planning-candidate-item ${checked ? "selected" : ""}"><div class="planning-candidate-row"><label class="planning-candidate-check"><input type="checkbox" data-planning-candidate-select="${escapeHtml(item.id)}"${checked ? " checked" : ""}><span aria-hidden="true"></span><b>用于规划</b></label><button type="button" class="planning-candidate-main" data-planning-action="toggle-candidate-detail" data-candidate-id="${escapeHtml(item.id)}" aria-expanded="${expanded}"><small>${escapeHtml(item.kindLabel)}</small><strong>${escapeHtml(item.title)}</strong><span>${escapeHtml(item.subtitle)}</span></button><button type="button" class="planning-candidate-remove" data-planning-action="remove-candidate" data-candidate-id="${escapeHtml(item.id)}" aria-label="同步移除${escapeHtml(item.title)}" title="同步移除候选"><i data-lucide="trash-2"></i></button></div>${expanded ? `<div class="planning-candidate-detail"><p>${escapeHtml(item.description)}</p>${item.meta ? `<span>${escapeHtml(item.meta)}</span>` : ""}<div><button type="button" data-planning-action="open-candidate" data-candidate-id="${escapeHtml(item.id)}">打开原页面<i data-lucide="arrow-up-right"></i></button><button type="button" data-planning-action="remove-candidate" data-candidate-id="${escapeHtml(item.id)}">同步移除</button></div></div>` : ""}</article>`;
+    }).join("") : `<div class="planning-candidate-empty"><i data-lucide="bookmark-plus"></i><span>暂时没有已保存候选</span></div>`}</div></section>`;
+  }
+
+  function candidateManagerMarkup() {
+    const items = planningCandidates();
+    const selected = selectedCandidateCount(items);
+    return `<section class="planning-candidate-bridge"><header><div><h2>从三个阶段带入的候选数据</h2><p>勾选决定是否用于当前规划；同步移除会同时更新原阶段候选。</p></div><strong>${selected} / ${items.length} 条已选择</strong></header><div class="planning-candidate-stage-grid">${candidateStageMarkup("gaokao", "高考志愿", "red", items)}${candidateStageMarkup("graduate", "考研择校", "teal", items)}${candidateStageMarkup("career", "就业选择", "amber", items)}</div></section>`;
+  }
+
   function pageHeader(kicker, title, description, note = "") {
     return `<header class="planning-page-header"><div><span class="planning-kicker">${kicker}</span><h1 id="planningPageTitle">${title}</h1><p>${description}</p></div>${note ? `<span class="planning-page-note">${note}</span>` : ""}</header>`;
   }
@@ -101,7 +137,7 @@
   function overviewPage() {
     return `${pageHeader("人生规划 · 综合规划", "把下一步，变成一条可以被验证的路", "从你现在的位置出发，把升学、就业、地域和真实经历放在同一张规划桌上。", "规划草案")}
       <section class="planning-profile-strip"><div><span>当前身份</span><strong>本科毕业 · 方向探索中</strong></div><div><span>已有经历</span><strong>计算机科学 · 2 段项目</strong></div><div><span>规划目标</span><strong>硕士深造 / 上海就业</strong></div><button type="button" data-planning-page="builder">编辑路径<i data-lucide="arrow-right"></i></button></section>
-      <section class="planning-candidate-bridge"><header><div><h2>从三个阶段带入的候选数据</h2><p>只读取阶段页面里主动保存的候选，不会改变原页面内容。</p></div><button type="button" data-planning-page="data">管理导入数据</button></header><div><article class="red"><strong>高考志愿候选</strong><span>3 所学校 · 6 个专业</span><em>已同步</em></article><article class="teal"><strong>考研择校候选</strong><span>2 所院校 · 3 位导师</span><em>已同步</em></article><article class="amber"><strong>就业选择候选</strong><span>4 个岗位 · 3 个城市</span><em>已同步</em></article></div></section>
+      ${candidateManagerMarkup()}
       <div class="planning-section-heading"><div><h2>AI 整理出的三条完整组合</h2><p>分数用于比较当前输入，不是录取率或成功概率。</p></div><button type="button" data-planning-page="simulator">调整分析条件</button></div>
       <div class="planning-route-grid">${routeCard("路径 A", "国内硕士 → 上海算法", 82, "本科毕业 → 国内 AI 硕士 → 上海就业", ["专业基础衔接较好", "需要补充科研或竞赛经历", "上海算法岗位学历门槛偏高"], "red")}${routeCard("路径 B", "海外硕士 → 上海 AI 产品", 76, "本科毕业 → 海外数据科学 → 上海就业", ["跨学科方向可行", "语言与资金成本需要提前准备", "上海平台与外企岗位较多"], "teal")}${routeCard("路径 C", "直接就业 → 在职深造", 69, "本科毕业 → 上海应用开发 → 在职硕士", ["可以尽快积累真实项目", "本科可进入的应用岗位更多", "需要评估工作与学习时间"], "blue")}</div>
       <div class="planning-overview-lower"><section><header><div><h2>你的路径关系</h2><p>阶段、方向和地域分别设置，再组合成路线。</p></div><button type="button" data-planning-page="graph">打开知识图谱</button></header><div class="planning-flow"><span>计算机本科</span><i></i><span>硕士 / 就业</span><i></i><span>上海 · AI 方向</span></div></section><section><header><h2>下一步建议</h2></header><ul class="planning-next-list"><li><i data-lucide="circle"></i><span><strong>补齐一段真实经历</strong><small>参加项目，验证自己更喜欢研究还是落地。</small></span></li><li><i data-lucide="circle"></i><span><strong>比较两条路线成本</strong><small>同时查看时间、资金和替代方案。</small></span></li><li><i data-lucide="circle"></i><span><strong>保存规划版本</strong><small>把不同方案分别保存，避免互相覆盖。</small></span></li></ul></section></div>`;
@@ -155,7 +191,7 @@
 
   function dataPage() {
     return `${pageHeader("人生规划 · 数据与依据", "让每一条建议都能回到它的来源", "查看规划使用了哪些候选、经验、公开数据和个人条件。", "透明说明")}
-      <div class="planning-data-grid"><section><i data-lucide="bookmark-check"></i><h2>阶段候选</h2><p>来自高考、考研和就业页面中由用户主动保存的候选。</p><strong>已连接 9 条</strong></section><section><i data-lucide="messages-square"></i><h2>真实经验</h2><p>带有身份边界和发生时间的学生、教师及从业者经历。</p><strong>已引用 6 条</strong></section><section><i data-lucide="landmark"></i><h2>公开信息</h2><p>院校官网、招生简章和公开招聘要求等可核验来源。</p><strong>待接入真实接口</strong></section><section><i data-lucide="database"></i><h2>地域与岗位数据</h2><p>正式版本应显示统计时间、样本范围、采集方式和更新时间。</p><strong>当前为演示数据</strong></section></div><section class="planning-data-principles"><h2>AI 分析边界</h2><ul><li>可行性分数只用于比较当前输入，不是录取率、就业率或成功概率。</li><li>AI 建议不会自动修改规划，写回节点前必须由用户确认。</li><li>个人兴趣和经历变化后，应重新分析并保留历史复盘记录。</li><li>地域、薪资和岗位数字过期后必须明显提示，不与最新数据混用。</li></ul></section>`;
+      <div class="planning-data-grid"><section><i data-lucide="bookmark-check"></i><h2>阶段候选</h2><p>来自高考、考研和就业页面中由用户主动保存的候选。</p><strong>${selectedCandidateCount()} 条已选择</strong></section><section><i data-lucide="messages-square"></i><h2>真实经验</h2><p>带有身份边界和发生时间的学生、教师及从业者经历。</p><strong>随候选同步</strong></section><section><i data-lucide="landmark"></i><h2>公开信息</h2><p>院校官网、招生简章和公开招聘要求等可核验来源。</p><strong>待接入真实接口</strong></section><section><i data-lucide="database"></i><h2>地域与岗位数据</h2><p>正式版本应显示统计时间、样本范围、采集方式和更新时间。</p><strong>当前为演示数据</strong></section></div>${candidateManagerMarkup()}<section class="planning-data-principles"><h2>AI 分析边界</h2><ul><li>可行性分数只用于比较当前输入，不是录取率、就业率或成功概率。</li><li>AI 建议不会自动修改规划，写回节点前必须由用户确认。</li><li>个人兴趣和经历变化后，应重新分析并保留历史复盘记录。</li><li>地域、薪资和岗位数字过期后必须明显提示，不与最新数据混用。</li></ul></section>`;
   }
 
   function pageContent() {
@@ -215,6 +251,14 @@
   }
 
   function handleChange(event) {
+    const candidateId = event.target.dataset.planningCandidateSelect;
+    if (candidateId) {
+      state.candidateSelection[candidateId] = event.target.checked;
+      saveState();
+      render();
+      notify(event.target.checked ? "已纳入当前规划" : "已从当前规划暂时隐藏");
+      return;
+    }
     const branch = activePlan().branches.find((item) => item.id === activePlan().selectedBranch);
     if (!branch) return;
     const field = event.target.dataset.planningField;
@@ -239,6 +283,26 @@
     if (pageButton) {
       event.preventDefault();
       setPage(pageButton.dataset.planningPage);
+      return true;
+    }
+    const candidateAction = event.target.closest("[data-planning-action][data-candidate-id]");
+    if (candidateAction) {
+      event.preventDefault();
+      const candidateId = candidateAction.dataset.candidateId;
+      const action = candidateAction.dataset.planningAction;
+      if (action === "toggle-candidate-detail") {
+        state.expandedCandidateId = state.expandedCandidateId === candidateId ? "" : candidateId;
+        saveState();
+        render();
+      }
+      if (action === "open-candidate") window.YinluCandidateBridge?.open?.(candidateId);
+      if (action === "remove-candidate") {
+        delete state.candidateSelection[candidateId];
+        if (state.expandedCandidateId === candidateId) state.expandedCandidateId = "";
+        saveState();
+        window.YinluCandidateBridge?.remove?.(candidateId);
+        render();
+      }
       return true;
     }
     const addElement = event.target.closest("[data-planning-add]");

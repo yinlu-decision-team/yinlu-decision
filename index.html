@@ -10,22 +10,26 @@
       const savedTheme = localStorage.getItem("yinlu_theme");
       if (["spring", "milestone", "coast", "sunroad", "ember", "night", "apple", "pearl", "buzz", "iceglass", "retro", "orange"].includes(savedTheme)) document.documentElement.dataset.theme = savedTheme;
       const route = new URLSearchParams(window.location.search);
-      if (!["view", "stage", "answerStage", "identity"].some((key) => route.has(key))) document.documentElement.classList.add("portal-entry");
+      const hasWorkspaceRoute = route.get("workspace") === "1";
+      const hasAnswererPortalRoute = route.get("answererPortal") === "1";
+      const hasFamilyPortalRoute = route.get("familyPortal") === "1";
+      const hasProductRoute = ["view", "stage", "answerStage", "identity", "answererPortal", "familyPortal"].some((key) => route.has(key));
+      if (hasWorkspaceRoute) document.documentElement.classList.add("workspace-entry");
+      else if (hasAnswererPortalRoute) document.documentElement.classList.add("answerer-portal-entry");
+      else if (hasFamilyPortalRoute) document.documentElement.classList.add("family-portal-entry");
+      else if (!hasProductRoute) document.documentElement.classList.add("public-entry");
     } catch (error) {}
   </script>
-  <!-- favicon (SVG) -->
+<!-- favicon (SVG) -->
 <link rel="icon" href="./favicon.svg" type="image/svg+xml">
-<!-- PNG 备用（可选） -->
-<link rel="icon" href="./favicon-32.png" sizes="32x32" type="image/png">
-<link rel="apple-touch-icon" href="./favicon-180.png">
 
 <!-- 本地化的轻量图标脚本（替代外部 CDN） -->
 <script src="./lib/lucide-lite.js?v=8" defer></script>
 
 <!-- 本地 app.js（确保在 lucide-lite 后加载） -->
-<script src="./planning.js?v=20260816-4" defer></script>
-<script src="./app.js?v=20260816-identity-center-1" defer></script>
-  <link rel="stylesheet" href="styles.css?v=20260816-identity-center-3">
+<script src="./planning.js?v=20260816-candidate-sync-1" defer></script>
+  <script src="./app.js?v=20260816-family-portal-1" defer></script>
+  <link rel="stylesheet" href="styles.css?v=20260816-family-portal-1">
 </head>
 <body>
   <div class="app-shell">
@@ -49,12 +53,21 @@
         <a class="nav-item" href="./index.html?view=experience" data-view="experience"><span class="nav-dot-icon" aria-hidden="true"></span><span id="experienceNavLabel">院校与经验</span></a>
         <a class="nav-item" href="./index.html?view=questions" data-view="questions"><span class="nav-dot-icon" aria-hidden="true"></span><span>匿名提问</span><span class="nav-count" id="questionsCount">0</span></a>
         <a class="nav-item" id="compareNavItem" href="./index.html?view=compare" data-view="compare"><span class="nav-dot-icon" aria-hidden="true"></span><span>我的候选</span></a>
-        <a class="nav-item" href="./index.html?view=planning" data-view="planning"><span class="nav-dot-icon" aria-hidden="true"></span><span>人生规划</span></a>
         <a class="nav-item" href="./index.html?view=trust" data-view="trust"><span class="nav-dot-icon" aria-hidden="true"></span><span>信任与认证</span></a>
       </nav>
       <nav class="sidebar-nav answerer-nav" id="answererNav" aria-label="回答者导航" data-identity-nav="answerer" hidden>
-        <a class="nav-item" href="./answerer/gaokao/index.html" data-view="answerer" data-answerer-entry="true"><span class="nav-dot-icon" aria-hidden="true"></span><span>回答中心</span><span class="nav-count" id="answererQuestionsCount">0</span></a>
-        <a class="nav-item" href="./index.html?view=trust" data-view="trust"><span class="nav-dot-icon" aria-hidden="true"></span><span>信任与认证</span></a>
+        <a class="nav-item" href="./index.html?view=answerer&identity=answerer" data-view="answerer"><span class="nav-dot-icon" aria-hidden="true"></span><span id="answererNavCenterLabel">回答中心</span><span class="nav-count" id="answererQuestionsCount">0</span></a>
+        <a class="nav-item" href="./index.html?view=answerer-experience&identity=answerer" data-view="answerer-experience"><span class="nav-dot-icon" aria-hidden="true"></span><span id="answererNavExperienceLabel">我的经历</span></a>
+        <a class="nav-item" href="./index.html?view=answerer-history&identity=answerer" data-view="answerer-history"><span class="nav-dot-icon" aria-hidden="true"></span><span id="answererNavHistoryLabel">历史回答</span></a>
+        <a class="nav-item" href="./index.html?view=answerer-stage&identity=answerer" data-view="answerer-stage"><span class="nav-dot-icon" aria-hidden="true"></span><span id="answererNavStageLabel">回答阶段</span></a>
+      </nav>
+      <nav class="sidebar-nav family-nav" id="familyNav" aria-label="家庭协同导航" data-identity-nav="family" hidden>
+        <a class="nav-item" href="./index.html?view=family-overview&identity=parent" data-view="family-overview"><span class="nav-dot-icon" aria-hidden="true"></span><span>协同概览</span></a>
+        <a class="nav-item" href="./index.html?view=compare&identity=parent" data-view="compare"><span class="nav-dot-icon" aria-hidden="true"></span><span>共享候选</span></a>
+        <a class="nav-item" href="./index.html?view=family-discussion&identity=parent" data-view="family-discussion"><span class="nav-dot-icon" aria-hidden="true"></span><span>家庭讨论</span><span class="nav-count" id="familyDiscussionCount">0</span></a>
+        <a class="nav-item" href="./index.html?view=family-advice&identity=parent" data-view="family-advice"><span class="nav-dot-icon" aria-hidden="true"></span><span>家庭建议</span></a>
+        <a class="nav-item" href="./index.html?view=family-planning&identity=parent" data-view="family-planning"><span class="nav-dot-icon" aria-hidden="true"></span><span>授权人生规划</span></a>
+        <a class="nav-item" href="./index.html?view=family-permissions&identity=parent" data-view="family-permissions"><span class="nav-dot-icon" aria-hidden="true"></span><span>授权边界</span></a>
       </nav>
 
       <div class="sidebar-divider" id="sourceDivider"></div>
@@ -66,15 +79,13 @@
         <span><b class="dot cyan"></b>教师 / 从业者</span>
       </div>
 
-      <div class="identity-switcher" id="identitySwitcher">
-        <div class="identity-switcher-copy">
+      <button class="identity-switcher" id="identityModeToggle" type="button" aria-label="切换当前身份和工作状态" title="切换身份">
+        <span class="identity-switcher-copy">
           <span class="identity-switcher-kicker">当前身份 / 工作状态</span>
           <strong id="identityModeLabel">学生 · 决策者</strong>
-        </div>
-        <button class="identity-switcher-button" id="identityModeToggle" type="button" aria-label="切换身份" aria-pressed="false" title="切换身份">
-          <i data-lucide="repeat-2"></i><span>切换</span>
-        </button>
-      </div>
+          <span class="identity-switcher-action">切换身份 <i data-lucide="arrow-right"></i></span>
+        </span>
+      </button>
 
       <div class="sidebar-footer">
         <span class="prototype-dot"></span>
@@ -84,7 +95,7 @@
 
     <main class="main-area">
       <header class="topbar">
-        <a class="portal-brand" href="./index.html" aria-label="返回引路首页">
+        <a class="portal-brand" href="./index.html" aria-label="返回引路登录主页">
           <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true">
             <path class="brand-mark-body" d="M13 9H30C34 9 37 12 37 16V37L25 30L13 37V9Z"/>
             <path class="brand-mark-fold" d="M13 9H25C29 9 32 12 32 16V27"/>
@@ -94,9 +105,11 @@
           <span><strong>引路</strong><small>青年生涯决策信息平台</small></span>
         </a>
         <button class="icon-button menu-button" id="menuButton" aria-label="打开导航"><i data-lucide="menu"></i></button>
-        <div class="breadcrumb"><a class="breadcrumb-home" href="./index.html">引路主页面</a><span class="breadcrumb-separator">/</span><strong id="breadcrumbTitle">首页</strong></div>
+        <nav class="breadcrumb" aria-label="当前页面路径"><a class="breadcrumb-home" href="./index.html">引路主页面</a><span class="breadcrumb-separator">/</span><a class="breadcrumb-workspace-home" id="breadcrumbWorkspaceHome" href="./index.html?workspace=1">学生决策者首页</a><span class="breadcrumb-separator">/</span><strong id="breadcrumbTitle" aria-current="page">首页</strong></nav>
         <nav class="planning-topbar-breadcrumb" aria-label="人生规划页面路径">
           <a href="./index.html" class="planning-topbar-home"><i data-lucide="house"></i><span>引路主页面</span></a>
+          <span class="breadcrumb-separator">/</span>
+          <a href="./index.html?workspace=1" id="planningBreadcrumbWorkspaceHome">学生决策者首页</a>
           <span class="breadcrumb-separator">/</span>
           <a href="./index.html?view=planning">人生规划</a>
           <span class="breadcrumb-separator">/</span>
@@ -182,7 +195,124 @@
         </div>
       </header>
 
-      <section class="portal-home" id="portalHome" aria-labelledby="portalTitle" hidden>
+      <section class="public-landing" id="publicLanding" aria-labelledby="publicWelcomeTitle" hidden>
+        <div class="public-welcome-hero">
+          <div class="public-welcome-copy">
+            <div class="public-welcome-kicker"><span></span>青年生涯决策信息平台</div>
+            <h1 id="publicWelcomeTitle">欢迎来到<span>引路</span></h1>
+            <p>从学校、专业到未来去向，把官方信息和真实经验放到同一张决策桌面上。登录后建立属于你的决策入口。</p>
+            <div class="public-welcome-actions">
+              <button class="public-login-action" id="publicLoginButton" type="button"><i data-lucide="log-in"></i><span id="publicLoginActionLabel">登录 / 注册</span></button>
+              <a class="public-guest-action" id="publicGuestButton" href="./index.html?workspace=1"><i data-lucide="eye"></i><span>先以游客身份浏览</span></a>
+            </div>
+            <div class="public-welcome-note"><i data-lucide="shield-check"></i><span>试用数据只保存在当前浏览器</span></div>
+          </div>
+
+          <figure class="public-route-map" aria-labelledby="publicRouteCaption">
+            <div class="public-route-heading"><span>每一次选择，都可以重新连接</span><strong>路线会分岔，也能在新的方向汇合</strong></div>
+            <svg class="public-route-art" viewBox="0 0 660 560" aria-hidden="true" focusable="false">
+              <circle class="public-route-sun" cx="548" cy="96" r="66"/>
+              <path class="public-route-hill-back" d="M24 486 Q130 405 235 432 T428 375 T674 178 L674 560 L24 560Z"/>
+              <path class="public-route-hill-front" d="M18 528 Q148 446 260 474 T468 408 T680 244 L680 560 L18 560Z"/>
+              <path class="public-route-road-base" d="M62 425 C159 420 194 302 292 294 C388 286 422 361 502 290 C553 244 564 170 610 133"/>
+              <path class="public-route-road" d="M62 425 C159 420 194 302 292 294 C388 286 422 361 502 290 C553 244 564 170 610 133"/>
+              <path class="public-route-branch public-route-branch-pink" d="M64 441 C180 449 197 372 286 360 C387 346 430 430 526 342 C566 306 579 253 620 226"/>
+              <path class="public-route-branch public-route-branch-mint" d="M64 403 C151 350 188 237 296 248 C405 258 440 297 519 230 C565 191 584 136 624 105"/>
+              <path class="public-route-branch-dash public-route-branch-red" d="M294 294 C344 320 384 383 431 383"/>
+              <path class="public-route-branch-dash public-route-branch-purple" d="M503 289 C549 313 596 284 620 226"/>
+              <path class="public-route-rays" d="M548 28v22 M507 43l15 18 M586 43l-15 18"/>
+            </svg>
+            <div class="public-route-stage public-route-stage-one"><span>01</span><strong>高考志愿</strong><small>从学校与专业开始</small></div>
+            <div class="public-route-stage public-route-stage-two"><span>02</span><strong>考研择校</strong><small>继续深造或转换方向</small></div>
+            <div class="public-route-stage public-route-stage-three"><span>03</span><strong>就业选择</strong><small>进入职业，也可以再深造</small></div>
+            <div class="public-route-stage public-route-stage-four"><span>04</span><strong>人生规划</strong><small>允许回望和重新选择</small></div>
+            <span class="public-route-label public-route-label-one">实践支路</span>
+            <span class="public-route-label public-route-label-two">深造支路</span>
+            <span class="public-route-label public-route-label-three">重新规划</span>
+            <figcaption id="publicRouteCaption">成长阶段示意，人生没有唯一顺序</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="answerer-portal-home" id="answererPortalHome" aria-labelledby="answererPortalTitle" hidden>
+        <div class="answerer-portal-status">
+          <span class="answerer-portal-status-mark"><i data-lucide="check"></i></span>
+          <div><strong id="answererPortalStatusRole">学生回答者分部</strong><small id="answererPortalStatusDescription">把真实经历整理好，给正在选择的人一份参考</small></div>
+          <span class="answerer-portal-stage-pill" id="answererPortalStagePill">当前阶段：高考志愿</span>
+        </div>
+        <div class="answerer-portal-hero">
+          <div class="answerer-portal-copy">
+            <div class="answerer-portal-kicker" id="answererPortalKicker">分享真实经历，帮助后来者少走弯路</div>
+            <h1 id="answererPortalTitle">欢迎回来，成为别人的路标</h1>
+            <p class="answerer-portal-lead" id="answererPortalLead">从你真正经历过的阶段开始回答。</p>
+            <p class="answerer-portal-description" id="answererPortalDescription">回答具体问题，标注发生时间，让经验保持清楚、真实，也保留边界。</p>
+            <div class="answerer-portal-actions">
+              <a class="answerer-portal-primary" id="answererPortalOpenCenter" href="./index.html?view=answerer&identity=answerer"><span>进入回答中心</span><i data-lucide="arrow-right"></i></a>
+              <a class="answerer-portal-secondary" id="answererPortalOpenExperience" href="./index.html?view=answerer-experience&identity=answerer"><span>整理我的经历</span><i data-lucide="arrow-right"></i></a>
+            </div>
+            <small class="answerer-portal-note" id="answererPortalNote">你可以随时修改经历范围，回答中心只展示与你经历匹配的问题。</small>
+          </div>
+          <div class="answerer-portal-route-art" aria-hidden="true">
+            <span class="answerer-portal-sun"></span>
+            <span class="answerer-portal-ray ray-one"></span><span class="answerer-portal-ray ray-two"></span>
+            <svg viewBox="0 0 560 460" focusable="false"><path class="answerer-route-road" d="M33 404 C99 330 160 305 242 282 C334 256 372 269 431 221 C475 185 488 139 527 95"/><path class="answerer-route-road-dash" d="M33 404 C99 330 160 305 242 282 C334 256 372 269 431 221 C475 185 488 139 527 95"/><path class="answerer-route-band blue-band" d="M118 360L240 270L302 310L420 193L516 165"/><path class="answerer-route-band pink-band" d="M175 340L290 277L365 282L454 210"/><circle class="answerer-route-node node-one" cx="60" cy="380" r="14"/><circle class="answerer-route-node node-two" cx="256" cy="270" r="14"/><circle class="answerer-route-node node-three" cx="447" cy="202" r="14"/><path class="answerer-route-flag" d="M514 94l20 8-10 23-20-9Z"/><circle class="answerer-route-dot" cx="520" cy="108" r="4"/></svg>
+            <span class="answerer-route-label label-one" id="answererPortalRouteOne">高考志愿</span><span class="answerer-route-label label-two" id="answererPortalRouteTwo">考研择校</span><span class="answerer-route-label label-three" id="answererPortalRouteThree">就业选择</span><span class="answerer-route-caption" id="answererPortalRouteCaption">我走过的路</span>
+          </div>
+        </div>
+        <div class="answerer-portal-entry-section">
+          <div class="answerer-portal-entry-heading"><div><h2 id="answererPortalEntryTitle">回答者工作入口</h2><p id="answererPortalEntryDescription">选择一个方向，进入左侧栏对应的具体页面</p></div></div>
+          <div class="answerer-portal-entry-grid">
+            <a class="answerer-portal-entry-card entry-red" id="answererPortalCenterCard" href="./index.html?view=answerer&identity=answerer"><small>01</small><strong id="answererPortalCenterLabel">回答中心</strong><i data-lucide="arrow-right"></i></a>
+            <a class="answerer-portal-entry-card entry-cyan" id="answererPortalExperienceCard" href="./index.html?view=answerer-experience&identity=answerer"><small>02</small><strong id="answererPortalExperienceLabel">我的经历</strong><i data-lucide="arrow-right"></i></a>
+            <a class="answerer-portal-entry-card entry-blue" id="answererPortalHistoryCard" href="./index.html?view=answerer-history&identity=answerer"><small>03</small><strong id="answererPortalHistoryLabel">历史回答</strong><i data-lucide="arrow-right"></i></a>
+            <a class="answerer-portal-entry-card entry-amber" id="answererPortalStageCard" href="./index.html?view=answerer-stage&identity=answerer"><small>04</small><strong id="answererPortalStageLabel">回答阶段</strong><i data-lucide="arrow-right"></i></a>
+          </div>
+        </div>
+      </section>
+
+      <section class="family-portal-home" id="familyPortalHome" aria-labelledby="familyPortalTitle" hidden>
+        <div class="family-portal-status">
+          <span class="family-portal-status-mark"><i data-lucide="users-round"></i></span>
+          <div><strong>家长 · 家庭协同</strong><small id="familyPortalConnectionLabel">只查看孩子主动共享的内容</small></div>
+          <span class="family-portal-stage-pill" id="familyPortalStagePill">当前关注：高考志愿</span>
+        </div>
+        <div class="family-portal-hero">
+          <div class="family-portal-copy">
+            <div class="family-portal-kicker">一起看清选择，也把决定留给孩子</div>
+            <h1 id="familyPortalTitle">和孩子一起，把选择看得更清楚</h1>
+            <p class="family-portal-lead">家长可以提供信息、表达建议，孩子仍然保留自己的选择权。</p>
+            <p class="family-portal-description">从孩子主动共享的候选开始，围绕升学、就业和长期规划形成一份可讨论的家庭共识。</p>
+            <div class="family-portal-actions">
+              <a class="family-portal-primary" id="familyPortalOpenOverview" href="./index.html?view=family-overview&identity=parent&stage=gaokao"><span>进入协同概览</span><i data-lucide="arrow-right"></i></a>
+              <a class="family-portal-secondary" id="familyPortalOpenPermissions" href="./index.html?view=family-permissions&identity=parent"><span>查看授权边界</span><i data-lucide="shield-check"></i></a>
+            </div>
+            <small class="family-portal-note">未被孩子主动共享的收藏、提问、浏览记录和规划节点不会显示。</small>
+          </div>
+          <div class="family-portal-route-art" aria-hidden="true">
+            <span class="family-route-sun"></span><span class="family-route-glow"></span>
+            <svg viewBox="0 0 600 440" focusable="false">
+              <path class="family-route-road family-route-road-student" d="M32 370 C123 328 148 232 248 248 C340 262 367 334 452 257 C499 214 514 136 571 93"/>
+              <path class="family-route-road family-route-road-parent" d="M32 392 C128 368 177 296 251 300 C338 305 380 354 453 287 C506 239 527 174 571 128"/>
+              <path class="family-route-dash" d="M32 370 C123 328 148 232 248 248 C340 262 367 334 452 257 C499 214 514 136 571 93"/>
+              <circle class="family-route-node family-node-student" cx="72" cy="351" r="14"/><circle class="family-route-node family-node-parent" cx="72" cy="382" r="14"/>
+              <circle class="family-route-node family-node-shared" cx="452" cy="272" r="17"/><path class="family-route-flag" d="M558 84l23 8-11 26-23-10Z"/><circle class="family-route-dot" cx="568" cy="98" r="4"/>
+            </svg>
+            <span class="family-route-label family-label-student">孩子的选择</span><span class="family-route-label family-label-parent">家长建议</span><span class="family-route-label family-label-shared">家庭共识</span>
+            <span class="family-route-caption">两条视角，走向同一张桌面</span>
+          </div>
+        </div>
+        <div class="family-portal-entry-section">
+          <div class="family-portal-entry-heading"><div><h2>从哪个阶段开始一起看？</h2><p>四个入口共享同一套家庭协同边界，点击后进入对应阶段的概览。</p></div><span>支持随时切换，不替孩子做决定</span></div>
+          <div class="family-portal-entry-grid">
+            <a class="family-portal-entry-card entry-red" id="familyPortalGaokaoCard" href="./index.html?view=family-overview&identity=parent&stage=gaokao"><small>01 / 高考</small><strong>高考志愿</strong><span>一起核对学校、专业与信息来源</span><i data-lucide="arrow-right"></i></a>
+            <a class="family-portal-entry-card entry-cyan" id="familyPortalGraduateCard" href="./index.html?view=family-overview&identity=parent&stage=graduate"><small>02 / 深造</small><strong>考研择校</strong><span>讨论方向、培养与备考成本</span><i data-lucide="arrow-right"></i></a>
+            <a class="family-portal-entry-card entry-blue" id="familyPortalCareerCard" href="./index.html?view=family-overview&identity=parent&stage=career"><small>03 / 工作</small><strong>就业选择</strong><span>把城市、岗位和学历门槛放在一起看</span><i data-lucide="arrow-right"></i></a>
+            <a class="family-portal-entry-card entry-amber" id="familyPortalPlanningCard" href="./index.html?view=family-planning&identity=parent"><small>04 / 长期</small><strong>人生规划</strong><span>只查看孩子授权的路径摘要与共同建议</span><i data-lucide="arrow-right"></i></a>
+          </div>
+        </div>
+      </section>
+
+      <section class="portal-home workspace-portal" id="portalHome" aria-labelledby="portalTitle" hidden>
         <div class="portal-hero">
           <div class="portal-hero-copy">
             <div class="portal-kicker"><span></span>从一次重要选择开始</div>
@@ -675,12 +805,17 @@
         <section class="view" id="view-answerer" aria-labelledby="answererTitle">
           <div class="page-header">
             <div>
-              <div class="section-kicker">回答者工作台</div>
+              <div class="section-kicker" id="answererHomeKicker">学生回答首页</div>
               <h1 id="answererTitle">把你的经历，交给正在选择的人</h1>
-              <p>只查看当前回答方向的问题，按学校、专业和时间边界补充真实经验。</p>
+              <p id="answererHomeDescription">把自己已经走过的阶段讲清楚，帮助正在选择的人判断信息是否适合自己。</p>
             </div>
-            <span class="mvp-badge answerer-workbench-badge"><i data-lucide="messages-square"></i>经验贡献</span>
+            <span class="mvp-badge answerer-workbench-badge" id="answererHomeBadge"><i data-lucide="messages-square"></i>学生 · 回答者</span>
           </div>
+          <section class="answerer-home-summary" aria-label="回答工作概览">
+            <article class="answerer-home-stat"><span class="answerer-home-stat-icon"><i data-lucide="message-circle-question"></i></span><div><small id="answererHomeQuestionLabel">适合回答</small><strong id="answererHomeQuestionCount">0 条问题</strong></div></article>
+            <article class="answerer-home-stat"><span class="answerer-home-stat-icon"><i data-lucide="history"></i></span><div><small id="answererHomeHistoryLabel">已经完成</small><strong id="answererHomeHistoryCount">0 条回答</strong></div></article>
+            <article class="answerer-home-stat"><span class="answerer-home-stat-icon"><i data-lucide="badge-check"></i></span><div><small>认证状态</small><strong id="answererHomeTrustStatus">待认证</strong></div></article>
+          </section>
           <section class="answerer-stage-banner" aria-live="polite">
             <span class="answerer-stage-icon"><i data-lucide="route"></i></span>
             <div>
@@ -688,29 +823,44 @@
               <strong id="answererStageLabel">高考志愿</strong>
               <p id="answererStageDescription">优先回答自己真正经历过的阶段问题。</p>
             </div>
-            <span class="answerer-stage-limit"><i data-lucide="shield-check"></i>仅回答对应阶段</span>
+            <span class="answerer-stage-limit"><i data-lucide="shield-check"></i><span id="answererStageLimitLabel">仅回答对应阶段</span></span>
           </section>
           <div class="answerer-workbench-grid">
             <section class="answerer-inbox-panel">
-              <div class="panel-heading"><div><span class="section-kicker">待处理问题</span><h2>适合你的问题</h2></div><span class="count-badge" id="answererQuestionCount">0 条匹配</span></div>
-              <p class="answerer-panel-intro">回答中可以明确学校、专业、年级和经验发生的时间，方便提问者判断信息是否适合自己。</p>
+              <div class="panel-heading"><div><span class="section-kicker" id="answererInboxKicker">待处理问题</span><h2 id="answererInboxTitle">适合你的问题</h2></div><span class="count-badge" id="answererQuestionCount">0 条匹配</span></div>
+              <p class="answerer-panel-intro" id="answererPanelIntro">回答中可以明确学校、专业、年级和经验发生的时间，方便提问者判断信息是否适合自己。</p>
               <div class="question-list" id="answererQuestionList"></div>
             </section>
             <aside class="answerer-side-stack">
               <section class="answerer-trust-panel">
                 <div class="answerer-panel-icon"><i data-lucide="badge-check"></i></div>
-                <span class="section-kicker">回答边界</span>
-                <h2>让经验保持可信</h2>
-                <ul><li><i data-lucide="check"></i>只分享亲身经历</li><li><i data-lucide="check"></i>标注经历发生时间</li><li><i data-lucide="check"></i>不代替官方信息下结论</li></ul>
-                <button class="quiet-button" type="button" data-view-target="trust"><i data-lucide="arrow-up-right"></i>查看信任与认证</button>
+                <span class="section-kicker" id="answererBoundaryKicker">回答边界</span>
+                <h2 id="answererBoundaryTitle">让经验保持可信</h2>
+                <ul id="answererBoundaryList"><li><i data-lucide="check"></i>只分享亲身经历</li><li><i data-lucide="check"></i>标注经历发生时间</li><li><i data-lucide="check"></i>不代替官方信息下结论</li></ul>
               </section>
-              <section class="answerer-history-panel">
-                <div class="panel-heading"><h2>历史回答</h2><span class="count-badge">已保存</span></div>
+              <section class="answerer-history-panel" id="answererHistoryPanel">
+                <div class="panel-heading"><h2 id="answererWorkbenchHistoryTitle">历史回答</h2><span class="count-badge" id="answererHistoryCount">0 条</span></div>
                 <div class="question-list" id="answererHistoryList"></div>
               </section>
             </aside>
           </div>
         </section>
+
+        <section class="view" id="view-answerer-experience" aria-labelledby="answererExperienceTitle">
+          <div id="answererExperienceContent"></div>
+        </section>
+        <section class="view" id="view-answerer-history" aria-labelledby="answererHistoryTitle">
+          <div id="answererHistoryContent"></div>
+        </section>
+        <section class="view" id="view-answerer-stage" aria-labelledby="answererStagePageTitle">
+          <div id="answererStageContent"></div>
+        </section>
+
+        <section class="view family-internal-view" id="view-family-overview" aria-labelledby="familyOverviewTitle"><div id="familyOverviewContent"></div></section>
+        <section class="view family-internal-view" id="view-family-discussion" aria-labelledby="familyDiscussionTitle"><div id="familyDiscussionContent"></div></section>
+        <section class="view family-internal-view" id="view-family-advice" aria-labelledby="familyAdviceTitle"><div id="familyAdviceContent"></div></section>
+        <section class="view family-internal-view" id="view-family-planning" aria-labelledby="familyPlanningTitle"><div id="familyPlanningContent"></div></section>
+        <section class="view family-internal-view" id="view-family-permissions" aria-labelledby="familyPermissionsTitle"><div id="familyPermissionsContent"></div></section>
 
         <section class="view" id="view-identity" aria-label="身份中心">
           <div id="identityCenterContent"></div>
@@ -906,6 +1056,13 @@
 
   <div class="toast" id="toast" role="status"><i data-lucide="check-circle-2"></i><span></span></div>
 
+  <div class="page-transition" id="pageTransition" aria-hidden="true" hidden>
+    <div class="page-transition-mark" aria-hidden="true">
+      <svg class="brand-mark" viewBox="0 0 48 48"><path class="brand-mark-body" d="M13 9H30C34 9 37 12 37 16V37L25 30L13 37V9Z"/><path class="brand-mark-fold" d="M13 9H25C29 9 32 12 32 16V27"/><path class="brand-mark-gap" d="M25 16V29"/><circle class="brand-mark-dot" cx="25" cy="16" r="3"/></svg>
+      <span>正在进入新的选择空间</span>
+    </div>
+  </div>
+
   <div class="modal-backdrop" id="accountModal" aria-hidden="true">
     <div class="modal account-modal" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
       <button class="modal-close icon-button" data-close-modal="accountModal" aria-label="关闭"><i data-lucide="x"></i></button>
@@ -1000,6 +1157,7 @@
           <button class="primary-button full-button" type="submit"><i data-lucide="save"></i>保存资料</button>
         </form>
         <div class="account-stats"><span><strong id="profileQuestionCount">0</strong><small>我的问题</small></span><span><strong id="profileFavoriteCount">0</strong><small>候选收藏</small></span><span><strong id="profileFamilyCode">未生成</strong><small>家庭邀请码</small></span></div>
+        <button class="quiet-button full-button profile-enter-workspace" id="profileEnterWorkspace" type="button"><i data-lucide="arrow-right"></i>进入工作台</button>
         <button class="logout-button" id="logoutButton"><i data-lucide="log-out"></i>退出当前账号</button>
       </div>
     </div>
