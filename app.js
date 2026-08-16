@@ -626,8 +626,21 @@ const write = (key, value) => localStorage.setItem(key, JSON.stringify(value));
 const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
 
 // ✅ 密码安全 - SHA-256哈希（从修正版集成）
+function randomHex(byteLength = 16) {
+  const bytes = new Uint8Array(byteLength);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function randomToken(length = 12) {
+  const alphabet = "0123456789abcdefghijklmnopqrstuvwxyz";
+  const bytes = new Uint8Array(length);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (byte) => alphabet[byte % alphabet.length]).join("");
+}
+
 async function createPasswordRecord(password) {
-  const salt = Array.from({ length: 16 }, () => Math.random().toString(36).charAt(2)).join('');
+  const salt = randomHex(16);
   const encoder = new TextEncoder();
   const data = encoder.encode(salt + password);
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
@@ -646,7 +659,7 @@ async function passwordMatches(user, password) {
   return hashHex === user.passwordHash;
 }
 
-const uid = (prefix = "id") => `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+const uid = (prefix = "id") => `${prefix}_${Date.now()}_${randomToken(10)}`;
 const majorCandidateId = (schoolId, major) => `major-${schoolId}-${encodeURIComponent(major)}`;
 const majorDecisionKey = (school, major) => encodeURIComponent(`${school}::${major}`);
 const candidateStatuses = ["待了解", "正在比较", "已倾向", "暂不考虑"];
@@ -840,7 +853,7 @@ function updateProfileAge() {
 
 function setUserAvatar(element, user) {
   if (!element) return;
-  const avatar = typeof user?.avatarDataUrl === "string" && user.avatarDataUrl.startsWith("data:image/") ? user.avatarDataUrl : "";
+  const avatar = typeof user?.avatarDataUrl === "string" && /^data:image\/(?:jpeg|png|webp);base64,/i.test(user.avatarDataUrl) ? user.avatarDataUrl : "";
   element.classList.toggle("has-image", Boolean(avatar));
   element.style.backgroundImage = avatar ? `url(${avatar})` : "";
   element.style.backgroundPosition = avatar ? "center" : "";
@@ -5094,9 +5107,7 @@ function generateFamilyInvite() {
 
   if (!all[user.id]) {
     // 使用8位随机字符，更安全
-    const code = `YL-${Array.from({ length: 8 }, () =>
-      Math.random().toString(36).charAt(2).toUpperCase()
-    ).join('')}`;
+    const code = `YL-${randomToken(8).toUpperCase()}`;
 
     all[user.id] = {
       code,
