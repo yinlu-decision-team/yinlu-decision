@@ -403,7 +403,7 @@ const ANSWERER_QUESTION_EXAMPLES = {
     { title: "行业变化后，哪些课程或技能仍然有用？", meta: "行业发展 · 能力迁移", tag: "行业经验" }
   ]
 };
-const STORE = { users: "yinlu_users", session: "yinlu_session", questions: "yinlu_questions", answers: "yinlu_answers", favorites: "yinlu_favorites", candidateStatus: "yinlu_candidate_status", compareHistory: "yinlu_compare_history", family: "yinlu_family", verification: "yinlu_verification", theme: "yinlu_theme", experienceLayout: "yinlu_experience_layout", history: "yinlu_history", decisionEvents: "yinlu_decision_events", petPosition: "yinlu_pet_position_v2", petAvatar: "yinlu_pet_avatar", petMotion: "yinlu_pet_reduce_motion", pageFeedback: "yinlu_page_feedback", onboarding: "yinlu_onboarding_complete_v1", identityMode: "yinlu_identity_mode" };
+const STORE = { users: "yinlu_users", session: "yinlu_session", questions: "yinlu_questions", answers: "yinlu_answers", favorites: "yinlu_favorites", candidateStatus: "yinlu_candidate_status", compareHistory: "yinlu_compare_history", family: "yinlu_family", verification: "yinlu_verification", theme: "yinlu_theme", experienceLayout: "yinlu_experience_layout", history: "yinlu_history", decisionEvents: "yinlu_decision_events", petPosition: "yinlu_pet_position_v2", petAvatar: "yinlu_pet_avatar", petMotion: "yinlu_pet_reduce_motion", pageFeedback: "yinlu_page_feedback", onboarding: "yinlu_onboarding_complete_v1", identityMode: "yinlu_identity_mode", planning: "yinlu_planning_workspace_v1" };
 const CYBER_PET_AVATARS = {
   egret: { name: "鹭小引", src: "./pet-t-egret-guide.svg?v=20260815" },
   deer: { name: "不迷鹿", src: "./pet-s-never-lost-deer.svg?v=20260815" },
@@ -416,6 +416,7 @@ const CYBER_PET_GUIDANCE = {
   experience: { context: "院校与经验", status: "经验对照中", stage: "经验筛选 · 核实信息", reminder: "先看信息来源和发布时间，再把个人体验与客观事实分开记录。", title: "把相同问题放在一起比较", text: "同一所学校的体验可能因专业、校区和年份不同而变化。优先寻找与你情况接近的经验。" },
   questions: { context: "问答中心", status: "问题梳理中", stage: "提出问题 · 补充细节", reminder: "说明你的地区、阶段和已经了解的内容，更容易获得真正有用的回答。", title: "把问题问得更具体一点", text: "与其问“这所学校好吗”，不如说明你在意的专业、城市、住宿或就业方向。" },
   compare: { context: "我的候选", status: "候选比较中", stage: "候选比较 · 聚焦差异", reminder: "一次先比较两个最重要的维度，避免信息太多反而难以判断。", title: "先找出真正影响选择的差异", text: "相似条件可以暂时收起，把注意力放在专业实力、城市机会和录取把握等关键差异上。" },
+  planning: { context: "人生规划", status: "路径编排中", stage: "规划路径 · 比较分支", reminder: "规划可以修改。先保存不同版本，再用真实经历和数据验证关键假设。", title: "先搭出一条可以被验证的路径", text: "把教育阶段、就业方向和地域条件分开设置，AI 建议只作为参考，由你决定是否写回规划。" },
   trust: { context: "信任与认证", status: "来源确认中", stage: "信息核验 · 查看来源", reminder: "优先查看认证经历、回答时间和信息来源，过期内容需要再次确认。", title: "先确认这条经验是否适合你", text: "真实经历很重要，但不同年份、专业和校区也会影响结论。把经验放回具体背景里判断。" },
   "school-detail": { context: "学校详情", status: "资料查看中", stage: "学校详情 · 补齐信息", reminder: "把学校优势、专业情况和录取条件放在一起看，不要只依赖单一排名。", title: "记录一个优点和一个疑问", text: "先写下吸引你的地方，再记录仍需确认的问题，之后比较候选会更清楚。" }
 };
@@ -827,7 +828,7 @@ function closeModal(id) {
   modal.setAttribute("aria-hidden", "true");
   if (id === "accountModal" && wasOpen) {
     if (!currentUser()) localStorage.setItem("yinlu_guest_seen", "1");
-    scheduleOnboarding(420);
+    if (!isPortalEntry()) scheduleOnboarding(420);
   }
   if (id === "switchConfirmModal") pendingSwitchAction = null;
 }
@@ -1457,6 +1458,7 @@ function setIdentityMode(mode, { persist = true, switchContent = true } = {}) {
 
 function switchView(name) {
   $$(".view").forEach((view) => view.classList.toggle("active", view.id === `view-${name}`));
+  document.body.classList.toggle("planning-mode", name === "planning");
   const navigationView = currentIdentityMode === "answerer" && name === "questions" ? "answerer" : name;
   $$(".nav-item").forEach((button) => button.classList.toggle("active", button.dataset.view === navigationView));
   const active = $(`.nav-item[data-view="${navigationView}"]`);
@@ -1470,6 +1472,7 @@ function switchView(name) {
   if (name === "answerer") renderAnswererWorkbench();
   if (name === "questions" && currentIdentityMode === "answerer") switchQaTab("answer");
   if (name === "school-detail") renderSchoolDetail();
+  if (name === "planning") window.YinluPlanning?.render();
   renderCyberPetContext();
   suppressBackToTopDuringViewChange();
   window.scrollTo({ top: 0, behavior: document.body.classList.contains("onboarding-active") ? "auto" : "smooth" });
@@ -1499,15 +1502,18 @@ function applyInitialRouteState() {
     ? "answerer"
     : requestedMode === "planner" ? "planner" : storedMode;
   setIdentityMode(initialMode, { persist: Boolean(requestedMode || requestedView === "answerer"), switchContent: false });
-  const allowedViews = new Set(["home", "experience", "questions", "answerer", "compare", "trust"]);
-  if (stageOrder.includes(requestedStage)) setStage(requestedStage);
+  const allowedViews = new Set(["home", "experience", "questions", "answerer", "compare", "planning", "trust"]);
+  if (stageOrder.includes(requestedStage)) {
+    setStage(requestedStage);
+    if (GLOBAL_STAGE_CONFIG.some((item) => item.key === requestedStage)) localStorage.setItem("yinlu_portal_last_stage", requestedStage);
+  }
   const stageSafeView = currentStage === "career" && requestedView === "compare" ? "experience" : requestedView;
   if (stageSafeView !== requestedView) {
     const safeUrl = new URL(window.location.href);
     safeUrl.searchParams.set("view", stageSafeView);
     window.history.replaceState(null, "", safeUrl);
   }
-  const initialView = currentIdentityMode === "answerer" && ["home", "experience", "compare"].includes(stageSafeView)
+  const initialView = currentIdentityMode === "answerer" && ["home", "experience", "compare", "planning"].includes(stageSafeView)
     ? "answerer"
     : stageSafeView;
   if (allowedViews.has(initialView)) switchView(initialView);
@@ -1536,6 +1542,53 @@ function applyInitialRouteState() {
     if ($("#experienceSchoolSearch")) $("#experienceSchoolSearch").value = query;
   }
   renderExperiences();
+}
+
+function isPortalEntry() {
+  const params = new URLSearchParams(window.location.search);
+  return !["view", "stage", "answerStage", "identity"].some((key) => params.has(key));
+}
+
+function initializePortalHome() {
+  const portal = $("#portalHome");
+  const active = isPortalEntry();
+  document.documentElement.classList.toggle("portal-entry", active);
+  document.body.classList.toggle("portal-mode", active);
+  if (portal) portal.hidden = !active;
+  if (!active) return false;
+
+  const storedStage = localStorage.getItem("yinlu_portal_last_stage");
+  const stageConfig = GLOBAL_STAGE_CONFIG.find((item) => item.key === storedStage);
+  const continueButton = $("#portalContinueStage");
+  if (continueButton && stageConfig) {
+    continueButton.hidden = false;
+    continueButton.href = `./index.html?view=home&stage=${encodeURIComponent(stageConfig.key)}`;
+    const label = $("#portalContinueLabel");
+    if (label) label.textContent = stageNames[stageConfig.key] || "当前阶段";
+  }
+  return true;
+}
+
+let portalStageTrigger = null;
+
+function openPortalStagePicker() {
+  const stagePicker = $("#portalStages");
+  if (!stagePicker) return;
+  portalStageTrigger = document.activeElement;
+  stagePicker.setAttribute("role", "dialog");
+  stagePicker.setAttribute("aria-modal", "true");
+  document.body.classList.add("portal-stage-picker-open");
+  window.setTimeout(() => $("#portalStageClose")?.focus({ preventScroll: true }), 120);
+}
+
+function closePortalStagePicker() {
+  const stagePicker = $("#portalStages");
+  if (!document.body.classList.contains("portal-stage-picker-open")) return;
+  document.body.classList.remove("portal-stage-picker-open");
+  stagePicker?.removeAttribute("role");
+  stagePicker?.removeAttribute("aria-modal");
+  portalStageTrigger?.focus?.({ preventScroll: true });
+  portalStageTrigger = null;
 }
 
 const BACK_TO_TOP_VIEWS = new Set(["view-experience", "view-compare"]);
@@ -2047,13 +2100,17 @@ function updateGlobalStageSwitcher() {
     if (plannerRoute) localStorage.setItem("yinlu_planner_stage", plannerRoute);
   } catch (error) {}
 
+  const activeView = $(".view.active")?.id;
   $$('[data-global-planner-stage]').forEach((link) => {
     const stageKey = link.dataset.globalPlannerStage;
     const stageConfig = GLOBAL_STAGE_CONFIG.find((item) => item.key === stageKey);
     if (stageConfig) {
       link.href = `./index.html?view=home&stage=${encodeURIComponent(stageKey)}`;
     }
-    link.classList.toggle("active", link.dataset.globalPlannerStage === currentStage);
+    const active = stageKey === "planning"
+      ? activeView === "view-planning"
+      : activeView !== "view-planning" && stageKey === currentStage;
+    link.classList.toggle("active", active);
   });
   $$('[data-global-answer-stage]').forEach((control) => {
     const stageKey = control.dataset.globalAnswerStage;
@@ -2073,7 +2130,8 @@ function updateGlobalStageSwitcher() {
     : preferredAnswererStageRoute(currentStage) || answererRoute || "gaokao";
   if (answererEntry) answererEntry.href = answererStageUrl(activeAnswererRoute, currentStage);
   const compactLabel = $("#globalStageCompactLabel");
-  if (compactLabel) compactLabel.textContent = stageNames[currentStage] || "当前阶段";
+  const planningActive = activeView === "view-planning";
+  if (compactLabel) compactLabel.textContent = planningActive ? "人生规划" : stageNames[currentStage] || "当前阶段";
 }
 
 function updateExperienceStageUi() {
@@ -3886,6 +3944,7 @@ function switchQaTab(name) {
 
 // 事件委托保留，但同时安全绑定核心按钮以避免空引用错误
 document.addEventListener("click", (event) => {
+  if (window.YinluPlanning?.handleClick(event)) return;
   const petAvatar = event.target.closest("#cyberPetAvatarMenu [data-pet-avatar]");
   if (petAvatar) {
     setCyberPetAvatar(petAvatar.dataset.petAvatar, { notify: true });
@@ -4028,6 +4087,10 @@ document.addEventListener("click", (event) => {
     if (plannerStageLink) {
       event.preventDefault();
       const stageKey = plannerStageLink.dataset.globalPlannerStage;
+      if (stageKey === "planning") {
+        window.location.href = plannerStageLink.href;
+        return;
+      }
       if (stageKey === currentStage) return;
       const stageLabel = stageNames[stageKey] || "新的决策阶段";
       openSwitchConfirm({
@@ -4243,6 +4306,11 @@ const identityModeToggle = $("#identityModeToggle"); if (identityModeToggle) ide
 });
 const switchConfirmProceed = $("#switchConfirmProceed"); if (switchConfirmProceed) switchConfirmProceed.addEventListener("click", confirmSwitchAction);
 const accountButton = $("#accountButton"); if (accountButton) accountButton.addEventListener("click", showAccount);
+const portalChooseStage = $("#portalChooseStage"); if (portalChooseStage) portalChooseStage.addEventListener("click", openPortalStagePicker);
+const portalStageClose = $("#portalStageClose"); if (portalStageClose) portalStageClose.addEventListener("click", closePortalStagePicker);
+$$("[data-portal-stage]").forEach((link) => link.addEventListener("click", () => {
+  localStorage.setItem("yinlu_portal_last_stage", link.dataset.portalStage);
+}));
 const onboardingReplayButton = $("#onboardingReplayButton"); if (onboardingReplayButton) onboardingReplayButton.addEventListener("click", () => startOnboarding({ force: true }));
 const notifyButton = $("#notifyButton"); if (notifyButton) notifyButton.addEventListener("click", () => showToast(currentUser() ? "暂无新的认证回答" : "登录后可查看你的通知"));
 const decisionCalendarButton = $("#decisionCalendarButton"); if (decisionCalendarButton) decisionCalendarButton.addEventListener("click", openDecisionCalendar);
@@ -4428,6 +4496,11 @@ const clearExperienceFilters = $("#clearExperienceFilters"); if (clearExperience
 });
 
 document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && document.body.classList.contains("portal-stage-picker-open")) {
+    event.preventDefault();
+    closePortalStagePicker();
+    return;
+  }
   const onboardingOverlay = $("#onboardingOverlay");
   if (onboardingIndex >= 0 || (onboardingOverlay && !onboardingOverlay.hidden)) {
     if (event.key === "Escape") {
@@ -4459,10 +4532,10 @@ window.addEventListener("popstate", () => {
   const requestedStage = params.get("stage");
   if (stageOrder.includes(requestedStage) && requestedStage !== currentStage) setStage(requestedStage);
   const requestedView = params.get("view") || "home";
-  const allowedViews = new Set(["home", "experience", "questions", "answerer", "compare", "trust"]);
+  const allowedViews = new Set(["home", "experience", "questions", "answerer", "compare", "planning", "trust"]);
   const targetView = currentStage === "career" && requestedView === "compare" ? "experience" : requestedView;
   if (!allowedViews.has(targetView)) return;
-  if (currentIdentityMode === "answerer" && ["home", "experience", "compare"].includes(targetView)) {
+  if (currentIdentityMode === "answerer" && ["home", "experience", "compare", "planning"].includes(targetView)) {
     switchView("answerer");
     return;
   }
@@ -4499,6 +4572,7 @@ switchQaTab(currentIdentityMode === "answerer" ? "answer" : "ask");
 applyInitialRouteState();
 updateBackToTopButton();
 setGlobalStageBarCollapsed(false);
+const portalEntryActive = initializePortalHome();
 if (!currentUser() && !localStorage.getItem("yinlu_guest_seen")) window.setTimeout(showAccount, 500);
-else if (!stageSelectionIsComplete()) window.setTimeout(showStageSelection, 500);
-else scheduleOnboarding(900);
+else if (!portalEntryActive && !stageSelectionIsComplete()) window.setTimeout(showStageSelection, 500);
+else if (!portalEntryActive) scheduleOnboarding(900);

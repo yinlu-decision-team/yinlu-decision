@@ -9,6 +9,8 @@
     try {
       const savedTheme = localStorage.getItem("yinlu_theme");
       if (["spring", "milestone", "coast", "sunroad", "ember", "night", "apple", "pearl", "buzz", "iceglass", "retro", "orange"].includes(savedTheme)) document.documentElement.dataset.theme = savedTheme;
+      const route = new URLSearchParams(window.location.search);
+      if (!["view", "stage", "answerStage", "identity"].some((key) => route.has(key))) document.documentElement.classList.add("portal-entry");
     } catch (error) {}
   </script>
   <!-- favicon (SVG) -->
@@ -18,11 +20,12 @@
 <link rel="apple-touch-icon" href="./favicon-180.png">
 
 <!-- 本地化的轻量图标脚本（替代外部 CDN） -->
-<script src="./lib/lucide-lite.js?v=7" defer></script>
+<script src="./lib/lucide-lite.js?v=8" defer></script>
 
 <!-- 本地 app.js（确保在 lucide-lite 后加载） -->
-<script src="./app.js?v=20260816-stage-collapse-1" defer></script>
-  <link rel="stylesheet" href="styles.css?v=20260816-stage-collapse-1">
+<script src="./planning.js?v=20260816-4" defer></script>
+<script src="./app.js?v=20260816-life-planning-4" defer></script>
+  <link rel="stylesheet" href="styles.css?v=20260816-life-planning-5">
 </head>
 <body>
   <div class="app-shell">
@@ -46,6 +49,7 @@
         <a class="nav-item" href="./index.html?view=experience" data-view="experience"><span class="nav-dot-icon" aria-hidden="true"></span><span id="experienceNavLabel">院校与经验</span></a>
         <a class="nav-item" href="./index.html?view=questions" data-view="questions"><span class="nav-dot-icon" aria-hidden="true"></span><span>匿名提问</span><span class="nav-count" id="questionsCount">0</span></a>
         <a class="nav-item" id="compareNavItem" href="./index.html?view=compare" data-view="compare"><span class="nav-dot-icon" aria-hidden="true"></span><span>我的候选</span></a>
+        <a class="nav-item" href="./index.html?view=planning" data-view="planning"><span class="nav-dot-icon" aria-hidden="true"></span><span>人生规划</span></a>
         <a class="nav-item" href="./index.html?view=trust" data-view="trust"><span class="nav-dot-icon" aria-hidden="true"></span><span>信任与认证</span></a>
       </nav>
       <nav class="sidebar-nav answerer-nav" id="answererNav" aria-label="回答者导航" data-identity-nav="answerer" hidden>
@@ -80,8 +84,24 @@
 
     <main class="main-area">
       <header class="topbar">
+        <a class="portal-brand" href="./index.html" aria-label="返回引路首页">
+          <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true">
+            <path class="brand-mark-body" d="M13 9H30C34 9 37 12 37 16V37L25 30L13 37V9Z"/>
+            <path class="brand-mark-fold" d="M13 9H25C29 9 32 12 32 16V27"/>
+            <path class="brand-mark-gap" d="M25 16V29"/>
+            <circle class="brand-mark-dot" cx="25" cy="16" r="3"/>
+          </svg>
+          <span><strong>引路</strong><small>青年生涯决策信息平台</small></span>
+        </a>
         <button class="icon-button menu-button" id="menuButton" aria-label="打开导航"><i data-lucide="menu"></i></button>
-        <div class="breadcrumb"><span>我的引路</span><span class="breadcrumb-separator">/</span><strong id="breadcrumbTitle">首页</strong></div>
+        <div class="breadcrumb"><a class="breadcrumb-home" href="./index.html">引路主页面</a><span class="breadcrumb-separator">/</span><strong id="breadcrumbTitle">首页</strong></div>
+        <nav class="planning-topbar-breadcrumb" aria-label="人生规划页面路径">
+          <a href="./index.html" class="planning-topbar-home"><i data-lucide="house"></i><span>引路主页面</span></a>
+          <span class="breadcrumb-separator">/</span>
+          <a href="./index.html?view=planning">人生规划</a>
+          <span class="breadcrumb-separator">/</span>
+          <strong id="planningTopbarTitle">综合规划</strong>
+        </nav>
         <div class="top-actions">
           <button class="icon-button onboarding-replay-button" id="onboardingReplayButton" type="button" aria-label="重新查看新手指引" title="重新查看新手指引" hidden><span class="onboarding-replay-symbol" aria-hidden="true">?</span></button>
           <div class="theme-control">
@@ -162,8 +182,61 @@
         </div>
       </header>
 
+      <section class="portal-home" id="portalHome" aria-labelledby="portalTitle" hidden>
+        <div class="portal-hero">
+          <div class="portal-hero-copy">
+            <div class="portal-kicker"><span></span>从一次重要选择开始</div>
+            <h1 id="portalTitle">欢迎来到引路 <small>青年生涯决策信息平台</small></h1>
+            <p>在升学与就业的每一个路口，找到真实经验、可靠信息，也找到真正懂你的人。</p>
+            <div class="portal-hero-actions">
+              <button class="portal-primary-action" id="portalChooseStage" type="button">选择当前阶段<i data-lucide="chevron-down"></i></button>
+              <a class="portal-continue-action" id="portalContinueStage" href="./index.html?view=home&stage=gaokao" hidden>
+                <span>继续我的阶段</span><small id="portalContinueLabel">高考志愿</small><i data-lucide="arrow-right"></i>
+              </a>
+            </div>
+          </div>
+
+          <div class="portal-route-art" aria-hidden="true">
+            <div class="portal-sun"></div>
+            <div class="portal-mountain portal-mountain-left"></div>
+            <div class="portal-mountain portal-mountain-right"></div>
+            <div class="portal-route-line"></div>
+            <span class="portal-route-pin portal-route-pin-one"><i></i><b>填报志愿</b></span>
+            <span class="portal-route-pin portal-route-pin-two"><i></i><b>继续深造</b></span>
+            <span class="portal-route-pin portal-route-pin-three"><i></i><b>走向职场</b></span>
+          </div>
+        </div>
+
+        <div class="portal-stage-section" id="portalStages">
+          <button class="portal-stage-close" id="portalStageClose" type="button" aria-label="关闭阶段选择" title="关闭阶段选择"><i data-lucide="x"></i></button>
+          <div class="portal-stage-heading">
+            <div><h2>你正走到哪一个路口？</h2><p>选择当前阶段，进入对应的决策空间</p></div>
+            <span>每一段经历，都能成为后来者的路标</span>
+          </div>
+          <div class="portal-stage-grid">
+            <a class="portal-stage-card portal-stage-gaokao" href="./index.html?view=home&stage=gaokao" data-portal-stage="gaokao">
+              <span class="portal-stage-number">01 / NOW</span><h3>高考志愿</h3><p>看院校、辨专业，找到适合你的选择。</p><i data-lucide="arrow-right"></i>
+            </a>
+            <a class="portal-stage-card portal-stage-graduate" href="./index.html?view=home&stage=graduate" data-portal-stage="graduate">
+              <span class="portal-stage-number">02 / NEXT</span><h3>考研择校</h3><p>比较方向与培养体验，少走信息弯路。</p><i data-lucide="arrow-right"></i>
+            </a>
+            <a class="portal-stage-card portal-stage-career" href="./index.html?view=home&stage=career" data-portal-stage="career">
+              <span class="portal-stage-number">03 / FUTURE</span><h3>就业选择</h3><p>从真实经历中，理解岗位与行业。</p><i data-lucide="arrow-right"></i>
+            </a>
+            <a class="portal-stage-card portal-stage-plan" href="./index.html?view=planning" data-portal-planning>
+              <span class="portal-stage-number">04 / PLAN</span><h3>人生规划</h3><p>把每一次选择，连成自己的长期方向。</p><i data-lucide="arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </section>
+
       <nav class="global-stage-bar" aria-label="全局决策阶段">
-        <div class="global-stage-track">
+          <div class="global-stage-track">
+          <svg class="global-stage-routes" viewBox="0 0 100 50" preserveAspectRatio="none" aria-hidden="true">
+            <path class="global-stage-route global-stage-route-upper" d="M8 28 Q22 11 38 11 Q52 11 66 28"></path>
+            <path class="global-stage-route global-stage-route-lower" d="M8 28 Q37 45 66 28"></path>
+            <path class="global-stage-route global-stage-route-final" d="M66 28 L94 28"></path>
+          </svg>
           <div class="global-stage-stop" data-global-stage-stop="gaokao">
             <a class="global-stage-link" href="./index.html?view=home&stage=gaokao" data-global-planner-stage="gaokao">
               <span class="global-stage-flag" aria-hidden="true"><i data-lucide="flag"></i></span>
@@ -184,6 +257,13 @@
               <span class="global-stage-node">03</span><span>就业选择</span>
             </a>
             <a class="global-answer-stage-control" href="./answerer/jiuye/index.html" data-global-answer-stage="career" aria-label="回答就业阶段问题" title="回答就业阶段问题"><i data-lucide="message-circle"></i></a>
+          </div>
+          <div class="global-stage-stop global-stage-planning-stop" data-global-stage-stop="planning">
+            <a class="global-stage-link" href="./index.html?view=planning" data-global-planner-stage="planning">
+              <span class="global-stage-flag" aria-hidden="true"><i data-lucide="route"></i></span>
+              <span class="global-stage-node">04</span><span>人生规划</span>
+            </a>
+            <span class="global-stage-answer-spacer" aria-hidden="true"></span>
           </div>
         </div>
         <div class="global-stage-compact" aria-hidden="true">
@@ -645,6 +725,10 @@
         <section class="view" id="view-trust">
           <div class="page-header"><div><div class="section-kicker">信任与认证</div><h1>让真实经验有可验证的来源</h1><p>后台实名，前台匿名。认证只保留必要的脱敏标签。</p></div><span class="mvp-badge"><i data-lucide="flask-conical"></i>MVP概念原型</span></div>
           <div class="trust-dashboard"><div class="verification-card" id="verificationContent"></div><div class="trust-principles"><h2>引路的认证原则</h2><div class="principle"><span class="principle-number">01</span><div><strong>最小必要</strong><p>核验通过后只保留学校、专业和入学/毕业年份等脱敏字段。</p></div></div><div class="principle"><span class="principle-number">02</span><div><strong>匿名保护</strong><p>认证记录和内容分离存储，前台只显示认证标签。</p></div></div><div class="principle"><span class="principle-number">03</span><div><strong>观点并列</strong><p>平台呈现共识与分歧，不替用户输出报考或就业结论。</p></div></div></div></div>
+        </section>
+
+        <section class="view planning-view" id="view-planning" aria-labelledby="planningPageTitle">
+          <div id="planningApp"></div>
         </section>
       </div>
 
