@@ -234,7 +234,176 @@ const demoAnswers = [
 ];
 const stageNames = { gaokao: "高考志愿", graduate: "考研择校", career: "职业选择", adapt: "大学适应" };
 const stageOrder = ["gaokao", "graduate", "career", "adapt"];
-const STORE = { users: "yinlu_users", session: "yinlu_session", questions: "yinlu_questions", answers: "yinlu_answers", favorites: "yinlu_favorites", candidateStatus: "yinlu_candidate_status", compareHistory: "yinlu_compare_history", family: "yinlu_family", verification: "yinlu_verification", theme: "yinlu_theme", experienceLayout: "yinlu_experience_layout", history: "yinlu_history", decisionEvents: "yinlu_decision_events", petPosition: "yinlu_pet_position_v2", petAvatar: "yinlu_pet_avatar", petMotion: "yinlu_pet_reduce_motion", pageFeedback: "yinlu_page_feedback", onboarding: "yinlu_onboarding_complete_v1" };
+const GLOBAL_STAGE_CONFIG = [
+  { key: "gaokao", route: "gaokao" },
+  { key: "graduate", route: "kaoyan" },
+  { key: "career", route: "jiuye" }
+];
+
+function createGraduateInstitution(config) {
+  const officialSource = `${config.school}研究生招生网`;
+  return {
+    decisionStage: "graduate",
+    id: config.id,
+    school: config.school,
+    englishName: config.englishName,
+    city: config.city,
+    type: config.type,
+    identityTags: config.identityTags,
+    founded: config.founded,
+    educationLevel: "硕士研究生 / 博士研究生",
+    campuses: config.campuses,
+    updatedAt: "2026年8月",
+    intro: config.intro,
+    majors: config.majorPrograms.map((program) => program.name),
+    majorPrograms: config.majorPrograms,
+    highlights: config.highlights,
+    dataSummary: "招生人数、考试科目、复试线和拟录取情况会随年份与专业变化，平台仅整理查询入口，具体结论以当年官方文件为准。",
+    admissionBrief: "考研信息需要按招生年度、学院、专业、学习方式和招生方式逐项核对，尤其注意专业代码、初试科目、复试办法与拟招生人数是否调整。",
+    admissionYears: ["2026", "2025", "2024"],
+    admissionProvinces: ["统考", "推免"],
+    admissionSubjects: ["全日制", "非全日制"],
+    admissionResources: [
+      { icon: "scroll-text", title: "硕士招生简章", description: "查看报考条件、学习方式、学制与学费说明", sourceType: "学校官方发布", sourceName: officialSource, year: "2026", status: "查看原文", url: config.officialUrl },
+      { icon: "list-tree", title: "招生专业目录", description: "按学院核对专业代码、研究方向、初试科目与备注", sourceType: "学校官方发布", sourceName: officialSource, year: "2026", status: "查看原文", url: config.officialUrl },
+      { icon: "clipboard-check", title: "复试与录取办法", description: "核对复试形式、成绩计算、差额比例与录取规则", sourceType: "学校官方发布", sourceName: officialSource, year: "按年度更新", status: "查看原文", url: config.officialUrl },
+      { icon: "database", title: "全国硕士研究生招生信息", description: "辅助查询院校与专业目录，最终回到学校原文核验", sourceType: "教育部平台", sourceName: "中国研究生招生信息网", year: "持续更新", status: "外部入口", url: "https://yz.chsi.com.cn/" }
+    ],
+    latestUpdates: [
+      { type: "招生简章", title: `${config.school}硕士研究生招生简章`, summary: "重点核对报考条件、学制、学费和招生方式是否发生变化。", date: "按年度更新", publisher: officialSource, status: "以官网发布时间为准", url: config.officialUrl },
+      { type: "专业目录", title: `${config.school}硕士招生专业目录`, summary: "查看专业代码、研究方向、考试科目与拟招生人数。", date: "按年度更新", publisher: officialSource, status: "以官网目录为准", url: config.officialUrl },
+      { type: "复试录取", title: `${config.school}复试录取相关通知`, summary: "复试线、复试名单和拟录取公示应按学院与专业分别核验。", date: "招生季更新", publisher: officialSource, status: "保留历年原文", url: config.officialUrl }
+    ],
+    postgraduateRecommendation: {
+      value: "专业复试线待接入",
+      year: "按招生年度核对",
+      recommendedCount: "统考名额待核验",
+      graduateScope: "复试差额待核验",
+      methodology: "学院复试名单、招生计划与拟录取公示需使用同一专业代码和同一招生年度",
+      source: `${officialSource}、学院复试通知与拟录取公示`,
+      updatedAt: "随招生进程更新"
+    },
+    officialSummary: "按学院查看硕士招生专业、研究方向、学习方式和考试科目，专业名称相同也要继续核对专业代码与培养单位。",
+    campusSummary: `${config.school}研究生培养可能分布在不同校区，择校时需要继续确认目标学院、实验室和住宿安排所在校区。`,
+    campusDetails: config.campusDetails,
+    cityReferences: [
+      { icon: "train-front", label: "跨城交通", value: `${config.city}交通与到校路线`, note: "复试与入学前结合校区位置确认" },
+      { icon: "briefcase-business", label: "实习科研", value: "结合学院方向与城市产业查看", note: "不以城市标签替代具体培养信息" },
+      { icon: "wallet-cards", label: "学习成本", value: "学费与住宿信息待官方核验", note: "区分全日制与非全日制" }
+    ],
+    campusMedia: [
+      { icon: "map", title: "校区地图", description: "确认目标学院、实验室与宿舍所在校区", status: "前往学校官网", url: config.schoolUrl },
+      { icon: "building-2", title: "学院主页", description: "查看导师团队、研究方向与培养通知", status: "从研招网进入学院", url: config.officialUrl },
+      { icon: "newspaper", title: "研招通知", description: "追踪招生目录、复试办法和拟录取公示", status: "按发布时间核验", url: config.officialUrl }
+    ],
+    careerSummary: "考研阶段应把专业复试线、统考名额、复试差额和拟录取结果放在同一招生年度内比较，避免混用学校线、学院线与专业线。",
+    officialSource,
+    officialUrl: config.officialUrl,
+    dataSource: "中国研究生招生信息网",
+    dataUrl: "https://yz.chsi.com.cn/",
+    dimensions: ["招生与报录", "初试备考", "复试准备", "培养方向", "导师与科研"]
+  };
+}
+
+const graduateInstitutions = [
+  createGraduateInstitution({
+    id: "grad-xmu", school: "厦门大学", englishName: "Xiamen University", city: "厦门", founded: "1921年", campuses: "思明校区、翔安校区等", type: "教育部直属 · 综合性研究型大学", identityTags: ["985", "211", "双一流"],
+    officialUrl: "https://zs.xmu.edu.cn/", schoolUrl: "https://www.xmu.edu.cn/", highlights: ["学科方向多", "学院目录清晰", "厦门城市环境"],
+    intro: "考研择校时应从目标学院和专业代码进入，继续核对研究方向、考试科目、推免与统考安排以及复试录取文件。",
+    majorPrograms: [
+      { name: "计算机科学与技术", school: "信息学院", category: "工学", level: "学术学位", note: "重点核对研究方向、专业课科目、复试考核和导师团队。", officialUrl: "https://zs.xmu.edu.cn/" },
+      { name: "电子信息", school: "信息学院", category: "工学", level: "专业学位", note: "关注专业代码下的培养方向、学习方式与实践安排。", officialUrl: "https://zs.xmu.edu.cn/" },
+      { name: "应用经济学", school: "经济学院", category: "经济学", level: "学术学位", note: "核对不同方向的考试科目、招生名额和复试要求。", officialUrl: "https://zs.xmu.edu.cn/" }
+    ],
+    campusDetails: [
+      { name: "思明校区", location: "厦门市思明区", colleges: "具体学院分布以学校最新信息为准", transport: "复试前按学院通知确认报到地点", status: "主要校区" },
+      { name: "翔安校区", location: "厦门市翔安区", colleges: "部分学院与科研平台分布于此", transport: "需结合目标学院核对通行安排", status: "重要校区" }
+    ]
+  }),
+  createGraduateInstitution({
+    id: "grad-fzu", school: "福州大学", englishName: "Fuzhou University", city: "福州", founded: "1958年", campuses: "旗山校区等", type: "省部共建 · 综合性大学", identityTags: ["211", "双一流"],
+    officialUrl: "https://yjsy.fzu.edu.cn/", schoolUrl: "https://www.fzu.edu.cn/", highlights: ["工科方向突出", "福建本地样本", "学院信息可追踪"],
+    intro: "考研信息需要按学院与专业代码查询，重点比较专业课、统考名额、复试办法和拟录取结果，避免只看学校整体标签。",
+    majorPrograms: [
+      { name: "计算机科学与技术", school: "计算机与大数据学院", category: "工学", level: "学术学位", note: "关注专业课科目、研究方向和复试实践考核。", officialUrl: "https://yjsy.fzu.edu.cn/" },
+      { name: "电子信息", school: "相关培养学院", category: "工学", level: "专业学位", note: "同一专业代码可能包含多个方向，需按学院目录继续核验。", officialUrl: "https://yjsy.fzu.edu.cn/" },
+      { name: "工商管理", school: "经济与管理学院", category: "管理学", level: "专业学位", note: "注意报考条件、学习方式、学费与培养安排。", officialUrl: "https://yjsy.fzu.edu.cn/" }
+    ],
+    campusDetails: [
+      { name: "旗山校区", location: "福州市大学城片区", colleges: "多数学院和研究生培养信息需按学院核验", transport: "报到和复试地点以学院通知为准", status: "主要校区" }
+    ]
+  }),
+  createGraduateInstitution({
+    id: "grad-ecnu", school: "华东师范大学", englishName: "East China Normal University", city: "上海", founded: "1951年", campuses: "闵行校区、中山北路校区", type: "教育部直属 · 综合性研究型大学", identityTags: ["985", "211", "双一流"],
+    officialUrl: "https://yjszs.ecnu.edu.cn/", schoolUrl: "https://www.ecnu.edu.cn/", highlights: ["教育学科突出", "培养方向丰富", "上海城市资源"],
+    intro: "报考时需要区分培养单位、专业代码、学术学位与专业学位，并继续核对不同校区和学院的复试安排。",
+    majorPrograms: [
+      { name: "教育学", school: "教育学部", category: "教育学", level: "学术学位", note: "关注二级方向、研究方法训练和复试考察范围。", officialUrl: "https://yjszs.ecnu.edu.cn/" },
+      { name: "应用心理", school: "心理与认知科学学院", category: "教育学", level: "专业学位", note: "核对培养方向、实践要求、学习方式和复试安排。", officialUrl: "https://yjszs.ecnu.edu.cn/" },
+      { name: "软件工程", school: "软件工程学院", category: "工学", level: "学术学位", note: "关注专业课、项目基础、导师方向与培养平台。", officialUrl: "https://yjszs.ecnu.edu.cn/" }
+    ],
+    campusDetails: [
+      { name: "闵行校区", location: "上海市闵行区", colleges: "学院分布以学校和学院主页为准", transport: "复试地点需按学院通知确认", status: "主要校区" },
+      { name: "中山北路校区", location: "上海市普陀区", colleges: "部分学院和培养单位分布于此", transport: "提前核对学院所在校区", status: "主要校区" }
+    ]
+  }),
+  createGraduateInstitution({
+    id: "grad-szu", school: "深圳大学", englishName: "Shenzhen University", city: "深圳", founded: "1983年", campuses: "粤海校区、丽湖校区", type: "地方综合性大学", identityTags: ["双非样本", "城市产业资源"],
+    officialUrl: "https://yz.szu.edu.cn/", schoolUrl: "https://www.szu.edu.cn/", highlights: ["城市产业联系", "专业学位选择", "校区差异需核对"],
+    intro: "择校时除学校与城市外，还要继续核对学院研究方向、考试科目、招生名额和培养校区，避免只根据就业城市作判断。",
+    majorPrograms: [
+      { name: "计算机科学与技术", school: "计算机与软件学院", category: "工学", level: "学术学位", note: "关注研究方向、专业课和复试中的项目能力要求。", officialUrl: "https://yz.szu.edu.cn/" },
+      { name: "金融", school: "经济学院", category: "经济学", level: "专业学位", note: "核对报考条件、考试科目、学习方式与实践培养安排。", officialUrl: "https://yz.szu.edu.cn/" },
+      { name: "新闻与传播", school: "传播学院", category: "文学", level: "专业学位", note: "关注作品与实践经历、复试形式和培养方向。", officialUrl: "https://yz.szu.edu.cn/" }
+    ],
+    campusDetails: [
+      { name: "粤海校区", location: "深圳市南山区", colleges: "目标学院分布需按学校最新信息确认", transport: "结合复试通知确认到校路线", status: "主要校区" },
+      { name: "丽湖校区", location: "深圳市南山区", colleges: "部分学院和科研平台分布于此", transport: "提前核对培养与住宿校区", status: "重要校区" }
+    ]
+  })
+];
+
+const graduateExperiences = [
+  { id: "grad-xmu-cs-prepare", school: "厦门大学", major: "计算机科学与技术", city: "厦门", level: "在读认证 · 2025级硕士", source: "student", publishedAt: "2026-08-11", text: "择校时不能只看学校层次，专业课范围、复试机试形式和导师方向都需要放在一起核对。", tags: ["专业课", "复试"], dimensions: ["初试备考", "复试准备"] },
+  { id: "grad-xmu-econ-direction", school: "厦门大学", major: "应用经济学", city: "厦门", level: "在读认证 · 2024级硕士", source: "student", publishedAt: "2026-07-28", text: "相同专业名称下面的研究方向和课程训练差别明显，建议先看学院培养方案，再决定是否适合长期研究。", tags: ["研究方向", "课程"], dimensions: ["培养方向", "导师与科研"] },
+  { id: "grad-fzu-cs-retest", school: "福州大学", major: "计算机科学与技术", city: "福州", level: "在读认证 · 2025级硕士", source: "student", publishedAt: "2026-08-03", text: "复试准备要按照当年学院通知拆分，专业基础、项目表达和英语环节的准备方式并不相同。", tags: ["复试", "项目表达"], dimensions: ["复试准备"] },
+  { id: "grad-fzu-electronic-life", school: "福州大学", major: "电子信息", city: "福州", level: "在读认证 · 2024级硕士", source: "student", publishedAt: "2026-06-19", text: "确认培养方向后还要继续了解实验室节奏、项目安排和住宿校区，这些会直接影响研究生日常。", tags: ["实验室", "校区"], dimensions: ["导师与科研", "研究生生活"] },
+  { id: "grad-ecnu-education-method", school: "华东师范大学", major: "教育学", city: "上海", level: "在读认证 · 2025级硕士", source: "student", publishedAt: "2026-07-16", text: "教育学方向不能只按专业大类准备，研究方向、阅读基础和研究方法训练会影响复试表达与后续学习。", tags: ["研究方法", "阅读"], dimensions: ["复试准备", "培养方向"] },
+  { id: "grad-szu-cs-city", school: "深圳大学", major: "计算机科学与技术", city: "深圳", level: "在读认证 · 2024级硕士", source: "student", publishedAt: "2026-05-22", text: "城市机会是加分项，但择校前仍应先确认导师方向、培养要求和自己的技术基础是否匹配。", tags: ["城市机会", "方向匹配"], dimensions: ["导师与科研", "就业去向"] },
+  { id: "grad-expert-adjustment", school: "福州大学", major: "电子信息", city: "福州", level: "教师视角 · 信息边界已标注", source: "expert", publishedAt: "2026-07-08", title: "调剂信息应该怎样判断是否仍然有效？", text: "先核对发布时间、专业代码、学习方式和学院联系方式，不要把往年缺额直接当作当年结论。", tags: ["时间核验", "专业代码"], dimensions: ["调剂信息", "招生与报录"] },
+  { id: "grad-expert-supervisor", school: "华东师范大学", major: "教育学", city: "上海", level: "教师视角 · 信息边界已标注", source: "expert", publishedAt: "2026-06-30", title: "导师方向与招生专业是什么关系？", text: "先以招生目录确认报考入口，再通过学院和导师主页理解研究方向，不能用导师个人主页替代当年招生文件。", tags: ["招生目录", "导师主页"], dimensions: ["导师与科研", "培养方向"] }
+];
+const careerExperiences = [
+  { id: "career-software-role", school: "软件与信息技术服务", major: "软件开发岗位", city: "全国", level: "从业者视角 · 信息边界已标注", source: "expert", publishedAt: "2026-08-12", title: "软件开发岗位日常在做什么？", text: "岗位名称相同，实际工作也可能分别偏业务开发、平台工程、测试保障或数据处理。了解岗位时应继续核对团队业务、技术栈和协作方式。", tags: ["岗位职责", "团队协作"], dimensions: ["岗位内容", "工作环境"] },
+  { id: "career-product-skill", school: "互联网与数字产品", major: "产品岗位", city: "全国", level: "从业者视角 · 信息边界已标注", source: "expert", publishedAt: "2026-07-30", title: "产品岗位需要哪些可验证的能力？", text: "不能只看沟通能力这类宽泛描述，还需要结合需求分析、数据判断、文档表达和跨团队推进等具体任务理解岗位要求。", tags: ["能力拆解", "岗位任务"], dimensions: ["能力要求", "岗位内容"] },
+  { id: "career-finance-entry", school: "金融与商业服务", major: "分析与运营岗位", city: "上海", level: "毕业生经验 · 2025届", source: "student", publishedAt: "2026-07-18", text: "求职初期最有帮助的是把课程项目、实习任务和岗位要求逐项对应，而不是只罗列证书或课程名称。", tags: ["求职准备", "经历表达"], dimensions: ["能力要求", "实习准备", "专业关联"] },
+  { id: "career-education-path", school: "教育与公共服务", major: "教育相关岗位", city: "福州", level: "毕业生经验 · 2024届", source: "student", publishedAt: "2026-06-26", text: "教育相关岗位不只有课堂教学，还包括教研、课程运营和公共教育服务。不同路径对资格、实践和表达能力的要求并不相同。", tags: ["职业方向", "资格要求"], dimensions: ["岗位内容", "职业发展", "专业关联"] },
+  { id: "career-internship-prepare", school: "通用求职参考", major: "第一份实习", city: "全国", level: "毕业生经验 · 经历时间已标注", source: "student", publishedAt: "2026-08-05", text: "第一份实习可以先从真实任务入手准备：明确岗位常用工具，整理一项能够说明过程和结果的课程或社团项目，再针对岗位描述补足基础能力。", tags: ["实习", "项目经历"], dimensions: ["实习准备", "能力要求"] },
+  { id: "career-industry-change", school: "行业发展参考", major: "可迁移能力", city: "全国", level: "从业者视角 · 信息边界已标注", source: "expert", publishedAt: "2026-07-09", title: "行业变化时怎样看待热门岗位？", text: "热门程度会随年份变化，更稳定的参考是岗位解决的问题、核心任务以及能够迁移到其他岗位的能力。具体招聘结论仍需核对当期招聘信息。", tags: ["行业趋势", "可迁移能力"], dimensions: ["行业变化", "职业发展", "能力要求"] }
+];
+const ANSWERER_STAGE_CONFIG = {
+  gaokao: { key: "gaokao", name: stageNames.gaokao, description: "高考志愿阶段的问题，优先邀请有对应学校、专业和填报经历的人回答。" },
+  kaoyan: { key: "graduate", name: stageNames.graduate, description: "考研择校阶段的问题，优先邀请经历过备考、择校和复试过程的人回答。" },
+  jiuye: { key: "career", name: stageNames.career, description: "就业选择阶段的问题，优先邀请有对应专业和工作经历的人回答。" }
+};
+const ANSWERER_QUESTION_EXAMPLES = {
+  gaokao: [
+    { title: "这所学校不同校区的学习和生活差别大吗？", meta: "院校选择 · 设施布局", tag: "同校经历" },
+    { title: "这个专业大一课程强度和转专业机会怎么样？", meta: "专业选择 · 课程学习", tag: "专业经历" },
+    { title: "填报前最容易忽略的招生条件是什么？", meta: "志愿填报 · 信息核对", tag: "填报经历" }
+  ],
+  kaoyan: [
+    { title: "择校时应该怎样判断专业课难度是否适合自己？", meta: "考研择校 · 备考难度", tag: "备考经历" },
+    { title: "复试更看重项目经历还是初试成绩？", meta: "复试准备 · 评价标准", tag: "复试经历" },
+    { title: "导师方向与实际培养内容会有多大差别？", meta: "培养方向 · 导师选择", tag: "在读经历" }
+  ],
+  jiuye: [
+    { title: "这个专业毕业后的岗位和日常工作内容是什么？", meta: "职业选择 · 工作内容", tag: "从业经历" },
+    { title: "第一份实习最需要提前准备哪些能力？", meta: "实习准备 · 能力要求", tag: "实习经历" },
+    { title: "行业变化后，哪些课程或技能仍然有用？", meta: "行业发展 · 能力迁移", tag: "行业经验" }
+  ]
+};
+const STORE = { users: "yinlu_users", session: "yinlu_session", questions: "yinlu_questions", answers: "yinlu_answers", favorites: "yinlu_favorites", candidateStatus: "yinlu_candidate_status", compareHistory: "yinlu_compare_history", family: "yinlu_family", verification: "yinlu_verification", theme: "yinlu_theme", experienceLayout: "yinlu_experience_layout", history: "yinlu_history", decisionEvents: "yinlu_decision_events", petPosition: "yinlu_pet_position_v2", petAvatar: "yinlu_pet_avatar", petMotion: "yinlu_pet_reduce_motion", pageFeedback: "yinlu_page_feedback", onboarding: "yinlu_onboarding_complete_v1", identityMode: "yinlu_identity_mode" };
 const CYBER_PET_AVATARS = {
   egret: { name: "鹭小引", src: "./pet-t-egret-guide.svg?v=20260815" },
   deer: { name: "不迷鹿", src: "./pet-s-never-lost-deer.svg?v=20260815" },
@@ -243,6 +412,7 @@ const CYBER_PET_AVATARS = {
   turtle: { name: "归途龟", src: "./pet-z-homebound-turtle.svg?v=20260815" }
 };
 const CYBER_PET_GUIDANCE = {
+  answerer: { context: "回答者工作台", status: "经验贡献中", stage: "回答问题 · 标注时间", reminder: "只分享亲身经历，并标注学校、专业和经历发生的时间。", title: "把你的经验讲清楚", text: "你的具体经历可以帮助别人判断信息是否适合自己，也请把官方信息和个人感受分开。" },
   experience: { context: "院校与经验", status: "经验对照中", stage: "经验筛选 · 核实信息", reminder: "先看信息来源和发布时间，再把个人体验与客观事实分开记录。", title: "把相同问题放在一起比较", text: "同一所学校的体验可能因专业、校区和年份不同而变化。优先寻找与你情况接近的经验。" },
   questions: { context: "问答中心", status: "问题梳理中", stage: "提出问题 · 补充细节", reminder: "说明你的地区、阶段和已经了解的内容，更容易获得真正有用的回答。", title: "把问题问得更具体一点", text: "与其问“这所学校好吗”，不如说明你在意的专业、城市、住宿或就业方向。" },
   compare: { context: "我的候选", status: "候选比较中", stage: "候选比较 · 聚焦差异", reminder: "一次先比较两个最重要的维度，避免信息太多反而难以判断。", title: "先找出真正影响选择的差异", text: "相似条件可以暂时收起，把注意力放在专业实力、城市机会和录取把握等关键差异上。" },
@@ -321,9 +491,9 @@ const MUNICIPALITIES = new Set(["北京市", "上海市", "天津市", "重庆�
 const MAJOR_CATEGORIES = ["工学", "理学", "文学", "教育学", "经济学", "管理学", "农学", "医学", "法学", "艺术学"];
 const MAJOR_CATEGORY_BY_NAME = {
   "计算机科学与技术": "工学", "机械设计制造及其自动化": "工学", "电气工程及其自动化": "工学",
-  "化学工程与工艺": "工学", "食品科学与工程": "工学", "风景园林": "工学", "航海技术": "工学",
+  "化学工程与工艺": "工学", "食品科学与工程": "工学", "风景园林": "工学", "航海技术": "工学", "电子信息": "工学", "软件工程": "工学",
   "数学与应用数学": "理学", "地理科学": "理学", "汉语言文学": "文学", "新闻传播学": "文学",
-  "教育学": "教育学", "经济学": "经济学", "农学": "农学", "植物保护": "农学", "临床医学": "医学"
+  "新闻与传播": "文学", "教育学": "教育学", "应用心理": "教育学", "经济学": "经济学", "应用经济学": "经济学", "金融": "经济学", "工商管理": "管理学", "农学": "农学", "植物保护": "农学", "临床医学": "医学"
 };
 let currentStage = "gaokao";
 let currentSchoolSearch = "";
@@ -351,6 +521,9 @@ let currentSearch = "";
 let currentSchoolDetail = "fjnu";
 let currentCandidateTab = "school";
 let currentSchoolReturnView = "experience";
+let currentIdentityMode = "planner";
+let pendingSwitchAction = null;
+let plannerViewBeforeIdentity = "home";
 let schoolCompareMode = false;
 const selectedSchoolCandidateIds = new Set();
 let schoolMajorSelectionMode = false;
@@ -374,6 +547,39 @@ const EXPERIENCE_DIMENSIONS_BY_SOURCE = {
   official: ["课程学习", "设施布局", "城市环境"],
   expert: ["课程学习", "校园氛围", "城市环境", "就业去向"]
 };
+const GRADUATE_EXPERIENCE_DIMENSIONS_BY_SOURCE = {
+  all: ["招生与报录", "初试备考", "复试准备", "培养方向", "导师与科研", "调剂信息", "研究生生活", "就业去向"],
+  student: ["招生与报录", "初试备考", "复试准备", "培养方向", "导师与科研", "调剂信息", "研究生生活", "就业去向"],
+  official: ["招生与报录", "培养方向"],
+  expert: ["招生与报录", "复试准备", "培养方向", "导师与科研", "调剂信息", "就业去向"]
+};
+const CAREER_EXPERIENCE_DIMENSIONS_BY_SOURCE = {
+  all: ["岗位内容", "能力要求", "实习准备", "工作环境", "职业发展", "专业关联", "行业变化"],
+  student: ["岗位内容", "能力要求", "实习准备", "工作环境", "职业发展", "专业关联", "行业变化"],
+  official: [],
+  expert: ["岗位内容", "能力要求", "工作环境", "职业发展", "专业关联", "行业变化"]
+};
+
+function institutionDatasetForStage(stage = currentStage) {
+  if (stage === "career") return [];
+  return stage === "graduate" ? graduateInstitutions : institutions;
+}
+
+function experienceDatasetForStage(stage = currentStage) {
+  if (stage === "career") return careerExperiences;
+  return stage === "graduate" ? graduateExperiences : experiences;
+}
+
+function experienceDimensionsForSource(source = currentSourceFilter) {
+  const dimensionMap = currentStage === "career"
+    ? CAREER_EXPERIENCE_DIMENSIONS_BY_SOURCE
+    : currentStage === "graduate" ? GRADUATE_EXPERIENCE_DIMENSIONS_BY_SOURCE : EXPERIENCE_DIMENSIONS_BY_SOURCE;
+  return dimensionMap[source] || dimensionMap.all;
+}
+
+function findInstitutionById(id) {
+  return [...graduateInstitutions, ...institutions].find((item) => item.id === id);
+}
 let cyberPetSuppressClick = false;
 let cyberPetExpressionTimer = 0;
 let cyberPetLongPressTimer = 0;
@@ -623,6 +829,26 @@ function closeModal(id) {
     if (!currentUser()) localStorage.setItem("yinlu_guest_seen", "1");
     scheduleOnboarding(420);
   }
+  if (id === "switchConfirmModal") pendingSwitchAction = null;
+}
+
+function openSwitchConfirm({ title, description, confirmLabel = "确认切换", action }) {
+  const titleNode = $("#switchConfirmTitle");
+  const descriptionNode = $("#switchConfirmDescription");
+  const proceedButton = $("#switchConfirmProceed");
+  if (!titleNode || !descriptionNode || !proceedButton) return;
+  pendingSwitchAction = typeof action === "function" ? action : null;
+  titleNode.textContent = title;
+  descriptionNode.textContent = description;
+  proceedButton.textContent = confirmLabel;
+  openModal("switchConfirmModal");
+}
+
+function confirmSwitchAction() {
+  const action = pendingSwitchAction;
+  pendingSwitchAction = null;
+  closeModal("switchConfirmModal");
+  action?.();
 }
 
 function parseDecisionDate(value) {
@@ -784,7 +1010,7 @@ function deleteDecisionEvent(id) {
 
 function cyberPetContextLabel() {
   const activeView = $(".view.active")?.id.replace("view-", "") || "home";
-  if (activeView === "school-detail") return institutions.find((item) => item.id === currentSchoolDetail)?.school || "学校详情";
+  if (activeView === "school-detail") return findInstitutionById(currentSchoolDetail)?.school || "学校详情";
   return ({ home: "首页", experience: "院校与经验", questions: "问答中心", compare: "我的候选", trust: "信任与认证" })[activeView] || "当前页面";
 }
 
@@ -800,7 +1026,7 @@ function cyberPetGuidance() {
     return guidance[currentStage] || guidance.gaokao;
   }
   const guidance = { ...(CYBER_PET_GUIDANCE[activeView] || CYBER_PET_GUIDANCE.experience) };
-  if (activeView === "school-detail") guidance.context = institutions.find((item) => item.id === currentSchoolDetail)?.school || guidance.context;
+  if (activeView === "school-detail") guidance.context = findInstitutionById(currentSchoolDetail)?.school || guidance.context;
   return guidance;
 }
 
@@ -1122,7 +1348,7 @@ function handleCyberPetAction(action) {
     window.setTimeout(() => questionInput?.focus(), 320);
     return;
   }
-  if (action === "compare") { switchView("compare"); return; }
+  if (action === "compare") { navigateToFeatureRoute("compare"); return; }
   if (action === "calendar") { openDecisionCalendar(); return; }
   if (action === "report") {
     if (report) report.hidden = false;
@@ -1163,25 +1389,164 @@ function submitCyberPetReport(event) {
   showToast("页面问题已记录在本机");
 }
 
+function navigateToFeatureRoute(name) {
+  // All feature views live inside the original single-page shell. Keep this
+  // hook for existing callers, but do not send them to a second shell.
+  return false;
+}
+
+function answerableStageRoutes(stageKey = currentStage) {
+  const plannerIndex = GLOBAL_STAGE_CONFIG.findIndex((item) => item.key === stageKey);
+  return GLOBAL_STAGE_CONFIG.slice(0, Math.max(plannerIndex, 0)).map((item) => item.route);
+}
+
+function preferredAnswererStageRoute(stageKey = currentStage) {
+  const allowedRoutes = answerableStageRoutes(stageKey);
+  let storedRoute = "";
+  try { storedRoute = localStorage.getItem("yinlu_answerer_stage") || ""; } catch (error) {}
+  return allowedRoutes.includes(storedRoute) ? storedRoute : allowedRoutes.at(-1) || "";
+}
+
+function answererStageUrl(route, stageKey = currentStage) {
+  return `./answerer/${encodeURIComponent(route)}/index.html?stage=${encodeURIComponent(stageKey)}`;
+}
+
+function isStandaloneAnswererPage() {
+  return document.body.dataset.answererStandalone === "true";
+}
+
+function identityModeLabel(mode = currentIdentityMode) {
+  return mode === "answerer" ? "回答者" : "决策者";
+}
+
+function setIdentityMode(mode, { persist = true, switchContent = true } = {}) {
+  const nextMode = mode === "answerer" ? "answerer" : "planner";
+  const previousMode = currentIdentityMode;
+  if (nextMode === "answerer" && previousMode !== "answerer") {
+    plannerViewBeforeIdentity = $(".view.active")?.id.replace("view-", "") || "home";
+  }
+  currentIdentityMode = nextMode;
+  if (persist) localStorage.setItem(STORE.identityMode, nextMode);
+  document.body.classList.toggle("answerer-mode", nextMode === "answerer");
+  const plannerNav = $("#plannerNav");
+  const answererNav = $("#answererNav");
+  if (plannerNav) plannerNav.hidden = nextMode === "answerer";
+  if (answererNav) answererNav.hidden = nextMode !== "answerer";
+  const label = $("#identityModeLabel");
+  if (label) label.textContent = identityModeLabel(nextMode);
+  const workbenchLabel = $("#workbenchModeLabel");
+  if (workbenchLabel) workbenchLabel.textContent = nextMode === "answerer" ? "回答工作台" : "决策工作台";
+  ["#sourceDivider", "#sourceLabel", "#sourceList"].forEach((selector) => {
+    const element = $(selector);
+    if (element) element.hidden = nextMode === "answerer";
+  });
+  const toggle = $("#identityModeToggle");
+  if (toggle) {
+    toggle.setAttribute("aria-pressed", String(nextMode === "answerer"));
+    toggle.title = `切换到${nextMode === "answerer" ? "决策者" : "回答者"}`;
+  }
+  if (switchContent) {
+    const targetView = nextMode === "answerer"
+      ? "answerer"
+      : (previousMode === "answerer" ? plannerViewBeforeIdentity : $(".view.active")?.id.replace("view-", "") || "home");
+    switchView(targetView);
+    if (targetView === "questions") switchQaTab(nextMode === "answerer" ? "answer" : "ask");
+  }
+  renderCyberPetContext();
+}
+
 function switchView(name) {
   $$(".view").forEach((view) => view.classList.toggle("active", view.id === `view-${name}`));
-  $$(".nav-item").forEach((button) => button.classList.toggle("active", button.dataset.view === name));
-  const active = $(`.nav-item[data-view="${name}"]`);
-  $("#breadcrumbTitle").textContent = name === "school-detail" ? `${institutions.find((item) => item.id === currentSchoolDetail)?.school || "学校详情"}` : active?.querySelector("span")?.textContent || "首页";
+  const navigationView = currentIdentityMode === "answerer" && name === "questions" ? "answerer" : name;
+  $$(".nav-item").forEach((button) => button.classList.toggle("active", button.dataset.view === navigationView));
+  const active = $(`.nav-item[data-view="${navigationView}"]`);
+  $("#breadcrumbTitle").textContent = name === "school-detail" ? `${findInstitutionById(currentSchoolDetail)?.school || "学校详情"}` : navigationView === "answerer" ? "回答中心" : active?.querySelector("span:not(.nav-dot-icon)")?.textContent || "首页";
   $("#sidebar")?.classList.remove("open");
+  updateGlobalStageSwitcher();
   if (name === "experience") renderExperiences();
   if (name === "questions") renderQuestions();
   if (name === "compare") { renderCompare(); renderFamily(); }
   if (name === "trust") renderTrust();
+  if (name === "answerer") renderAnswererWorkbench();
+  if (name === "questions" && currentIdentityMode === "answerer") switchQaTab("answer");
   if (name === "school-detail") renderSchoolDetail();
   renderCyberPetContext();
   suppressBackToTopDuringViewChange();
   window.scrollTo({ top: 0, behavior: document.body.classList.contains("onboarding-active") ? "auto" : "smooth" });
 }
 
+function updateShellViewUrl(name, nav) {
+  const url = new URL(window.location.href);
+  const navUrl = nav?.href ? new URL(nav.href, window.location.href) : null;
+  url.searchParams.set("view", name);
+  const tab = name === "questions" ? navUrl?.searchParams.get("tab") : "";
+  if (tab) url.searchParams.set("tab", tab);
+  else url.searchParams.delete("tab");
+  if (url.href !== window.location.href) window.history.pushState(null, "", url);
+}
+
+function applyInitialRouteState() {
+  const params = new URLSearchParams(window.location.search);
+  const requestedStage = params.get("stage");
+  const requestedView = params.get("view");
+  const answererStage = params.get("answerStage");
+  if (answererStage && ANSWERER_STAGE_CONFIG[answererStage]) {
+    localStorage.setItem("yinlu_answerer_stage", answererStage);
+  }
+  const requestedMode = params.get("identity");
+  const storedMode = localStorage.getItem(STORE.identityMode) === "answerer" ? "answerer" : "planner";
+  const initialMode = requestedMode === "answerer" || requestedView === "answerer"
+    ? "answerer"
+    : requestedMode === "planner" ? "planner" : storedMode;
+  setIdentityMode(initialMode, { persist: Boolean(requestedMode || requestedView === "answerer"), switchContent: false });
+  const allowedViews = new Set(["home", "experience", "questions", "answerer", "compare", "trust"]);
+  if (stageOrder.includes(requestedStage)) setStage(requestedStage);
+  const stageSafeView = currentStage === "career" && requestedView === "compare" ? "experience" : requestedView;
+  if (stageSafeView !== requestedView) {
+    const safeUrl = new URL(window.location.href);
+    safeUrl.searchParams.set("view", stageSafeView);
+    window.history.replaceState(null, "", safeUrl);
+  }
+  const initialView = currentIdentityMode === "answerer" && ["home", "experience", "compare"].includes(stageSafeView)
+    ? "answerer"
+    : stageSafeView;
+  if (allowedViews.has(initialView)) switchView(initialView);
+  else if (!requestedView && currentIdentityMode === "answerer") switchView("answerer");
+  if (currentIdentityMode === "answerer") switchQaTab("answer");
+  if (params.get("calendar") === "1") window.setTimeout(openDecisionCalendar, 0);
+  if (params.get("theme") === "1") window.setTimeout(() => setThemeMenu(true), 0);
+  if (params.get("pet") === "1") window.setTimeout(() => setCyberPetOpen(true), 0);
+  if (params.get("onboarding") === "1") window.setTimeout(() => startOnboarding({ force: true }), 350);
+  if (requestedView !== "experience") return;
+
+  const requestedTab = params.get("tab");
+  if (["institution", "experience"].includes(requestedTab)) switchExperienceContentTab(requestedTab);
+  if (params.get("focus") === "region") {
+    currentExperienceRegionOpen = true;
+    renderLibraryRegionPicker("experience");
+    window.setTimeout(() => $("#experienceRegionSearch")?.focus(), 0);
+  }
+  const query = params.get("q")?.trim() || "";
+  if (!query) return;
+  if (requestedTab === "institution") {
+    currentInstitutionSchoolSearch = query;
+    if ($("#institutionSchoolSearch")) $("#institutionSchoolSearch").value = query;
+  } else {
+    currentSchoolSearch = query;
+    if ($("#experienceSchoolSearch")) $("#experienceSchoolSearch").value = query;
+  }
+  renderExperiences();
+}
+
 const BACK_TO_TOP_VIEWS = new Set(["view-experience", "view-compare"]);
 let backToTopFrame = 0;
 let backToTopHiddenUntil = 0;
+let lastStageBarScrollY = window.scrollY;
+let stageBarScrollFrame = 0;
+let stageBarPinnedOpen = false;
+let stageBarPinnedOpenAt = null;
+let stageBarPinnedClosedAt = null;
+let stageBarToggleGuardUntil = 0;
 
 function updateBackToTopButton() {
   const button = $("#backToTopButton");
@@ -1213,6 +1578,65 @@ function suppressBackToTopDuringViewChange() {
 function scrollCurrentPageToTop() {
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   window.scrollTo({ top: 0, behavior: reducedMotion ? "auto" : "smooth" });
+}
+
+function setGlobalStageBarCollapsed(collapsed) {
+  const button = $("#globalStageToggle");
+  if (!button) return;
+  const wasCollapsed = document.body.classList.contains("stage-bar-collapsed");
+  if (collapsed && !wasCollapsed && stageBarPinnedClosedAt === null) {
+    stageBarPinnedClosedAt = window.scrollY;
+    stageBarToggleGuardUntil = performance.now() + 600;
+  }
+  document.body.classList.toggle("stage-bar-collapsed", collapsed);
+  button.setAttribute("aria-expanded", String(!collapsed));
+  button.setAttribute("aria-label", collapsed ? "展开决策阶段栏" : "收起决策阶段栏");
+  button.title = collapsed ? "展开决策阶段栏" : "收起决策阶段栏";
+  button.innerHTML = `<i data-lucide="${collapsed ? "chevron-down" : "chevron-up"}"></i>`;
+  hydrateIcons();
+}
+
+function scheduleGlobalStageBarUpdate() {
+  if (stageBarScrollFrame) return;
+  stageBarScrollFrame = window.requestAnimationFrame(() => {
+    stageBarScrollFrame = 0;
+    const currentScrollY = Math.max(window.scrollY, 0);
+    const scrollingDown = currentScrollY > lastStageBarScrollY + 4;
+    const scrollingUp = currentScrollY < lastStageBarScrollY - 4;
+
+    if (currentScrollY < 80) {
+      stageBarPinnedOpen = false;
+      stageBarPinnedOpenAt = null;
+      stageBarPinnedClosedAt = null;
+      setGlobalStageBarCollapsed(false);
+    } else if (stageBarPinnedClosedAt !== null) {
+      if (performance.now() < stageBarToggleGuardUntil) {
+        stageBarPinnedClosedAt = currentScrollY;
+      } else if (currentScrollY < stageBarPinnedClosedAt - 60) {
+        stageBarPinnedClosedAt = null;
+        stageBarPinnedOpen = true;
+        stageBarPinnedOpenAt = currentScrollY;
+        stageBarToggleGuardUntil = performance.now() + 600;
+        setGlobalStageBarCollapsed(false);
+      }
+    } else if (stageBarPinnedOpen) {
+      if (performance.now() < stageBarToggleGuardUntil || scrollingUp) {
+        stageBarPinnedOpenAt = currentScrollY;
+      } else if (currentScrollY > (stageBarPinnedOpenAt ?? currentScrollY) + 60) {
+        stageBarPinnedOpen = false;
+        stageBarPinnedOpenAt = null;
+        setGlobalStageBarCollapsed(true);
+      }
+    } else if (scrollingUp) {
+      stageBarPinnedOpen = true;
+      stageBarPinnedOpenAt = currentScrollY;
+      stageBarToggleGuardUntil = performance.now() + 600;
+      setGlobalStageBarCollapsed(false);
+    } else if (scrollingDown && currentScrollY > 180 && !stageBarPinnedOpen) {
+      setGlobalStageBarCollapsed(true);
+    }
+    lastStageBarScrollY = currentScrollY;
+  });
 }
 
 const ONBOARDING_STEPS = [
@@ -1274,6 +1698,78 @@ const ONBOARDING_STEPS = [
     copy: "在这里了解认证规则并申请身份认证，让回答更有依据。"
   }
 ];
+
+const STAGE_SELECTION_OPTIONS = [
+  { key: "gaokao", icon: "school", title: "高考志愿", text: "我正在了解学校、专业和招生信息。" },
+  { key: "graduate", icon: "book-open", title: "考研择校", text: "我正在规划研究生阶段的学校和专业。" },
+  { key: "career", icon: "briefcase-business", title: "就业选择", text: "我正在了解职业方向和就业路径。" }
+];
+const STAGE_SELECTION_STORE_PREFIX = "yinlu_stage_selection_v1:";
+
+function stageSelectionKey(user = currentUser()) {
+  return user?.id ? `${STAGE_SELECTION_STORE_PREFIX}${user.id}` : "";
+}
+
+function stageSelectionIsComplete(user = currentUser()) {
+  const key = stageSelectionKey(user);
+  return Boolean(key && localStorage.getItem(key) === "1");
+}
+
+function stageKeyFromUser(user = currentUser()) {
+  return Object.entries(stageNames).find(([, label]) => label === user?.stage)?.[0] || "gaokao";
+}
+
+function createStageSelectionModal() {
+  let backdrop = $("#stageSelectionModal");
+  if (backdrop) return backdrop;
+  backdrop = document.createElement("div");
+  backdrop.id = "stageSelectionModal";
+  backdrop.className = "modal-backdrop stage-selection-backdrop";
+  backdrop.setAttribute("aria-hidden", "true");
+  backdrop.innerHTML = `<section class="modal stage-selection-modal" role="dialog" aria-modal="true" aria-labelledby="stageSelectionTitle"><div class="stage-selection-kicker"><span></span>先确定你的决策位置</div><h2 id="stageSelectionTitle">你现在准备走哪一段路？</h2><p class="modal-description">这个选择会决定首页优先展示的阶段，也会帮助我们判断你之后可以回答哪些更早阶段的问题。</p><div class="stage-selection-grid">${STAGE_SELECTION_OPTIONS.map((option) => `<button class="stage-selection-option" type="button" data-stage-choice="${option.key}" aria-pressed="false"><span class="stage-selection-option-icon"><i data-lucide="${option.icon}"></i></span><span><strong>${option.title}</strong><small>${option.text}</small></span><i class="stage-selection-check" data-lucide="check"></i></button>`).join("")}</div><div class="stage-selection-footer"><span>之后可以在个人信息或顶部阶段线上调整</span><button type="button" class="text-button" data-stage-selection-skip>先用高考志愿</button></div></section>`;
+  document.body.appendChild(backdrop);
+  backdrop.addEventListener("click", (event) => {
+    const choice = event.target.closest("[data-stage-choice]");
+    if (choice) { finishStageSelection(choice.dataset.stageChoice); return; }
+    if (event.target.closest("[data-stage-selection-skip]")) finishStageSelection(stageKeyFromUser());
+  });
+  return backdrop;
+}
+
+function showStageSelection() {
+  const user = currentUser();
+  if (!user || stageSelectionIsComplete(user)) {
+    scheduleOnboarding(350);
+    return;
+  }
+  const backdrop = createStageSelectionModal();
+  const selected = stageKeyFromUser(user);
+  $$('[data-stage-choice]', backdrop).forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.stageChoice === selected)));
+  const skipButton = $("[data-stage-selection-skip]", backdrop);
+  if (skipButton) skipButton.textContent = `使用${stageNames[selected] || "当前阶段"}`;
+  backdrop.hidden = false;
+  backdrop.setAttribute("aria-hidden", "false");
+  backdrop.classList.add("open");
+  hydrateIcons();
+  window.setTimeout(() => $(`[data-stage-choice="${selected}"]`, backdrop)?.focus(), 0);
+}
+
+function finishStageSelection(stageKey) {
+  const user = currentUser();
+  if (!user || !STAGE_SELECTION_OPTIONS.some((option) => option.key === stageKey)) return;
+  localStorage.setItem(stageSelectionKey(user), "1");
+  updateCurrentUser({ stage: stageNames[stageKey] });
+  setStage(stageKey);
+  updateAccountHeader();
+  const backdrop = $("#stageSelectionModal");
+  if (backdrop) {
+    backdrop.classList.remove("open");
+    backdrop.hidden = true;
+    backdrop.setAttribute("aria-hidden", "true");
+  }
+  showToast(`当前决策阶段已设为：${stageNames[stageKey]}`);
+  window.setTimeout(() => startOnboarding(), 350);
+}
 
 let onboardingIndex = -1;
 let onboardingTimer = 0;
@@ -1541,8 +2037,156 @@ function refreshOnboardingPosition() {
   });
 }
 
+function updateGlobalStageSwitcher() {
+  const plannerIndex = GLOBAL_STAGE_CONFIG.findIndex((item) => item.key === currentStage);
+  const answerableStages = new Set(GLOBAL_STAGE_CONFIG.slice(0, Math.max(plannerIndex, 0)).map((item) => item.key));
+  let answererRoute = "";
+  try {
+    answererRoute = localStorage.getItem("yinlu_answerer_stage") || "";
+    const plannerRoute = GLOBAL_STAGE_CONFIG.find((item) => item.key === currentStage)?.route;
+    if (plannerRoute) localStorage.setItem("yinlu_planner_stage", plannerRoute);
+  } catch (error) {}
+
+  $$('[data-global-planner-stage]').forEach((link) => {
+    const stageKey = link.dataset.globalPlannerStage;
+    const stageConfig = GLOBAL_STAGE_CONFIG.find((item) => item.key === stageKey);
+    if (stageConfig) {
+      link.href = `./index.html?view=home&stage=${encodeURIComponent(stageKey)}`;
+    }
+    link.classList.toggle("active", link.dataset.globalPlannerStage === currentStage);
+  });
+  $$('[data-global-answer-stage]').forEach((control) => {
+    const stageKey = control.dataset.globalAnswerStage;
+    const stageRoute = GLOBAL_STAGE_CONFIG.find((item) => item.key === stageKey)?.route;
+    const allowed = answerableStages.has(stageKey);
+    control.classList.toggle("disabled", !allowed);
+    control.classList.toggle("active", allowed && stageRoute === answererRoute);
+    control.setAttribute("aria-disabled", String(!allowed));
+    const answererHref = stageRoute ? answererStageUrl(stageRoute, currentStage) : "";
+    if (answererHref) control.href = answererHref;
+    control.title = allowed ? `回答${stageNames[stageKey]}阶段问题` : `当前阶段尚不能回答${stageNames[stageKey]}阶段问题`;
+  });
+  const answererEntry = $("[data-answerer-entry]");
+  const requestedAnswererRoute = new URLSearchParams(window.location.search).get("answerStage");
+  const activeAnswererRoute = isStandaloneAnswererPage() && ANSWERER_STAGE_CONFIG[requestedAnswererRoute]
+    ? requestedAnswererRoute
+    : preferredAnswererStageRoute(currentStage) || answererRoute || "gaokao";
+  if (answererEntry) answererEntry.href = answererStageUrl(activeAnswererRoute, currentStage);
+  const compactLabel = $("#globalStageCompactLabel");
+  if (compactLabel) compactLabel.textContent = stageNames[currentStage] || "当前阶段";
+}
+
+function updateExperienceStageUi() {
+  const graduate = currentStage === "graduate";
+  const career = currentStage === "career";
+  document.body.dataset.decisionStage = currentStage;
+  const copy = career ? {
+    kicker: "就业选择 · 就业参考",
+    title: "先了解岗位与行业，再参考真实从业经历",
+    description: "这里提供职业方向、岗位要求和从业经验作为参考，不比较工作，也不替你做就业决定。",
+    institutionTab: "职业信息",
+    experienceTab: "就业参考",
+    institutionHeading: "从职业方向和岗位任务开始了解",
+    institutionDescription: "职业信息只作为了解岗位的入口，具体招聘要求仍需核对当期招聘信息。",
+    schoolPlaceholder: "搜索行业或职业方向",
+    majorPlaceholder: "输入岗位名称或能力关键词",
+    studentSource: "毕业生 / 求职者",
+    expertSource: "从业者 / 招聘视角",
+    sameSchool: "同类职业方向"
+  } : graduate ? {
+    kicker: "考研择校 · 院校与经验",
+    title: "先核对研招信息，再比较真实备考与培养体验",
+    description: "招生目录、考试科目和复试文件单独核验，再用在读研究生与教师经验补充判断。",
+    institutionTab: "考研院校",
+    experienceTab: "考研经验",
+    institutionHeading: "从招生学院和专业代码开始了解",
+    institutionDescription: "平台整理招生简章、硕士专业目录、初复试资料与培养方向，所有结论保留官方核验入口。",
+    schoolPlaceholder: "搜索考研招生院校",
+    majorPlaceholder: "输入硕士专业名称或按学科门类查找",
+    studentSource: "在读研究生",
+    expertSource: "导师 / 培养教师",
+    sameSchool: "本科背景相近优先"
+  } : {
+    kicker: "院校与经验",
+    title: "先查清学校，再参考真实经验",
+    description: "院校资料与个人经验分开查看，需要时再相互对照。",
+    institutionTab: "院校信息",
+    experienceTab: "经验库",
+    institutionHeading: "先了解学校，再深入具体专业",
+    institutionDescription: "平台将学校简介、招生信息和公开数据整理成摘要，原始来源用于核验和继续查阅。",
+    schoolPlaceholder: "搜索学校名称",
+    majorPlaceholder: "输入专业名称或按学科门类查找",
+    studentSource: "在读学生",
+    expertSource: "教师 / 从业者",
+    sameSchool: "同高中优先"
+  };
+  const textBySelector = {
+    "#experiencePageKicker": copy.kicker,
+    "#experiencePageTitle": copy.title,
+    "#experiencePageDescription": copy.description,
+    "#institutionTabLabel": copy.institutionTab,
+    "#experienceTabLabel": copy.experienceTab,
+    "#institutionHeading": copy.institutionHeading,
+    "#institutionDescription": copy.institutionDescription,
+    "#institutionSectionKicker": career ? "职业信息" : graduate ? "考研院校信息" : "院校信息",
+    "#studentSourceFilter": copy.studentSource,
+    "#expertSourceFilter": copy.expertSource,
+    "#sameSchoolFilterLabel": copy.sameSchool,
+    "#experienceNavLabel": career ? "就业参考" : "院校与经验",
+    "#homeExperienceActionLabel": career ? "查看就业参考" : "查看院校与经验",
+    "#institutionPrimaryFilterLabel": career ? "职业方向" : "学校",
+    "#institutionSecondaryFilterLabel": career ? "岗位关键词" : "专业",
+    "#experiencePrimaryFilterLabel": career ? "职业方向" : "学校",
+    "#experienceSecondaryFilterLabel": career ? "岗位关键词" : "专业"
+  };
+  Object.entries(textBySelector).forEach(([selector, text]) => {
+    const node = $(selector);
+    if (node) node.textContent = text;
+  });
+  const sourceItems = $$("#sourceList > span");
+  const sidebarSourceLabels = career
+    ? ["毕业生经验", "招聘原信息", "公开数据", "从业者视角"]
+    : ["在读认证", "官方信息", "客观数据", "教师 / 从业者"];
+  sourceItems.forEach((item, index) => {
+    if (item.lastChild?.nodeType === Node.TEXT_NODE) item.lastChild.textContent = sidebarSourceLabels[index] || "";
+  });
+  const timeNote = $("#experienceTimeNote");
+  if (timeNote?.lastChild?.nodeType === Node.TEXT_NODE) {
+    timeNote.lastChild.textContent = career
+      ? "发布时间用于判断毕业生和从业者经验是否仍适合当前就业环境"
+      : "发布时间用于判断学生、教师与从业者经验的时效性";
+  }
+  $("#view-experience .experience-layout-switch")?.setAttribute("aria-label", career ? "就业参考页面布局" : "院校与经验页面布局");
+  $("#view-experience .experience-content-tabs")?.setAttribute("aria-label", career ? "就业参考内容类型" : "院校与经验内容类型");
+  $('[data-experience-content-panel="experience"]')?.setAttribute("aria-label", career ? "就业参考筛选" : "经验筛选");
+  ["#institutionSchoolSearch", "#experienceSchoolSearch"].forEach((selector) => {
+    const input = $(selector);
+    if (input) input.placeholder = copy.schoolPlaceholder;
+  });
+  ["#institutionMajorSearch", "#experienceMajorSearch"].forEach((selector) => {
+    const input = $(selector);
+    if (input) input.placeholder = copy.majorPlaceholder;
+  });
+  const compareNavItem = $("#compareNavItem");
+  const candidateAction = $("#experienceCandidateAction");
+  const institutionTab = $('[data-experience-content-tab="institution"]');
+  const sameSchoolFilter = $("#sameSchoolFilter");
+  if (compareNavItem) compareNavItem.hidden = career;
+  if (candidateAction) candidateAction.hidden = career;
+  if (institutionTab) institutionTab.hidden = career;
+  if (sameSchoolFilter) sameSchoolFilter.hidden = career;
+  if (career && $("#sameSchoolToggle")) $("#sameSchoolToggle").checked = false;
+  if (career && currentExperienceContentTab !== "experience") switchExperienceContentTab("experience");
+  const availableDimensions = experienceDimensionsForSource(currentSourceFilter);
+  [...currentDimensionFilters].filter((dimension) => !availableDimensions.includes(dimension)).forEach((dimension) => currentDimensionFilters.delete(dimension));
+  syncDimensionFilterAvailability();
+  updateDimensionFilterButtons();
+  updateExperienceFilterUi();
+}
+
 function setStage(stage) {
   if (!stageOrder.includes(stage)) return;
+  const stageChanged = currentStage !== stage;
   currentStage = stage;
   const activeIndex = stageOrder.indexOf(stage);
   const previousIndex = (activeIndex - 1 + stageOrder.length) % stageOrder.length;
@@ -1563,6 +2207,9 @@ function setStage(stage) {
   });
   const position = $("#stagePosition");
   if (position) position.textContent = `${activeIndex + 1} / ${stageOrder.length}`;
+  updateGlobalStageSwitcher();
+  updateExperienceStageUi();
+  if (stageChanged && $("#view-experience")?.classList.contains("active")) renderExperiences();
   renderCyberPetContext();
 }
 
@@ -1573,7 +2220,7 @@ function moveStage(direction) {
 
 function setExperienceFilters({ dimension = "all", dimensions = null, source = "all", time = "all", sort = "relevance" } = {}) {
   currentSourceFilter = source;
-  const availableDimensions = EXPERIENCE_DIMENSIONS_BY_SOURCE[source] || EXPERIENCE_DIMENSIONS_BY_SOURCE.all;
+  const availableDimensions = experienceDimensionsForSource(source);
   const requestedDimensions = Array.isArray(dimensions) ? dimensions : dimension === "all" ? [] : [dimension];
   currentDimensionFilters.clear();
   requestedDimensions.filter((item) => availableDimensions.includes(item)).forEach((item) => currentDimensionFilters.add(item));
@@ -1608,8 +2255,10 @@ function matchesContentTime(value) {
 }
 
 function updateExperienceFilterUi() {
-  const dimensionLabels = { all: "全部", "课程学习": "课程学习", "宿舍生活": "宿舍生活", "设施布局": "设施布局", "社团活动": "社团活动", "校园氛围": "校园氛围", "城市环境": "城市环境", "就业去向": "就业去向" };
-  const sourceLabels = { all: "全部", official: "官方信息", student: "在读学生", expert: "教师 / 从业者" };
+  const dimensionLabels = { all: "全部", "课程学习": "课程学习", "宿舍生活": "宿舍生活", "设施布局": "设施布局", "社团活动": "社团活动", "校园氛围": "校园氛围", "城市环境": "城市环境", "就业去向": "就业去向", "招生与报录": "招生与报录", "初试备考": "初试备考", "复试准备": "复试准备", "培养方向": "培养方向", "导师与科研": "导师与科研", "调剂信息": "调剂信息", "研究生生活": "研究生生活", "岗位内容": "岗位内容", "能力要求": "能力要求", "实习准备": "实习准备", "工作环境": "工作环境", "职业发展": "职业发展", "专业关联": "专业关联", "行业变化": "行业变化" };
+  const sourceLabels = currentStage === "career"
+    ? { all: "全部", official: "招聘原信息", student: "毕业生 / 求职者", expert: "从业者 / 招聘视角" }
+    : { all: "全部", official: "官方信息", student: "在读学生", expert: "教师 / 从业者" };
   const timeLabels = { all: "不限", "6m": "近半年", "1y": "近一年", "3y": "近三年" };
   const dimensionSummary = $("#dimensionFilterSummary");
   const sourceSummary = $("#sourceFilterSummary");
@@ -1632,11 +2281,11 @@ function updateExperienceFilterUi() {
   if (currentSchoolSearch.trim()) selected.push({ key: "school", label: `学校：${currentSchoolSearch.trim()}` });
   if (currentMajorSearch.trim()) selected.push({ key: "major", label: `专业：${currentMajorSearch.trim()}` });
   if (currentExperienceRegion !== "all") selected.push({ key: "region", label: `地区：${regionSelectionLabel(currentExperienceRegion)}` });
-  currentDimensionFilters.forEach((dimension) => selected.push({ key: "dimension", value: dimension, label: dimensionLabels[dimension] }));
+  currentDimensionFilters.forEach((dimension) => selected.push({ key: "dimension", value: dimension, label: dimensionLabels[dimension] || dimension }));
   if (currentSourceFilter !== "all") selected.push({ key: "source", label: sourceLabels[currentSourceFilter] });
   if (currentTimeFilter !== "all") selected.push({ key: "time", label: timeLabels[currentTimeFilter] });
   if (currentExperienceSort === "newest") selected.push({ key: "sort", label: "最新发布" });
-  if ($("#sameSchoolToggle")?.checked) selected.push({ key: "same-school", label: "同高中优先" });
+  if ($("#sameSchoolToggle")?.checked) selected.push({ key: "same-school", label: currentStage === "graduate" ? "本科背景相近优先" : "同高中优先" });
   const selectedFilters = $("#experienceSelectedFilters");
   if (selectedFilters) {
     selectedFilters.innerHTML = selected.length
@@ -1652,7 +2301,7 @@ function updateExperienceFilterUi() {
 }
 
 function syncDimensionFilterAvailability() {
-  const availableDimensions = EXPERIENCE_DIMENSIONS_BY_SOURCE[currentSourceFilter] || EXPERIENCE_DIMENSIONS_BY_SOURCE.all;
+  const availableDimensions = experienceDimensionsForSource(currentSourceFilter);
   $$('[data-dimension-filter]').forEach((button) => {
     const dimension = button.dataset.dimensionFilter;
     button.hidden = dimension !== "all" && !availableDimensions.includes(dimension);
@@ -1718,10 +2367,10 @@ function runStageTask(task) {
   }
   const institutionTasks = ["school", "major", "admission", "progression"];
   const taskFilters = {
-    course: { dimension: "课程学习" },
+    course: { dimension: currentStage === "graduate" ? "培养方向" : "课程学习" },
     career: { dimension: "就业去向" },
     expert: { source: "expert" },
-    dorm: { dimension: "宿舍生活" },
+    dorm: { dimension: currentStage === "graduate" ? "研究生生活" : "宿舍生活" },
     city: { dimension: "城市环境" }
   };
   currentSearch = "";
@@ -1765,14 +2414,16 @@ function regionSelectionLabel(selection) {
 }
 
 function majorCategoryForName(name = "") {
-  const program = institutions.flatMap((item) => item.majorPrograms || []).find((item) => item.name === name);
+  const program = institutionDatasetForStage().flatMap((item) => item.majorPrograms || []).find((item) => item.name === name);
   return program?.category || MAJOR_CATEGORY_BY_NAME[name] || "";
 }
 
 function libraryMajorOptions(library) {
+  const institutionDataset = institutionDatasetForStage();
+  const experienceDataset = experienceDatasetForStage();
   const entries = library === "institution"
-    ? institutions.flatMap((institution) => (institution.majorPrograms || []).map((program) => ({ name: program.name, category: program.category || majorCategoryForName(program.name), school: institution.school })))
-    : experiences.filter((item) => (item.source === "student" || item.source === "expert") && item.major).map((item) => ({ name: item.major, category: majorCategoryForName(item.major), school: item.school }));
+    ? institutionDataset.flatMap((institution) => (institution.majorPrograms || []).map((program) => ({ name: program.name, category: program.category || majorCategoryForName(program.name), school: institution.school })))
+    : experienceDataset.filter((item) => (item.source === "student" || item.source === "expert") && item.major).map((item) => ({ name: item.major, category: majorCategoryForName(item.major), school: item.school }));
   const grouped = new Map();
   entries.forEach((item) => {
     if (!grouped.has(item.name)) grouped.set(item.name, { name: item.name, category: item.category, schools: new Set(), count: 0 });
@@ -1959,7 +2610,7 @@ function renderLibraryRegionPicker(library) {
 }
 
 function renderExperienceInstitutionSummary(item) {
-  const institution = institutions.find((school) => school.school === item.school);
+  const institution = institutionDatasetForStage().find((school) => school.school === item.school);
   if (!institution) {
     return `<div class="experience-institution-summary pending"><div class="experience-institution-heading"><span><i data-lucide="landmark"></i>院校摘要</span><strong>${escapeHtml(item.school || "未命名学校")}</strong></div><div class="experience-institution-meta"><span><i data-lucide="map-pin"></i>${escapeHtml(item.city || "地区待补充")}</span><span class="experience-institution-pending">院校资料待补充</span></div></div>`;
   }
@@ -1970,7 +2621,15 @@ function renderExperienceInstitutionSummary(item) {
 function renderExperiences() {
   const grid = $("#experienceGrid");
   if (!grid) return;
-  const experienceSectionCopy = {
+  const experienceSectionCopy = currentStage === "career" ? {
+    all: { kicker: "职业信息与从业经验", heading: "来自毕业生和从业者的就业参考", empty: "当前筛选下暂无匹配的就业参考内容" },
+    student: { kicker: "毕业生与求职经历", heading: "来自毕业生和求职者的真实过程", empty: "当前筛选下暂无匹配的毕业生或求职经验" },
+    expert: { kicker: "从业者与招聘视角", heading: "来自从业者和招聘视角的岗位判断", empty: "当前筛选下暂无匹配的从业者或招聘视角内容" }
+  } : currentStage === "graduate" ? {
+    all: { kicker: "考研经验与培养视角", heading: "来自在读研究生、导师与培养教师的真实补充", empty: "当前筛选下暂无匹配的考研经验内容" },
+    student: { kicker: "在读研究生经验", heading: "来自在读研究生的备考、复试与培养经历", empty: "当前筛选下暂无匹配的在读研究生经验" },
+    expert: { kicker: "导师与培养视角", heading: "来自导师与培养教师的信息判断", empty: "当前筛选下暂无匹配的导师或培养教师内容" }
+  } : {
     all: { kicker: "经验与职业视角", heading: "来自学生、教师与从业者的真实补充", empty: "当前筛选下暂无匹配的经验或职业视角内容" },
     student: { kicker: "学生经验", heading: "来自在读学生的真实经历", empty: "当前筛选下暂无匹配的在读学生经验" },
     expert: { kicker: "专业与职业视角", heading: "来自教师与从业者的经验判断", empty: "当前筛选下暂无匹配的教师或从业者内容" }
@@ -1985,7 +2644,7 @@ function renderExperiences() {
   const majorQuery = currentMajorSearch.trim().toLowerCase();
   const institutionSchoolQuery = currentInstitutionSchoolSearch.trim().toLowerCase();
   const institutionMajorQuery = currentInstitutionMajorSearch.trim().toLowerCase();
-  const experienceItems = experiences.filter((item) => item.source === "student" || item.source === "expert");
+  const experienceItems = experienceDatasetForStage().filter((item) => item.source === "student" || item.source === "expert");
   renderLibraryMajorPicker("institution");
   renderLibraryMajorPicker("experience");
   renderLibraryRegionPicker("institution");
@@ -2005,7 +2664,7 @@ function renderExperiences() {
     return schoolMatches && majorMatches && regionMatches && matchesDimension && matchesSource && matchesSearch && matchesContentTime(item.publishedAt);
   };
   const filtered = experienceItems.filter(matchesFilters);
-  const filteredInstitutions = institutions.filter((item) => {
+  const filteredInstitutions = institutionDatasetForStage().filter((item) => {
     const schoolText = (item.school || "").toLowerCase();
     const majorText = [...(item.majors || []), ...(item.majorPrograms || []).map((program) => program.name)].join("").toLowerCase();
     const schoolMatches = !institutionSchoolQuery || schoolText.includes(institutionSchoolQuery);
@@ -2023,14 +2682,18 @@ function renderExperiences() {
   if (clearInstitutionFilters) clearInstitutionFilters.disabled = !currentInstitutionSchoolSearch.trim() && !currentInstitutionMajorSearch.trim() && !currentInstitutionRegionSearch.trim() && currentInstitutionRegion === "all";
   $("#experienceResultNote") && ($("#experienceResultNote").textContent = `${filtered.length} 条内容`);
   const ordered = [...filtered].sort((a, b) => {
-    if (sameSchool) {
+    if (sameSchool && currentStage !== "graduate") {
       const schoolPriority = Number((b.school || "").includes("师范")) - Number((a.school || "").includes("师范"));
       if (schoolPriority) return schoolPriority;
     }
     return currentExperienceSort === "newest" ? String(b.publishedAt || "").localeCompare(String(a.publishedAt || "")) : 0;
   });
   const favorites = userFavorites();
-  const sourceLabels = { student: { cls: "level-student", icon: "user-check", text: "在读认证" }, official: { cls: "level-official", icon: "landmark", text: "官方信息" }, data: { cls: "level-data", icon: "database", text: "客观数据" }, expert: { cls: "level-expert", icon: "users", text: "教师/从业者" } };
+  const sourceLabels = currentStage === "career"
+    ? { student: { cls: "level-student", icon: "user-check", text: "毕业生 / 求职者" }, official: { cls: "level-official", icon: "landmark", text: "招聘原信息" }, data: { cls: "level-data", icon: "database", text: "公开数据" }, expert: { cls: "level-expert", icon: "users", text: "从业者 / 招聘视角" } }
+    : currentStage === "graduate"
+    ? { student: { cls: "level-student", icon: "user-check", text: "在读研究生" }, official: { cls: "level-official", icon: "landmark", text: "官方信息" }, data: { cls: "level-data", icon: "database", text: "公开资料" }, expert: { cls: "level-expert", icon: "users", text: "导师/培养教师" } }
+    : { student: { cls: "level-student", icon: "user-check", text: "在读认证" }, official: { cls: "level-official", icon: "landmark", text: "官方信息" }, data: { cls: "level-data", icon: "database", text: "客观数据" }, expert: { cls: "level-expert", icon: "users", text: "教师/从业者" } };
   const experienceEmptyText = currentExperienceRegion === "all" ? sectionCopy.empty : `${regionSelectionLabel(currentExperienceRegion)}暂无匹配的经验内容`;
   grid.innerHTML = ordered.length ? ordered.map((item) => {
     const src = sourceLabels[item.source] || sourceLabels.student;
@@ -2041,14 +2704,17 @@ function renderExperiences() {
     const publishedAt = `<time class="experience-published-at" datetime="${item.publishedAt || ""}"><i data-lucide="clock-3"></i>发布于 ${formatContentDate(item.publishedAt)}</time>`;
     const valueHtml = item.value ? `<div class="source-value"><strong>${item.value}</strong><small>来源内容摘要</small></div>` : "";
     const titleHtml = item.title ? `<h3 class="experience-card-title">${item.title}</h3>` : "";
-    const institutionSummary = renderExperienceInstitutionSummary(item);
+    const institutionSummary = currentStage === "career" ? "" : renderExperienceInstitutionSummary(item);
+    const favoriteLabel = currentStage === "career"
+      ? (saved ? "已收藏参考" : "收藏参考")
+      : (saved ? "已加入候选" : "加入我的候选");
     return `<article class="experience-card" onclick="saveHistory('${item.id}')">
       <div class="experience-top"><span class="school-avatar">${(item.school || "").slice(0, 1)}</span><div class="experience-school"><strong>${item.school || "未命名学校"}</strong><small>${item.major || "未分类专业"} · ${item.city || "未标注城市"}</small></div><span class="source-level-tag ${src.cls}">${src.text}</span></div>
       <div class="experience-divider"></div>
       ${institutionSummary}${valueHtml}${titleHtml}
       <p>${item.text || ""}</p>
       <div class="tag-row">${dimensionsHtml}${tagsHtml}</div>
-      <div class="experience-card-footer"><div class="experience-source-meta">${sourceDetail}${publishedAt}</div><div class="experience-card-actions"><button class="save-experience ${saved ? "saved" : ""}" data-favorite="${item.id}"><i data-lucide="${saved ? "bookmark-check" : "bookmark-plus"}"></i>${saved ? "已加入候选" : "加入我的候选"}</button></div></div>
+      <div class="experience-card-footer"><div class="experience-source-meta">${sourceDetail}${publishedAt}</div><div class="experience-card-actions"><button class="save-experience ${saved ? "saved" : ""}" data-favorite="${item.id}"><i data-lucide="${saved ? "bookmark-check" : "bookmark-plus"}"></i>${favoriteLabel}</button></div></div>
     </article>`;
   }).join("") : `<div class="empty-state"><i data-lucide="search-x"></i><p>${escapeHtml(experienceEmptyText)}</p><button class="quiet-button" data-clear-search>清空筛选</button></div>`;
   updateExperienceFilterUi();
@@ -2079,12 +2745,13 @@ function renderInstitutionCard(item) {
   const saved = userFavorites().includes(`school-${item.id}`);
   const majorHtml = item.majors.map((major) => `<span class="content-tag">${major}</span>`).join("");
   const highlightHtml = item.highlights.map((highlight) => `<span class="institution-highlight">${highlight}</span>`).join("");
+  const graduate = item.decisionStage === "graduate";
   return `<article class="institution-card">
-    <div class="institution-card-top"><div class="institution-mark">${item.school.slice(0, 1)}</div><div><span class="source-level-tag level-institution">院校信息</span><h3>${item.school}</h3><p>${item.city} · ${item.type}</p></div></div>
+    <div class="institution-card-top"><div class="institution-mark">${item.school.slice(0, 1)}</div><div><span class="source-level-tag level-institution">${graduate ? "考研院校" : "院校信息"}</span><h3>${item.school}</h3><p>${item.city} · ${item.type}</p></div></div>
     <p class="institution-intro">${item.intro}</p>
     <div class="institution-highlights">${highlightHtml}</div>
-    <div class="institution-card-block"><span>重点关注专业</span><div class="tag-row">${majorHtml}</div></div>
-    <div class="institution-evidence"><span><i data-lucide="database"></i>客观数据已整理</span><span><i data-lucide="landmark"></i>官方资料已整理</span></div>
+    <div class="institution-card-block"><span>${graduate ? "硕士招生专业样本" : "重点关注专业"}</span><div class="tag-row">${majorHtml}</div></div>
+    <div class="institution-evidence"><span><i data-lucide="database"></i>${graduate ? "初复试资料入口" : "客观数据已整理"}</span><span><i data-lucide="landmark"></i>${graduate ? "研招官方来源" : "官方资料已整理"}</span></div>
     <div class="institution-card-footer"><span class="institution-note"><i data-lucide="clock-3"></i>资料更新于 ${item.updatedAt || "时间待补充"} · 来源可核验</span><div class="institution-card-actions"><button class="text-button" data-school-detail="${item.id}">全面了解 <i data-lucide="arrow-up-right"></i></button><button class="save-experience ${saved ? "saved" : ""}" data-favorite="school-${item.id}"><i data-lucide="${saved ? "bookmark-check" : "bookmark-plus"}"></i>${saved ? "已加入候选" : "加入候选"}</button></div></div>
   </article>`;
 }
@@ -2117,8 +2784,10 @@ const schoolCommentExamples = {
 
 function renderSchoolCommentSection(item) {
   const seedComments = schoolCommentExamples[item.id] || [];
-  const composer = `<form class="school-comment-form" id="schoolCommentForm"><label for="schoolCommentInput">补充你的本校经历</label><textarea id="schoolCommentInput" maxlength="300" placeholder="写下具体事实，例如课程安排、宿舍生活或实习准备。"></textarea><div><select id="schoolCommentDimension" aria-label="评论维度"><option>课程学习</option><option>宿舍生活</option><option>城市环境</option><option>就业去向</option></select><button class="primary-button" type="submit"><i data-lucide="send"></i>匿名发布</button></div><small>仅本校认证学生可发布，正式版本由后端校验校园身份。</small></form>`;
-  return `<section class="detail-experience-panel school-comment-panel school-detail-anchor" id="school-comments"><div class="detail-panel-heading"><div><span class="subsection-kicker"><i data-lucide="messages-square"></i>本校学生补充</span><h2>院校细节补充</h2></div><span class="comment-count">${seedComments.length} 条</span></div><p class="school-comment-intro">用于补充官方资料难以覆盖的具体体验，院校信息仍以学校发布内容为准。</p>${composer}<div class="school-comment-list">${seedComments.length ? seedComments.map(renderSchoolComment).join("") : `<div class="detail-empty">暂时还没有本校学生补充</div>`}</div></section>`;
+  const graduate = item.decisionStage === "graduate";
+  const dimensions = graduate ? ["初试备考", "复试准备", "培养方向", "导师与科研", "研究生生活"] : ["课程学习", "宿舍生活", "城市环境", "就业去向"];
+  const composer = `<form class="school-comment-form" id="schoolCommentForm"><label for="schoolCommentInput">${graduate ? "补充你的考研或在读经历" : "补充你的本校经历"}</label><textarea id="schoolCommentInput" maxlength="300" placeholder="${graduate ? "写下具体事实，例如专业课准备、复试形式、培养节奏或实验室体验。" : "写下具体事实，例如课程安排、宿舍生活或实习准备。"}"></textarea><div><select id="schoolCommentDimension" aria-label="评论维度">${dimensions.map((dimension) => `<option>${dimension}</option>`).join("")}</select><button class="primary-button" type="submit"><i data-lucide="send"></i>匿名发布</button></div><small>${graduate ? "正式版本将核验报考或在读身份，并要求标注经历年份。" : "仅本校认证学生可发布，正式版本由后端校验校园身份。"}</small></form>`;
+  return `<section class="detail-experience-panel school-comment-panel school-detail-anchor" id="school-comments"><div class="detail-panel-heading"><div><span class="subsection-kicker"><i data-lucide="messages-square"></i>${graduate ? "考研人与在读研究生补充" : "本校学生补充"}</span><h2>${graduate ? "备考、复试与培养细节" : "院校细节补充"}</h2></div><span class="comment-count">${seedComments.length} 条</span></div><p class="school-comment-intro">${graduate ? "用于补充官方研招文件难以覆盖的真实过程，具体政策仍以当年学校和学院文件为准。" : "用于补充官方资料难以覆盖的具体体验，院校信息仍以学校发布内容为准。"}</p>${composer}<div class="school-comment-list">${seedComments.length ? seedComments.map(renderSchoolComment).join("") : `<div class="detail-empty">${graduate ? "暂时还没有该院校的考研经验补充" : "暂时还没有本校学生补充"}</div>`}</div></section>`;
 }
 
 function renderMajorPrograms(item, query = "") {
@@ -2153,27 +2822,90 @@ function renderCampusSection(item) {
 
 function renderSchoolDetail() {
   const panel = $("#schoolDetailContent");
-  const item = institutions.find((school) => school.id === currentSchoolDetail) || institutions[0];
+  const stageInstitutions = institutionDatasetForStage();
+  const item = stageInstitutions.find((school) => school.id === currentSchoolDetail) || findInstitutionById(currentSchoolDetail) || stageInstitutions[0];
   if (!panel || !item) return;
+  const graduate = item.decisionStage === "graduate";
+  const detailCopy = graduate ? {
+    profileKicker: "考研院校详情 · 平台整理",
+    majorNav: "招生专业",
+    admissionNav: "研招信息",
+    progressionNav: "复试参考",
+    majorTitle: "查看招生专业与培养方向",
+    admissionTitle: "按年份和招生方式查资料",
+    admissionMiddleLabel: "招生方式",
+    admissionLastLabel: "学习方式",
+    progressionKicker: "复试与录取参考",
+    progressionTitle: "复试线、名额与差额口径分开看",
+    progressionStatOne: "专业复试线",
+    progressionStatTwo: "统考名额",
+    progressionStatThree: "复试差额",
+    sourceOfficial: "招生简章 · 专业目录 · 复试办法",
+    sourceData: "复试名单 · 招生计划 · 拟录取公示"
+  } : {
+    profileKicker: "学校详情 · 平台整理",
+    majorNav: "专业列表",
+    admissionNav: "招生录取",
+    progressionNav: "升学参考",
+    majorTitle: "查看专业与培养方向",
+    admissionTitle: "按年份和报考条件查资料",
+    admissionMiddleLabel: "省份",
+    admissionLastLabel: "科类",
+    progressionKicker: "升学参考",
+    progressionTitle: "保研率先看统计口径",
+    progressionStatOne: "保研率",
+    progressionStatTwo: "推免人数",
+    progressionStatThree: "毕业生统计范围",
+    sourceOfficial: "学校简介 · 招生简章 · 培养信息",
+    sourceData: "招生计划 · 专业目录 · 公开录取信息"
+  };
   const saved = userFavorites().includes(`school-${item.id}`);
   const returnCopy = currentSchoolReturnView === "compare" ? "返回我的候选" : "返回院校与经验";
   const schoolCommentSection = renderSchoolCommentSection(item);
   const latestUpdatesSection = renderLatestUpdates(item);
   const campusSection = renderCampusSection(item);
   panel.innerHTML = `<div class="school-detail-topbar"><button class="quiet-button" data-view-target="${currentSchoolReturnView}"><i data-lucide="arrow-left"></i>${escapeHtml(returnCopy)}</button><div class="school-detail-top-actions"><a class="quiet-button" href="${escapeHtml(item.officialUrl)}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link"></i>学校官网</a><button class="primary-button" data-favorite="school-${escapeHtml(item.id)}"><i data-lucide="${saved ? "bookmark-check" : "bookmark-plus"}"></i>${saved ? "已加入候选" : "加入我的候选"}</button></div></div>
-    <header class="school-profile-header"><div class="institution-mark school-profile-mark">${escapeHtml(item.school.slice(0, 1))}</div><div class="school-profile-copy"><span class="section-kicker">学校详情 · 平台整理</span><h1>${escapeHtml(item.school)}</h1><p class="school-english-name">${escapeHtml(item.englishName)}</p><div class="school-profile-tags"><span><i data-lucide="map-pin"></i>${escapeHtml(item.city)}</span><span><i data-lucide="landmark"></i>${escapeHtml(item.type)}</span>${item.highlights.map((highlight) => `<span>${escapeHtml(highlight)}</span>`).join("")}</div></div></header>
-    <nav class="school-section-nav" aria-label="学校详情目录"><button data-school-anchor="school-overview" class="active">学校概况</button><button data-school-anchor="school-updates">最新资讯</button><button data-school-anchor="school-majors">专业列表</button><button data-school-anchor="school-admission">招生录取</button><button data-school-anchor="school-campus">校园与城市</button><button data-school-anchor="school-progression">升学参考</button><button data-school-anchor="school-comments">本校评论</button></nav>
+    <header class="school-profile-header"><div class="institution-mark school-profile-mark">${escapeHtml(item.school.slice(0, 1))}</div><div class="school-profile-copy"><span class="section-kicker">${detailCopy.profileKicker}</span><h1>${escapeHtml(item.school)}</h1><p class="school-english-name">${escapeHtml(item.englishName)}</p><div class="school-profile-tags"><span><i data-lucide="map-pin"></i>${escapeHtml(item.city)}</span><span><i data-lucide="landmark"></i>${escapeHtml(item.type)}</span>${item.highlights.map((highlight) => `<span>${escapeHtml(highlight)}</span>`).join("")}</div></div></header>
+    <nav class="school-section-nav" aria-label="学校详情目录"><button data-school-anchor="school-overview" class="active">学校概况</button><button data-school-anchor="school-updates">最新资讯</button><button data-school-anchor="school-majors">${detailCopy.majorNav}</button><button data-school-anchor="school-admission">${detailCopy.admissionNav}</button><button data-school-anchor="school-campus">校园与城市</button><button data-school-anchor="school-progression">${detailCopy.progressionNav}</button><button data-school-anchor="school-comments">${graduate ? "在读补充" : "本校评论"}</button></nav>
     <div class="school-detail-grid">
       <section class="school-detail-main">
         <article class="detail-panel detail-overview school-detail-anchor" id="school-overview"><div class="detail-panel-heading"><div><span class="subsection-kicker"><i data-lucide="notebook-tabs"></i>学校概况</span><h2>先建立整体认识</h2></div><span class="source-level-tag level-institution">平台整理</span></div><p>${escapeHtml(item.intro)}</p><dl class="school-facts"><div><dt>中文名称</dt><dd>${escapeHtml(item.school)}</dd></div><div><dt>英文名称</dt><dd>${escapeHtml(item.englishName)}</dd></div><div><dt>办学类型</dt><dd>${escapeHtml(item.type)}</dd></div><div><dt>办学层次</dt><dd>${escapeHtml(item.educationLevel)}</dd></div><div><dt>创办时间</dt><dd>${escapeHtml(item.founded)}</dd></div><div><dt>主要校区</dt><dd>${escapeHtml(item.campuses)}</dd></div></dl><div class="school-source-note"><span><i data-lucide="clock-3"></i>资料更新：${escapeHtml(item.updatedAt)}</span><a href="${escapeHtml(item.officialUrl)}" target="_blank" rel="noopener noreferrer">来源：${escapeHtml(item.officialSource)}<i data-lucide="external-link"></i></a></div></article>
         ${latestUpdatesSection}
-        <article class="detail-panel major-program-panel school-detail-anchor" id="school-majors"><div class="detail-panel-heading"><div><span class="subsection-kicker"><i data-lucide="book-open"></i>专业列表</span><h2>查看专业与培养方向</h2></div><span class="source-level-tag level-official">官方信息</span></div><p>${escapeHtml(item.officialSummary)}</p><div class="major-program-search"><i data-lucide="search"></i><input id="schoolMajorSearch" type="search" placeholder="搜索专业名称、学院或学科门类" autocomplete="off"><span id="majorProgramCount">${item.majorPrograms.length} 个示例专业</span></div><div class="major-program-list" id="majorProgramList">${renderMajorPrograms(item)}</div><div class="major-program-foot"><span>当前为页面结构示例,完整目录以学校官方发布为准。</span><a class="source-link" href="${escapeHtml(item.officialUrl)}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link"></i>查看 ${escapeHtml(item.officialSource)}</a></div></article>
-        <article class="detail-panel admission-panel school-detail-anchor" id="school-admission"><div class="detail-panel-heading"><div><span class="subsection-kicker"><i data-lucide="graduation-cap"></i>招生与录取</span><h2>按年份和报考条件查资料</h2></div><span class="source-level-tag level-data">公开资料</span></div><p>${escapeHtml(item.admissionBrief)}</p><div class="admission-filter-bar"><label><span>年份</span><select id="admissionYear">${item.admissionYears.map((year) => `<option>${escapeHtml(year)}</option>`).join("")}</select></label><label><span>省份</span><select id="admissionProvince">${item.admissionProvinces.map((province) => `<option>${escapeHtml(province)}</option>`).join("")}</select></label><label><span>科类</span><select id="admissionSubject">${item.admissionSubjects.map((subject) => `<option>${escapeHtml(subject)}</option>`).join("")}</select></label></div><div class="admission-selection-note"><i data-lucide="filter"></i><span id="admissionSelectionNote">当前条件：${escapeHtml(item.admissionYears[0])} · ${escapeHtml(item.admissionProvinces[0])} · ${escapeHtml(item.admissionSubjects[0])}</span><small>前端结构示例,真实查询待数据接口接入</small></div><div class="admission-resource-list">${renderAdmissionResources(item)}</div><div class="admission-disclaimer"><i data-lucide="info"></i><span>${escapeHtml(item.dataSummary)}</span></div></article>
+        <article class="detail-panel major-program-panel school-detail-anchor" id="school-majors"><div class="detail-panel-heading"><div><span class="subsection-kicker"><i data-lucide="book-open"></i>${detailCopy.majorNav}</span><h2>${detailCopy.majorTitle}</h2></div><span class="source-level-tag level-official">官方信息</span></div><p>${escapeHtml(item.officialSummary)}</p><div class="major-program-search"><i data-lucide="search"></i><input id="schoolMajorSearch" type="search" placeholder="${graduate ? "搜索招生专业、学院或学科门类" : "搜索专业名称、学院或学科门类"}" autocomplete="off"><span id="majorProgramCount">${item.majorPrograms.length} 个示例专业</span></div><div class="major-program-list" id="majorProgramList">${renderMajorPrograms(item)}</div><div class="major-program-foot"><span>当前为页面结构示例,完整目录以学校官方发布为准。</span><a class="source-link" href="${escapeHtml(item.officialUrl)}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link"></i>查看 ${escapeHtml(item.officialSource)}</a></div></article>
+        <article class="detail-panel admission-panel school-detail-anchor" id="school-admission"><div class="detail-panel-heading"><div><span class="subsection-kicker"><i data-lucide="graduation-cap"></i>${detailCopy.admissionNav}</span><h2>${detailCopy.admissionTitle}</h2></div><span class="source-level-tag level-data">公开资料</span></div><p>${escapeHtml(item.admissionBrief)}</p><div class="admission-filter-bar"><label><span>年份</span><select id="admissionYear">${item.admissionYears.map((year) => `<option>${escapeHtml(year)}</option>`).join("")}</select></label><label><span>${detailCopy.admissionMiddleLabel}</span><select id="admissionProvince">${item.admissionProvinces.map((province) => `<option>${escapeHtml(province)}</option>`).join("")}</select></label><label><span>${detailCopy.admissionLastLabel}</span><select id="admissionSubject">${item.admissionSubjects.map((subject) => `<option>${escapeHtml(subject)}</option>`).join("")}</select></label></div><div class="admission-selection-note"><i data-lucide="filter"></i><span id="admissionSelectionNote">当前条件：${escapeHtml(item.admissionYears[0])} · ${escapeHtml(item.admissionProvinces[0])} · ${escapeHtml(item.admissionSubjects[0])}</span><small>前端结构示例,真实查询待数据接口接入</small></div><div class="admission-resource-list">${renderAdmissionResources(item)}</div><div class="admission-disclaimer"><i data-lucide="info"></i><span>${escapeHtml(item.dataSummary)}</span></div></article>
         ${campusSection}
-        <article class="detail-panel progression-panel school-detail-anchor" id="school-progression"><div class="detail-panel-heading"><div><span class="subsection-kicker"><i data-lucide="trending-up"></i>升学参考</span><h2>保研率先看统计口径</h2></div><span class="source-level-tag level-data">待核验数据</span></div><p>${escapeHtml(item.careerSummary)}</p><div class="recommendation-summary"><div><span>保研率</span><strong>${escapeHtml(item.postgraduateRecommendation.value)}</strong><small>数据年份：${escapeHtml(item.postgraduateRecommendation.year)}</small></div><div><span>推免人数</span><strong>${escapeHtml(item.postgraduateRecommendation.recommendedCount)}</strong><small>需对应学校公示名单</small></div><div><span>毕业生统计范围</span><strong>${escapeHtml(item.postgraduateRecommendation.graduateScope)}</strong><small>需明确分母范围</small></div></div><dl class="recommendation-method"><div><dt>建议计算口径</dt><dd>${escapeHtml(item.postgraduateRecommendation.methodology)}</dd></div><div><dt>建议来源</dt><dd>${escapeHtml(item.postgraduateRecommendation.source)}</dd></div><div><dt>更新时间</dt><dd>${escapeHtml(item.postgraduateRecommendation.updatedAt)}</dd></div></dl><div class="admission-disclaimer warning"><i data-lucide="triangle-alert"></i><span>不同学院、专业和年份的推免情况可能不同,正式展示时必须保留原始来源与统计范围。</span></div></article>
+        <article class="detail-panel progression-panel school-detail-anchor" id="school-progression"><div class="detail-panel-heading"><div><span class="subsection-kicker"><i data-lucide="trending-up"></i>${detailCopy.progressionKicker}</span><h2>${detailCopy.progressionTitle}</h2></div><span class="source-level-tag level-data">待核验数据</span></div><p>${escapeHtml(item.careerSummary)}</p><div class="recommendation-summary"><div><span>${detailCopy.progressionStatOne}</span><strong>${escapeHtml(item.postgraduateRecommendation.value)}</strong><small>数据年份：${escapeHtml(item.postgraduateRecommendation.year)}</small></div><div><span>${detailCopy.progressionStatTwo}</span><strong>${escapeHtml(item.postgraduateRecommendation.recommendedCount)}</strong><small>${graduate ? "需对应当年招生计划" : "需对应学校公示名单"}</small></div><div><span>${detailCopy.progressionStatThree}</span><strong>${escapeHtml(item.postgraduateRecommendation.graduateScope)}</strong><small>${graduate ? "需对照复试与拟录取名单" : "需明确分母范围"}</small></div></div><dl class="recommendation-method"><div><dt>建议计算口径</dt><dd>${escapeHtml(item.postgraduateRecommendation.methodology)}</dd></div><div><dt>建议来源</dt><dd>${escapeHtml(item.postgraduateRecommendation.source)}</dd></div><div><dt>更新时间</dt><dd>${escapeHtml(item.postgraduateRecommendation.updatedAt)}</dd></div></dl><div class="admission-disclaimer warning"><i data-lucide="triangle-alert"></i><span>${graduate ? "不同学院、专业代码和年份的复试录取口径可能不同，必须保留原始文件和统计范围。" : "不同学院、专业和年份的推免情况可能不同,正式展示时必须保留原始来源与统计范围。"}</span></div></article>
       </section>
-      <aside class="school-detail-side"><section class="detail-source-panel"><span class="subsection-kicker"><i data-lucide="shield-check"></i>信息凭证</span><h2>每条摘要都有来源入口</h2><p>平台负责整理和解释,官方页面与公开数据用于核验具体细节。</p><a class="detail-source-row" href="${escapeHtml(item.officialUrl)}" target="_blank" rel="noopener noreferrer"><span class="source-icon official-icon"><i data-lucide="landmark"></i></span><span><strong>${escapeHtml(item.officialSource)}</strong><small>学校简介 · 招生简章 · 培养信息</small></span><i data-lucide="external-link"></i></a><a class="detail-source-row" href="${escapeHtml(item.dataUrl)}" target="_blank" rel="noopener noreferrer"><span class="source-icon data-icon"><i data-lucide="database"></i></span><span><strong>${escapeHtml(item.dataSource)}</strong><small>招生计划 · 专业目录 · 公开录取信息</small></span><i data-lucide="external-link"></i></a></section>${schoolCommentSection}</aside>
+      <aside class="school-detail-side"><section class="detail-source-panel"><span class="subsection-kicker"><i data-lucide="shield-check"></i>信息凭证</span><h2>每条摘要都有来源入口</h2><p>平台负责整理和解释,官方页面与公开数据用于核验具体细节。</p><a class="detail-source-row" href="${escapeHtml(item.officialUrl)}" target="_blank" rel="noopener noreferrer"><span class="source-icon official-icon"><i data-lucide="landmark"></i></span><span><strong>${escapeHtml(item.officialSource)}</strong><small>${detailCopy.sourceOfficial}</small></span><i data-lucide="external-link"></i></a><a class="detail-source-row" href="${escapeHtml(item.dataUrl)}" target="_blank" rel="noopener noreferrer"><span class="source-icon data-icon"><i data-lucide="database"></i></span><span><strong>${escapeHtml(item.dataSource)}</strong><small>${detailCopy.sourceData}</small></span><i data-lucide="external-link"></i></a></section>${schoolCommentSection}</aside>
     </div>`;
+  hydrateIcons();
+}
+
+function currentAnswererStageConfig() {
+  const params = new URLSearchParams(window.location.search);
+  let route = params.get("answerStage") || "";
+  if (!ANSWERER_STAGE_CONFIG[route]) {
+    try { route = localStorage.getItem("yinlu_answerer_stage") || ""; } catch (error) {}
+  }
+  return ANSWERER_STAGE_CONFIG[route] || ANSWERER_STAGE_CONFIG.gaokao;
+}
+
+function renderAnswererWorkbench() {
+  const config = currentAnswererStageConfig();
+  const route = Object.entries(ANSWERER_STAGE_CONFIG).find(([, item]) => item === config)?.[0] || "gaokao";
+  const questions = ANSWERER_QUESTION_EXAMPLES[route] || ANSWERER_QUESTION_EXAMPLES.gaokao;
+  const stageLabel = $("#answererStageLabel");
+  const stageDescription = $("#answererStageDescription");
+  const questionCount = $("#answererQuestionCount");
+  const questionList = $("#answererQuestionList");
+  const historyList = $("#answererHistoryList");
+  if (stageLabel) stageLabel.textContent = config.name;
+  if (stageDescription) stageDescription.textContent = config.description;
+  if (questionCount) questionCount.textContent = `${questions.length} 条匹配`;
+  if (questionList) questionList.innerHTML = questions.map((item) => `<article class="question-list-item answerer-question-item"><header><strong>${escapeHtml(item.title)}</strong><span class="question-status waiting">待回答</span></header><p>${escapeHtml(item.meta)}</p><footer><span class="content-tag">${escapeHtml(item.tag)}</span><button class="quiet-button" type="button" data-answerer-question><i data-lucide="message-square-plus"></i>开始回答</button></footer></article>`).join("");
+  const user = currentUser();
+  const history = user ? read(STORE.answers, []).filter((item) => item.userId === user.id) : demoAnswers;
+  if (historyList) historyList.innerHTML = history.length ? history.map((item) => `<article class="question-list-item"><header><strong>${escapeHtml(item.title)}</strong><span class="question-status">${escapeHtml(item.status)}</span></header><p>${escapeHtml(item.meta || `${item.topic || "未分类"} · 已完成回答`)}</p></article>`).join("") : `<div class="qa-empty"><i data-lucide="message-square-off"></i><p>你还没有回答记录</p><span>完成回答后，可以在这里继续查看和补充。</span></div>`;
   hydrateIcons();
 }
 
@@ -2184,6 +2916,15 @@ function renderAnswerHistory() {
   const history = user ? read(STORE.answers, []).filter((item) => item.userId === user.id) : demoAnswers;
   list.innerHTML = history.length ? history.map((item) => `<article class="question-list-item"><header><strong>${escapeHtml(item.title)}</strong><span class="question-status">${escapeHtml(item.status)}</span></header><p>${escapeHtml(item.meta || `${item.topic || "未分类"} · 已完成回答`)}</p></article>`).join("") : `<div class="qa-empty"><i data-lucide="message-square-off"></i><p>你还没有回答过问题</p><span>完成认证后，可以从左侧问题池选择自己真正经历过的问题。</span></div>`;
   hydrateIcons();
+}
+
+function renderAnswerQuestionPool() {
+  const pool = $("#answerQuestionPool");
+  if (!pool) return;
+  const config = currentAnswererStageConfig();
+  const route = Object.entries(ANSWERER_STAGE_CONFIG).find(([, item]) => item === config)?.[0] || "gaokao";
+  const questions = ANSWERER_QUESTION_EXAMPLES[route] || ANSWERER_QUESTION_EXAMPLES.gaokao;
+  pool.innerHTML = questions.map((item) => `<article class="question-list-item"><header><strong>${escapeHtml(item.title)}</strong><span class="question-status waiting">待回答</span></header><p>${escapeHtml(item.tag)} · ${escapeHtml(item.meta)}</p></article>`).join("");
 }
 
 function candidateStatusFor(type, key) {
@@ -2824,6 +3565,16 @@ function showAccount() {
   openModal("accountModal"); hydrateIcons();
 }
 
+function continueAfterAuthentication(message) {
+  updateAccountHeader();
+  if (!stageSelectionIsComplete()) {
+    showStageSelection();
+    return;
+  }
+  showToast(message);
+  scheduleOnboarding(350);
+}
+
 function requireAuth(message = "登录后才能使用这个功能") { if (currentUser()) return true; showAccount(); showToast(message); return false; }
 
 async function register(event) {
@@ -2854,8 +3605,7 @@ async function register(event) {
   localStorage.setItem(STORE.session, user.id);
   $("#registerForm")?.reset();
   closeModal("accountModal");
-  updateAccountHeader();
-  showToast(`欢迎加入引路，${user.nickname}`);
+  continueAfterAuthentication(`欢迎加入引路，${user.nickname}`);
 }
 
 async function login(event) {
@@ -2898,8 +3648,7 @@ async function login(event) {
 
   localStorage.setItem(STORE.session, user.id);
   closeModal("accountModal");
-  updateAccountHeader();
-  showToast(`欢迎回来，${user.nickname}`);
+  continueAfterAuthentication(`欢迎回来，${user.nickname}`);
 }
 
 function saveProfile(event) {
@@ -2933,6 +3682,8 @@ function saveProfile(event) {
     createdAt: user.createdAt || userCreatedAt(user).toISOString()
   });
   if (!updatedUser) return;
+  const updatedStageKey = Object.entries(stageNames).find(([, label]) => label === updatedUser.stage)?.[0];
+  if (updatedStageKey && stageOrder.includes(updatedStageKey)) setStage(updatedStageKey);
   updateAccountHeader();
   populateProfile(updatedUser);
   showToast("个人资料已保存");
@@ -3119,11 +3870,18 @@ function scrollToAnchor(id) {
 function switchQaTab(name) {
   const ask = $("#qaAskSection");
   const answer = $("#qaAnswerSection");
-  const active = name === "answer" ? "answer" : "ask";
+  const active = currentIdentityMode === "answerer" ? "answer" : "ask";
   ask?.classList.toggle("hidden", active !== "ask");
   answer?.classList.toggle("hidden", active !== "answer");
-  $$(".auth-tab[data-qa-tab]").forEach((button) => button.classList.toggle("active", button.dataset.qaTab === name));
-  if (active === "answer") renderAnswerHistory();
+  $$(".auth-tab[data-qa-tab]").forEach((button) => {
+    const allowed = button.dataset.qaTab === active;
+    button.hidden = !allowed;
+    button.classList.toggle("active", allowed);
+  });
+  if (active === "answer") {
+    renderAnswerQuestionPool();
+    renderAnswerHistory();
+  }
 }
 
 // 事件委托保留，但同时安全绑定核心按钮以避免空引用错误
@@ -3255,8 +4013,63 @@ document.addEventListener("click", (event) => {
   if (calendarDate) { selectDecisionDate(calendarDate.dataset.calendarDate); return; }
   const deleteDecision = event.target.closest("[data-delete-decision-event]");
   if (deleteDecision) { deleteDecisionEvent(deleteDecision.dataset.deleteDecisionEvent); return; }
-  const nav = event.target.closest("[data-view]"); if (nav) { switchView(nav.dataset.view); return; }
-  const targetView = event.target.closest("[data-view-target]"); if (targetView) { switchView(targetView.dataset.viewTarget); return; }
+  const answererQuestion = event.target.closest("[data-answerer-question]");
+  if (answererQuestion) {
+    switchView("questions");
+    switchQaTab("answer");
+    const url = new URL(window.location.href);
+    url.searchParams.set("view", "questions");
+    url.searchParams.set("tab", "answer");
+    window.history.pushState(null, "", url);
+    return;
+  }
+  {
+    const plannerStageLink = event.target.closest("[data-global-planner-stage]");
+    if (plannerStageLink) {
+      event.preventDefault();
+      const stageKey = plannerStageLink.dataset.globalPlannerStage;
+      if (stageKey === currentStage) return;
+      const stageLabel = stageNames[stageKey] || "新的决策阶段";
+      openSwitchConfirm({
+        title: `切换到${stageLabel}？`,
+        description: `切换后，当前工作台会进入${stageLabel}决策阶段，相关内容也会随之更新。`,
+        action: () => { window.location.href = plannerStageLink.href; }
+      });
+      return;
+    }
+  }
+  {
+    const answerStageControl = event.target.closest("[data-global-answer-stage]");
+    if (answerStageControl) {
+      if (answerStageControl.classList.contains("disabled")) {
+        event.preventDefault();
+        showToast("当前决策阶段暂不能回答这个阶段的问题");
+        return;
+      }
+      event.preventDefault();
+      const stageKey = answerStageControl.dataset.globalAnswerStage;
+      const stageLabel = stageNames[stageKey] || "对应阶段";
+      openSwitchConfirm({
+        title: `切换到${stageLabel}回答中心？`,
+        description: `确认后将进入回答者状态，专门查看和回答${stageLabel}阶段的问题。`,
+        action: () => { window.location.href = answerStageControl.href; }
+      });
+      return;
+    }
+  }
+  const answerStageControl = event.target.closest("[data-global-answer-stage]");
+  if (answerStageControl?.classList.contains("disabled")) { event.preventDefault(); showToast("当前决策阶段暂不能回答这个阶段的问题"); return; }
+  const nav = event.target.closest("[data-view]"); if (nav) {
+    event.preventDefault();
+    const targetName = nav.dataset.view;
+    if (!navigateToFeatureRoute(targetName)) {
+      const activeName = $(".view.active")?.id.replace("view-", "");
+      if (activeName !== targetName) switchView(targetName);
+      updateShellViewUrl(targetName, nav);
+    }
+    return;
+  }
+  const targetView = event.target.closest("[data-view-target]"); if (targetView) { if (!navigateToFeatureRoute(targetView.dataset.viewTarget)) switchView(targetView.dataset.viewTarget); return; }
   const schoolDetail = event.target.closest("[data-school-detail]"); if (schoolDetail) {
     const activeView = $(".view.active")?.id.replace("view-", "");
     if (activeView && activeView !== "school-detail") currentSchoolReturnView = activeView;
@@ -3329,7 +4142,7 @@ document.addEventListener("click", (event) => {
 
 document.addEventListener("input", (event) => {
   if (event.target.id !== "schoolMajorSearch") return;
-  const item = institutions.find((school) => school.id === currentSchoolDetail);
+  const item = findInstitutionById(currentSchoolDetail);
   if (!item) return;
   const query = event.target.value;
   const list = $("#majorProgramList");
@@ -3394,6 +4207,41 @@ document.addEventListener("submit", (event) => {
 
 // 安全绑定核心交互（检查元素存在后绑定）
 const menuButton = $("#menuButton"); if (menuButton) menuButton.addEventListener("click", () => $("#sidebar").classList.toggle("open"));
+const identityModeToggle = $("#identityModeToggle"); if (identityModeToggle) identityModeToggle.addEventListener("click", () => {
+  const nextMode = currentIdentityMode === "answerer" ? "planner" : "answerer";
+  const nextAnswererStage = nextMode === "answerer" ? preferredAnswererStageRoute(currentStage) : "";
+  if (nextMode === "answerer" && !nextAnswererStage) {
+    showToast("当前决策阶段还没有可回答的更早阶段");
+    return;
+  }
+  const nextLabel = nextMode === "answerer" ? "回答者工作台" : "决策工作台";
+  openSwitchConfirm({
+    title: `切换到${nextLabel}？`,
+    description: nextMode === "answerer"
+      ? "切换后将进入回答者工作台，你可以在回答中心查看并回答匹配的问题。"
+      : "切换后将回到决策工作台，你可以继续使用阶段规划、院校检索和匿名提问。",
+    action: () => {
+      if (nextMode === "answerer") {
+        localStorage.setItem(STORE.identityMode, "answerer");
+        window.location.href = answererStageUrl(nextAnswererStage, currentStage);
+        return;
+      }
+      if (isStandaloneAnswererPage()) {
+        localStorage.setItem(STORE.identityMode, "planner");
+        window.location.href = `./index.html?view=home&stage=${encodeURIComponent(currentStage)}&identity=planner`;
+        return;
+      }
+      setIdentityMode(nextMode);
+      const url = new URL(window.location.href);
+      const activeView = $(".view.active")?.id.replace("view-", "") || (nextMode === "answerer" ? "questions" : "home");
+      url.searchParams.set("view", activeView);
+      url.searchParams.set("identity", nextMode);
+      if (nextMode === "planner") url.searchParams.delete("answerStage");
+      window.history.replaceState(null, "", url);
+    }
+  });
+});
+const switchConfirmProceed = $("#switchConfirmProceed"); if (switchConfirmProceed) switchConfirmProceed.addEventListener("click", confirmSwitchAction);
 const accountButton = $("#accountButton"); if (accountButton) accountButton.addEventListener("click", showAccount);
 const onboardingReplayButton = $("#onboardingReplayButton"); if (onboardingReplayButton) onboardingReplayButton.addEventListener("click", () => startOnboarding({ force: true }));
 const notifyButton = $("#notifyButton"); if (notifyButton) notifyButton.addEventListener("click", () => showToast(currentUser() ? "暂无新的认证回答" : "登录后可查看你的通知"));
@@ -3430,6 +4278,11 @@ const continueGuestBtn = $("#continueGuest"); if (continueGuestBtn) continueGues
 $("#previousStage")?.addEventListener("click", () => moveStage(-1));
 $("#nextStage")?.addEventListener("click", () => moveStage(1));
 $$("[data-stage-dot]").forEach((button) => button.addEventListener("click", () => setStage(button.dataset.stageDot)));
+$$("[data-global-answer-stage]").forEach((control) => control.addEventListener("click", (event) => {
+  if (control.getAttribute("aria-disabled") !== "true") return;
+  event.preventDefault();
+  showToast("只能回答自己已经经历过的更早阶段问题");
+}));
 $$("[data-stage-search-submit]").forEach((button) => button.addEventListener("click", () => runStageSearch(button.closest(".stage-slide"))));
 $$("[data-stage-search]").forEach((input) => input.addEventListener("keydown", (event) => { if (event.key === "Enter") runStageSearch(input.closest(".stage-slide")); }));
 $$("[data-stage-task]").forEach((button) => button.addEventListener("click", () => runStageTask(button.dataset.stageTask)));
@@ -3458,7 +4311,7 @@ $$('[data-dimension-filter]').forEach((button) => button.addEventListener("click
 }));
 $$('[data-source-filter]').forEach((button) => button.addEventListener("click", () => {
   currentSourceFilter = button.dataset.sourceFilter;
-  const availableDimensions = EXPERIENCE_DIMENSIONS_BY_SOURCE[currentSourceFilter] || EXPERIENCE_DIMENSIONS_BY_SOURCE.all;
+  const availableDimensions = experienceDimensionsForSource(currentSourceFilter);
   [...currentDimensionFilters].filter((dimension) => !availableDimensions.includes(dimension)).forEach((dimension) => currentDimensionFilters.delete(dimension));
   if (currentSourceFilter === "official") currentTimeFilter = "all";
   $$('[data-source-filter]').forEach((item) => item.classList.toggle("active", item === button));
@@ -3594,16 +4447,41 @@ document.addEventListener("keydown", (event) => {
     closeModal("questionModal");
     closeModal("accountModal");
     closeModal("decisionCalendarModal");
+    closeModal("switchConfirmModal");
     setCyberPetOpen(false);
     setCyberPetAvatarMenu(false);
     setThemeMenu(false);
   }
 });
 window.addEventListener("resize", refreshOnboardingPosition);
+window.addEventListener("popstate", () => {
+  const params = new URLSearchParams(window.location.search);
+  const requestedStage = params.get("stage");
+  if (stageOrder.includes(requestedStage) && requestedStage !== currentStage) setStage(requestedStage);
+  const requestedView = params.get("view") || "home";
+  const allowedViews = new Set(["home", "experience", "questions", "answerer", "compare", "trust"]);
+  const targetView = currentStage === "career" && requestedView === "compare" ? "experience" : requestedView;
+  if (!allowedViews.has(targetView)) return;
+  if (currentIdentityMode === "answerer" && ["home", "experience", "compare"].includes(targetView)) {
+    switchView("answerer");
+    return;
+  }
+  switchView(targetView);
+  if (targetView === "questions") switchQaTab(currentIdentityMode === "answerer" ? "answer" : "ask");
+});
 window.addEventListener("scroll", refreshOnboardingPosition, true);
 window.addEventListener("scroll", scheduleBackToTopUpdate, { passive: true });
+window.addEventListener("scroll", scheduleGlobalStageBarUpdate, { passive: true });
 window.addEventListener("resize", scheduleBackToTopUpdate);
 $("#backToTopButton")?.addEventListener("click", scrollCurrentPageToTop);
+$("#globalStageToggle")?.addEventListener("click", () => {
+  const collapsed = document.body.classList.contains("stage-bar-collapsed");
+  stageBarPinnedOpen = collapsed;
+  stageBarPinnedOpenAt = collapsed ? window.scrollY : null;
+  stageBarPinnedClosedAt = collapsed ? null : window.scrollY;
+  stageBarToggleGuardUntil = performance.now() + 600;
+  setGlobalStageBarCollapsed(!collapsed);
+});
 
 applyTheme(localStorage.getItem(STORE.theme) || document.documentElement.dataset.theme || "apple");
 applyExperienceLayout(localStorage.getItem(STORE.experienceLayout) || "horizontal", { persist: false });
@@ -3616,7 +4494,11 @@ window.addEventListener("resize", () => {
   if (pet) setCyberPetPosition(pet.getBoundingClientRect().left, pet.getBoundingClientRect().top);
 });
 setStage(currentStage); updateAccountHeader(); updateOnboardingReplayButton(); hydrateIcons();
-switchQaTab("ask");
+setIdentityMode(localStorage.getItem(STORE.identityMode) === "answerer" ? "answerer" : "planner", { persist: false, switchContent: false });
+switchQaTab(currentIdentityMode === "answerer" ? "answer" : "ask");
+applyInitialRouteState();
 updateBackToTopButton();
+setGlobalStageBarCollapsed(false);
 if (!currentUser() && !localStorage.getItem("yinlu_guest_seen")) window.setTimeout(showAccount, 500);
+else if (!stageSelectionIsComplete()) window.setTimeout(showStageSelection, 500);
 else scheduleOnboarding(900);
