@@ -107,7 +107,7 @@ html.portal-entry .portal-home[hidden],
 .portal-stage-gaokao { --portal-stage-tone: var(--theme-nav-accent); }
 .portal-stage-graduate { --portal-stage-tone: var(--teal); }
 .portal-stage-career { --portal-stage-tone: var(--navy); }
-.portal-stage-plan { --portal-stage-tone: var(--amber); background: color-mix(in srgb, var(--paper) 86%, white); cursor: pointer; }
+.portal-stage-plan { --portal-stage-tone: var(--amber); background: #fff; cursor: pointer; }
 .portal-stage-plan p { padding-bottom: 24px; }
 .portal-stage-status { position: absolute; left: 23px; bottom: 20px; color: var(--muted); font-size: 10px; font-weight: 800; }
 
