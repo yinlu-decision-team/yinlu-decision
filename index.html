@@ -24,8 +24,8 @@
 
 <!-- 本地 app.js（确保在 lucide-lite 后加载） -->
 <script src="./planning.js?v=20260816-4" defer></script>
-<script src="./app.js?v=20260816-life-planning-4" defer></script>
-  <link rel="stylesheet" href="styles.css?v=20260816-life-planning-5">
+<script src="./app.js?v=20260816-identity-center-1" defer></script>
+  <link rel="stylesheet" href="styles.css?v=20260816-identity-center-1">
 </head>
 <body>
   <div class="app-shell">
@@ -68,8 +68,8 @@
 
       <div class="identity-switcher" id="identitySwitcher">
         <div class="identity-switcher-copy">
-          <span class="identity-switcher-kicker">当前身份</span>
-          <strong id="identityModeLabel">决策者</strong>
+          <span class="identity-switcher-kicker">当前身份 / 工作状态</span>
+          <strong id="identityModeLabel">学生 · 决策者</strong>
         </div>
         <button class="identity-switcher-button" id="identityModeToggle" type="button" aria-label="切换身份" aria-pressed="false" title="切换身份">
           <i data-lucide="repeat-2"></i><span>切换</span>
@@ -710,6 +710,10 @@
               </section>
             </aside>
           </div>
+        </section>
+
+        <section class="view" id="view-identity" aria-label="身份中心">
+          <div id="identityCenterContent"></div>
         </section>
 
         <section class="view" id="view-compare">

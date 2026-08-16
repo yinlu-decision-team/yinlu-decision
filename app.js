@@ -403,7 +403,7 @@ const ANSWERER_QUESTION_EXAMPLES = {
     { title: "行业变化后，哪些课程或技能仍然有用？", meta: "行业发展 · 能力迁移", tag: "行业经验" }
   ]
 };
-const STORE = { users: "yinlu_users", session: "yinlu_session", questions: "yinlu_questions", answers: "yinlu_answers", favorites: "yinlu_favorites", candidateStatus: "yinlu_candidate_status", compareHistory: "yinlu_compare_history", family: "yinlu_family", verification: "yinlu_verification", theme: "yinlu_theme", experienceLayout: "yinlu_experience_layout", history: "yinlu_history", decisionEvents: "yinlu_decision_events", petPosition: "yinlu_pet_position_v2", petAvatar: "yinlu_pet_avatar", petMotion: "yinlu_pet_reduce_motion", pageFeedback: "yinlu_page_feedback", onboarding: "yinlu_onboarding_complete_v1", identityMode: "yinlu_identity_mode", planning: "yinlu_planning_workspace_v1" };
+const STORE = { users: "yinlu_users", session: "yinlu_session", questions: "yinlu_questions", answers: "yinlu_answers", favorites: "yinlu_favorites", candidateStatus: "yinlu_candidate_status", compareHistory: "yinlu_compare_history", family: "yinlu_family", verification: "yinlu_verification", theme: "yinlu_theme", experienceLayout: "yinlu_experience_layout", history: "yinlu_history", decisionEvents: "yinlu_decision_events", petPosition: "yinlu_pet_position_v2", petAvatar: "yinlu_pet_avatar", petMotion: "yinlu_pet_reduce_motion", pageFeedback: "yinlu_page_feedback", onboarding: "yinlu_onboarding_complete_v1", identityMode: "yinlu_identity_mode", identityProfile: "yinlu_identity_profile_v1", identityRecords: "yinlu_identity_records_v1", planning: "yinlu_planning_workspace_v1" };
 const CYBER_PET_AVATARS = {
   egret: { name: "鹭小引", src: "./pet-t-egret-guide.svg?v=20260815" },
   deer: { name: "不迷鹿", src: "./pet-s-never-lost-deer.svg?v=20260815" },
@@ -828,7 +828,7 @@ function closeModal(id) {
   modal.setAttribute("aria-hidden", "true");
   if (id === "accountModal" && wasOpen) {
     if (!currentUser()) localStorage.setItem("yinlu_guest_seen", "1");
-    if (!isPortalEntry()) scheduleOnboarding(420);
+    if (!isPortalEntry() && !currentUserIdentityEntryPending()) scheduleOnboarding(420);
   }
   if (id === "switchConfirmModal") pendingSwitchAction = null;
 }
@@ -1420,6 +1420,227 @@ function identityModeLabel(mode = currentIdentityMode) {
   return mode === "answerer" ? "回答者" : "决策者";
 }
 
+function identitySwitcherLabel(mode = currentIdentityMode) {
+  const profile = identityEntryProfile();
+  const role = profile?.role || identityEntryRoleFromUser();
+  return `${identityEntryRoleLabel(role)} · ${role === "parent" ? "家庭协同" : identityModeLabel(mode)}`;
+}
+
+let identityCenterState = null;
+
+function identityRecordId(profile) {
+  return [profile?.role || "student", profile?.mode || "planner", profile?.scope || "gaokao"].join(":");
+}
+
+function identityRecordLabel(record) {
+  const role = identityEntryRoleLabel(record.role);
+  const mode = identityEntryModeLabel(record.mode);
+  const scope = identityEntryScopeLabel(record.scope);
+  return { role, mode, scope, title: `${role} · ${mode}`, subtitle: `${scope} · ${mode}` };
+}
+
+function identityRecordView(record) {
+  if (record.role === "parent" || record.mode === "family") return "compare";
+  if (record.mode === "answerer") return ["answerer", "trust"].includes(record.lastView) ? record.lastView : "answerer";
+  if (record.scope === "career" && record.lastView === "compare") return "experience";
+  return ["home", "experience", "questions", "compare", "planning", "trust"].includes(record.lastView) ? record.lastView : "home";
+}
+
+function identityViewLabel(view) {
+  return ({ home: "首页", experience: "院校与经验", questions: "匿名提问", answerer: "回答中心", compare: "我的候选", planning: "人生规划", trust: "信任与认证" })[view] || "工作台";
+}
+
+function identityRecordTime(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "尚未使用";
+  return date.toLocaleString("zh-CN", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" });
+}
+
+function identityRecordsForUser(user = currentUser()) {
+  if (!user) return [];
+  const all = read(STORE.identityRecords, {});
+  const records = Array.isArray(all[user.id]) ? all[user.id].map((record) => ({ ...record })) : [];
+  const profile = identityEntryProfile(user);
+  if (profile?.complete) {
+    const id = profile.recordId || identityRecordId(profile);
+    if (!records.some((record) => record.id === id)) records.push({ id, role: profile.role, mode: profile.mode, scope: profile.scope, lastView: "home", createdAt: profile.updatedAt || new Date().toISOString(), updatedAt: profile.updatedAt || new Date().toISOString(), lastUsedAt: profile.updatedAt || new Date().toISOString() });
+  }
+  return records.sort((a, b) => new Date(b.lastUsedAt || b.updatedAt || 0) - new Date(a.lastUsedAt || a.updatedAt || 0));
+}
+
+function upsertIdentityRecord(profile, { lastView = "home", replaceId = "" } = {}) {
+  const user = currentUser();
+  if (!user || !profile) return null;
+  const all = read(STORE.identityRecords, {});
+  const records = Array.isArray(all[user.id]) ? all[user.id] : [];
+  const id = identityRecordId(profile);
+  const now = new Date().toISOString();
+  const previous = records.find((record) => record.id === id) || records.find((record) => record.id === replaceId);
+  const next = { id, role: profile.role, mode: profile.mode, scope: profile.scope, lastView: identityRecordView({ ...profile, lastView }), createdAt: previous?.createdAt || now, updatedAt: now, lastUsedAt: now };
+  all[user.id] = [next, ...records.filter((record) => record.id !== id && record.id !== replaceId)];
+  write(STORE.identityRecords, all);
+  return next;
+}
+
+function captureCurrentIdentityRecordView(view) {
+  const user = currentUser();
+  const profile = identityEntryProfile(user);
+  if (!user || !profile?.complete || !view || view === "identity") return;
+  const all = read(STORE.identityRecords, {});
+  const records = Array.isArray(all[user.id]) ? all[user.id] : [];
+  const id = profile.recordId || identityRecordId(profile);
+  const current = records.find((record) => record.id === id);
+  if (!current) { upsertIdentityRecord(profile, { lastView: view }); return; }
+  current.lastView = identityRecordView({ ...current, lastView: view });
+  current.lastUsedAt = new Date().toISOString();
+  all[user.id] = records;
+  write(STORE.identityRecords, all);
+}
+
+function identityRecordSummary(record, user) {
+  const questions = read(STORE.questions, []).filter((item) => item.userId === user?.id).length;
+  const answers = read(STORE.answers, []).filter((item) => item.userId === user?.id).length;
+  const favorites = userFavorites().length;
+  if (record.role === "parent") return "已关联家庭 · 仅查看授权内容";
+  if (record.mode === "answerer") return `历史回答 ${answers} · 回答范围 ${identityEntryScopeLabel(record.scope)}`;
+  return `候选 ${favorites} · 提问 ${questions}`;
+}
+
+function identityCenterChoiceMarkup(items, attribute, selected) {
+  return items.map((item) => `<button class="identity-entry-choice" type="button" aria-pressed="${item.key === selected}" data-identity-center-${attribute}="${item.key}"><span class="identity-entry-choice-icon"><i data-lucide="${item.icon}"></i></span><span><strong>${item.title}</strong><small>${item.text}</small></span><i class="identity-entry-choice-check" data-lucide="check"></i></button>`).join("");
+}
+
+function identityCenterScopeMarkup(selected) {
+  return STAGE_SELECTION_OPTIONS.map((option) => `<button class="identity-entry-choice identity-entry-scope-choice" type="button" aria-pressed="${option.key === selected}" data-identity-center-scope="${option.key}"><span class="identity-entry-choice-icon"><i data-lucide="${option.icon}"></i></span><span><strong>${option.title}</strong><small>${option.text}</small></span><i class="identity-entry-choice-check" data-lucide="check"></i></button>`).join("");
+}
+
+function identityCenterEditorState(record = null) {
+  const base = record || identityEntryDefaultState();
+  return { step: 1, role: base.role || "student", mode: base.mode || "planner", scope: base.scope || currentStage, editingId: record?.id || "" };
+}
+
+function renderIdentityCenter() {
+  const panel = $("#identityCenterContent");
+  const user = currentUser();
+  if (!panel || !user) return;
+  if (!identityCenterState || identityCenterState.screen === "records") {
+    const profile = identityEntryProfile(user);
+    const activeId = profile?.recordId || (profile ? identityRecordId(profile) : "");
+    const records = identityRecordsForUser(user);
+    const current = records.find((record) => record.id === activeId) || records[0];
+    panel.innerHTML = `<div class="identity-center-header"><div><span class="section-kicker">身份中心</span><h1>选择你这次来到引路的位置</h1><p>每条记录保留独立的身份、阶段和工作状态，切换后原有候选与提问仍然保留。</p></div><button class="primary-button" type="button" data-identity-center-new><i data-lucide="plus"></i>新建身份状态</button></div>${current ? `<section class="identity-current-record"><span class="identity-current-icon"><i data-lucide="${current.mode === "answerer" ? "message-square-reply" : current.role === "parent" ? "users-round" : "compass"}"></i></span><div><small>当前正在使用</small><strong>${escapeHtml(identityRecordLabel(current).title)} · ${escapeHtml(identityRecordLabel(current).scope)}</strong><small>上次停留：${escapeHtml(identityViewLabel(identityRecordView(current)))} · ${escapeHtml(identityRecordTime(current.lastUsedAt || current.updatedAt))}</small></div><b>使用中</b></section>` : ""}<div class="identity-records-heading"><h2>我的身份记录</h2><span>${records.length} 条记录</span></div><div class="identity-record-grid">${records.length ? records.map((record) => { const label = identityRecordLabel(record); const active = record.id === activeId; const icon = record.mode === "answerer" ? "message-square-reply" : record.role === "parent" ? "users-round" : "compass"; return `<article class="identity-record-card ${active ? "is-current" : ""}"><span class="identity-record-icon"><i data-lucide="${icon}"></i></span><strong>${escapeHtml(label.title)}</strong><small>${escapeHtml(label.scope)} · ${record.mode === "answerer" ? "回答对应阶段问题" : record.role === "parent" ? "查看家庭授权内容" : "继续自己的决策"}</small><div class="identity-record-meta"><span>上次进入：${escapeHtml(identityRecordTime(record.lastUsedAt || record.updatedAt))}</span><span>${escapeHtml(identityRecordSummary(record, user))}</span></div><div class="identity-record-actions"><button class="quiet-button" type="button" data-identity-record-use="${escapeHtml(record.id)}">${active ? "继续使用" : "切换进入"}</button><button class="text-button" type="button" data-identity-record-edit="${escapeHtml(record.id)}">编辑</button></div></article>`; }).join("") : `<div class="identity-record-empty"><i data-lucide="layers-3"></i><strong>还没有身份记录</strong><p>新建一条身份状态后，之后可以从这里继续进入。</p></div>`}</div>`;
+    hydrateIcons();
+    return;
+  }
+  const state = identityCenterState;
+  const family = state.role === "parent";
+  const answerer = state.mode === "answerer";
+  const scopeTitle = family ? "选择孩子当前决策阶段" : answerer ? "你能够回答哪个阶段" : "选择当前决策阶段";
+  const scopeCopy = family ? "阶段决定家庭协同里优先展示的内容。" : answerer ? "回答范围应该来自真实经历或认证信息。" : "这个选择只决定当前优先展示的内容。";
+  let content = "";
+  if (state.step === 1) content = `<div class="identity-center-editor-heading"><span>01 / 04</span><h2>选择当前社会身份</h2><p>一个账号可以保存多条身份记录。</p></div><div class="identity-entry-choice-grid">${identityCenterChoiceMarkup(IDENTITY_ENTRY_ROLES, "role", state.role)}</div>`;
+  else if (state.step === 2) content = `<div class="identity-center-editor-heading"><span>02 / 04</span><h2>这次来到引路，你想做什么？</h2><p>工作状态可以随时切换，不会改变社会身份。</p></div><div class="identity-entry-choice-grid identity-entry-mode-grid">${identityCenterChoiceMarkup(IDENTITY_ENTRY_MODES, "mode", state.mode)}</div>`;
+  else if (state.step === 3) content = `<div class="identity-center-editor-heading"><span>03 / 04</span><h2>${scopeTitle}</h2><p>${scopeCopy}</p></div><div class="identity-entry-scope-list">${identityCenterScopeMarkup(state.scope)}</div>`;
+  else content = `<div class="identity-center-editor-heading"><span>04 / 04</span><h2>确认这条身份记录</h2><p>保存后可以从身份中心再次进入。</p></div><div class="identity-center-summary"><div><span>社会身份</span><strong>${identityEntryRoleLabel(state.role)}</strong></div><div><span>工作状态</span><strong>${identityEntryModeLabel(state.mode)}</strong></div><div><span>当前范围</span><strong>${identityEntryScopeLabel(state.scope)}</strong></div></div><div class="identity-center-destination"><span>确认后进入</span><strong>${identityEntryRoleLabel(state.role)} · ${identityEntryModeLabel(state.mode)}工作台</strong><small>${family ? "进入家庭协同，查看学生主动授权的候选。" : answerer ? "进入回答中心，查看对应阶段的问题。" : "进入决策工作台，继续查看信息和候选。"}</small></div>`;
+  panel.innerHTML = `<div class="identity-center-editor"><button class="text-button identity-center-back" type="button" data-identity-center-records><i data-lucide="arrow-left"></i>返回身份记录</button><div class="identity-center-editor-body"><aside><span class="section-kicker">身份中心</span><h1>${state.step === 4 ? "确认并保存" : "建立一条新的工作台记录"}</h1><p>身份记录让不同的使用目标彼此独立，之后可以快速回到上次工作位置。</p><div class="identity-center-route"><span>当前将进入</span><strong>${identityEntryRoleLabel(state.role)} · ${identityEntryModeLabel(state.mode)}</strong><small>${identityEntryScopeLabel(state.scope)}</small></div></aside><main>${content}<div class="identity-center-actions"><button class="quiet-button" type="button" data-identity-center-back ${state.step === 1 ? "disabled" : ""}>上一步</button><button class="primary-button" type="button" data-identity-center-next>${state.step === 4 ? "保存并进入" : "继续"}</button></div></main></div></div>`;
+  hydrateIcons();
+}
+
+function showIdentityCenterEditor(record = null) {
+  if (!currentUser()) return showAccount();
+  identityCenterState = { screen: "editor", ...identityCenterEditorState(record) };
+  switchView("identity");
+  renderIdentityCenter();
+  updateShellViewUrl("identity");
+}
+
+function openIdentityCenter() {
+  if (!currentUser()) return showAccount();
+  identityCenterState = { screen: "records" };
+  switchView("identity");
+  updateShellViewUrl("identity");
+}
+
+function enterIdentityRecord(record) {
+  const user = currentUser();
+  if (!user || !record) return;
+  const profile = identityEntryProfile(user);
+  const activeId = profile?.recordId || (profile ? identityRecordId(profile) : "");
+  const enter = () => {
+    const profiles = read(STORE.identityProfile, {});
+    profiles[identityEntryKey(user)] = { role: record.role, mode: record.mode, scope: record.scope, recordId: record.id, complete: true, updatedAt: new Date().toISOString() };
+    write(STORE.identityProfile, profiles);
+    updateCurrentUser({ identityRole: identityEntryRoleLabel(record.role), identityMode: identityEntryModeLabel(record.mode), identityScope: identityEntryScopeLabel(record.scope), stage: identityEntryScopeLabel(record.scope) });
+    localStorage.setItem(STORE.identityMode, record.mode === "answerer" ? "answerer" : "planner");
+    if (record.mode === "answerer") localStorage.setItem("yinlu_answerer_stage", record.scope === "graduate" ? "kaoyan" : record.scope === "career" ? "jiuye" : "gaokao");
+    upsertIdentityRecord(record, { lastView: identityRecordView(record) });
+    setStage(record.scope);
+    setIdentityMode(record.mode === "answerer" ? "answerer" : "planner", { persist: true, switchContent: false });
+    updateAccountHeader();
+    const target = identityRecordView(record);
+    switchView(target);
+    updateShellViewUrl(target);
+    showToast(`已进入：${identityRecordLabel(record).title}`);
+  };
+  if (record.id === activeId) enter();
+  else openSwitchConfirm({ title: `切换到${identityRecordLabel(record).title}？`, description: `将进入${identityRecordLabel(record).scope}的${identityEntryModeLabel(record.mode)}工作台，原有记录不会被删除。`, action: enter });
+}
+
+function finishIdentityCenterEditor() {
+  const user = currentUser();
+  const state = identityCenterState;
+  if (!user || !state || state.screen !== "editor") return;
+  const profile = { role: state.role, mode: state.mode === "family" ? "family" : state.mode, scope: state.scope };
+  const record = upsertIdentityRecord(profile, { lastView: state.mode === "answerer" ? "answerer" : state.mode === "family" ? "compare" : "home", replaceId: state.editingId });
+  if (!record) return;
+  const profiles = read(STORE.identityProfile, {});
+  profiles[identityEntryKey(user)] = { ...profile, recordId: record.id, complete: true, updatedAt: new Date().toISOString() };
+  write(STORE.identityProfile, profiles);
+  updateCurrentUser({ identityRole: identityEntryRoleLabel(profile.role), identityMode: identityEntryModeLabel(profile.mode), identityScope: identityEntryScopeLabel(profile.scope), stage: identityEntryScopeLabel(profile.scope) });
+  localStorage.setItem(STORE.identityMode, profile.mode === "answerer" ? "answerer" : "planner");
+  if (profile.mode === "answerer") localStorage.setItem("yinlu_answerer_stage", profile.scope === "graduate" ? "kaoyan" : profile.scope === "career" ? "jiuye" : "gaokao");
+  setStage(profile.scope);
+  setIdentityMode(profile.mode === "answerer" ? "answerer" : "planner", { persist: true, switchContent: false });
+  identityCenterState = null;
+  updateAccountHeader();
+  const target = identityRecordView(record);
+  switchView(target);
+  updateShellViewUrl(target);
+  showToast("身份记录已保存");
+}
+
+function currentIdentityRoleKey() {
+  if (!currentUser()) return "guest";
+  return identityEntryProfile()?.role || identityEntryRoleFromUser();
+}
+
+function applyIdentityRoleContext() {
+  const role = currentIdentityRoleKey();
+  const parent = role === "parent";
+  document.body.dataset.identityRole = role;
+  const workbenchLabel = $("#workbenchModeLabel");
+  if (workbenchLabel) workbenchLabel.textContent = currentIdentityMode === "answerer" ? "回答工作台" : parent ? "家庭协同" : "决策工作台";
+  const identityLabel = $("#identityModeLabel");
+  if (identityLabel) identityLabel.textContent = identitySwitcherLabel();
+  const compareLabel = $("#compareNavItem span:not(.nav-dot-icon)");
+  if (compareLabel) compareLabel.textContent = parent ? "共享候选" : "我的候选";
+  const planningNavItem = $('#plannerNav .nav-item[data-view="planning"]');
+  if (planningNavItem) planningNavItem.hidden = parent;
+  const candidateTabs = $("#view-compare .candidate-tabs");
+  const candidateActions = $("#view-compare .candidate-page-actions");
+  if (candidateTabs) candidateTabs.hidden = parent;
+  if (candidateActions) candidateActions.hidden = parent;
+  const compareHeader = $("#view-compare .page-header > div:first-child");
+  if (compareHeader) {
+    const kicker = $(".section-kicker", compareHeader);
+    const title = $("h1", compareHeader);
+    const copy = $("p", compareHeader);
+    if (kicker) kicker.textContent = parent ? "家庭协同" : "我的候选";
+    if (title) title.textContent = parent ? "查看孩子主动共享的候选" : "把选择放在同一张桌面上";
+    if (copy) copy.textContent = parent ? "家长只能查看学生主动授权的候选和对比结果，匿名提问、搜索记录与未授权收藏保持私密。" : "收藏学校和专业，按你在意的维度进行比较，也可以把候选清单授权给家长共同查看。";
+  }
+}
+
 function setIdentityMode(mode, { persist = true, switchContent = true } = {}) {
   const nextMode = mode === "answerer" ? "answerer" : "planner";
   const previousMode = currentIdentityMode;
@@ -1434,7 +1655,7 @@ function setIdentityMode(mode, { persist = true, switchContent = true } = {}) {
   if (plannerNav) plannerNav.hidden = nextMode === "answerer";
   if (answererNav) answererNav.hidden = nextMode !== "answerer";
   const label = $("#identityModeLabel");
-  if (label) label.textContent = identityModeLabel(nextMode);
+  if (label) label.textContent = identitySwitcherLabel(nextMode);
   const workbenchLabel = $("#workbenchModeLabel");
   if (workbenchLabel) workbenchLabel.textContent = nextMode === "answerer" ? "回答工作台" : "决策工作台";
   ["#sourceDivider", "#sourceLabel", "#sourceList"].forEach((selector) => {
@@ -1453,16 +1674,19 @@ function setIdentityMode(mode, { persist = true, switchContent = true } = {}) {
     switchView(targetView);
     if (targetView === "questions") switchQaTab(nextMode === "answerer" ? "answer" : "ask");
   }
+  applyIdentityRoleContext();
   renderCyberPetContext();
 }
 
 function switchView(name) {
+  const previousView = $(".view.active")?.id.replace("view-", "");
+  if (previousView && previousView !== name) captureCurrentIdentityRecordView(previousView);
   $$(".view").forEach((view) => view.classList.toggle("active", view.id === `view-${name}`));
   document.body.classList.toggle("planning-mode", name === "planning");
   const navigationView = currentIdentityMode === "answerer" && name === "questions" ? "answerer" : name;
   $$(".nav-item").forEach((button) => button.classList.toggle("active", button.dataset.view === navigationView));
   const active = $(`.nav-item[data-view="${navigationView}"]`);
-  $("#breadcrumbTitle").textContent = name === "school-detail" ? `${findInstitutionById(currentSchoolDetail)?.school || "学校详情"}` : navigationView === "answerer" ? "回答中心" : active?.querySelector("span:not(.nav-dot-icon)")?.textContent || "首页";
+  $("#breadcrumbTitle").textContent = name === "school-detail" ? `${findInstitutionById(currentSchoolDetail)?.school || "学校详情"}` : name === "identity" ? "身份中心" : navigationView === "answerer" ? "回答中心" : active?.querySelector("span:not(.nav-dot-icon)")?.textContent || "首页";
   $("#sidebar")?.classList.remove("open");
   updateGlobalStageSwitcher();
   if (name === "experience") renderExperiences();
@@ -1470,6 +1694,7 @@ function switchView(name) {
   if (name === "compare") { renderCompare(); renderFamily(); }
   if (name === "trust") renderTrust();
   if (name === "answerer") renderAnswererWorkbench();
+  if (name === "identity") renderIdentityCenter();
   if (name === "questions" && currentIdentityMode === "answerer") switchQaTab("answer");
   if (name === "school-detail") renderSchoolDetail();
   if (name === "planning") window.YinluPlanning?.render();
@@ -1502,7 +1727,7 @@ function applyInitialRouteState() {
     ? "answerer"
     : requestedMode === "planner" ? "planner" : storedMode;
   setIdentityMode(initialMode, { persist: Boolean(requestedMode || requestedView === "answerer"), switchContent: false });
-  const allowedViews = new Set(["home", "experience", "questions", "answerer", "compare", "planning", "trust"]);
+  const allowedViews = new Set(["home", "experience", "questions", "answerer", "compare", "planning", "trust", "identity"]);
   if (stageOrder.includes(requestedStage)) {
     setStage(requestedStage);
     if (GLOBAL_STAGE_CONFIG.some((item) => item.key === requestedStage)) localStorage.setItem("yinlu_portal_last_stage", requestedStage);
@@ -1757,6 +1982,203 @@ const STAGE_SELECTION_OPTIONS = [
   { key: "graduate", icon: "book-open", title: "考研择校", text: "我正在规划研究生阶段的学校和专业。" },
   { key: "career", icon: "briefcase-business", title: "就业选择", text: "我正在了解职业方向和就业路径。" }
 ];
+const IDENTITY_ENTRY_ROLES = [
+  { key: "student", title: "学生", icon: "graduation-cap", text: "为自己的升学、专业或就业方向做决定，也可以分享已经经历过的阶段。" },
+  { key: "parent", title: "家长", icon: "users-round", text: "关联孩子的决策空间，查看授权信息、表达建议并参与家庭讨论。" },
+  { key: "teacher", title: "教师", icon: "presentation", text: "可以使用决策工具，也可以提供教育、专业和培养方面的回答。" },
+  { key: "professional", title: "从业者", icon: "briefcase-business", text: "可以规划自己的下一步，也可以分享岗位、行业和职业发展经验。" }
+];
+const IDENTITY_ENTRY_MODES = [
+  { key: "planner", title: "作为决策者", icon: "compass", text: "查信息、提问、比较候选、记录自己的判断和下一步计划。" },
+  { key: "answerer", title: "作为回答者", icon: "message-square-reply", text: "回答自己真正经历过的问题，提供带时间和身份边界的经验。" }
+];
+const IDENTITY_ENTRY_STORE_PREFIX = "yinlu_identity_entry_v1:";
+let identityEntryState = null;
+
+function identityEntryKey(user = currentUser()) {
+  return user?.id ? `${IDENTITY_ENTRY_STORE_PREFIX}${user.id}` : "";
+}
+
+function currentUserIdentityEntryPending() {
+  const user = currentUser();
+  return Boolean(user && !identityEntryIsComplete(user));
+}
+
+function identityEntryProfile(user = currentUser()) {
+  const key = identityEntryKey(user);
+  if (!key) return null;
+  const profiles = read(STORE.identityProfile, {});
+  return profiles[key] || null;
+}
+
+function identityEntryIsComplete(user = currentUser()) {
+  return Boolean(identityEntryProfile(user)?.complete);
+}
+
+function identityEntryRoleFromUser(user = currentUser()) {
+  const role = String(user?.role || "");
+  if (role.includes("家长")) return "parent";
+  if (role.includes("教师")) return "teacher";
+  if (role.includes("从业")) return "professional";
+  return "student";
+}
+
+function identityEntryScopeLabel(scope) {
+  return STAGE_SELECTION_OPTIONS.find((option) => option.key === scope)?.title || "高考志愿";
+}
+
+function identityEntryRoleLabel(role) {
+  return IDENTITY_ENTRY_ROLES.find((option) => option.key === role)?.title || "学生";
+}
+
+function identityEntryModeLabel(mode) {
+  return mode === "answerer" ? "回答者" : mode === "family" ? "家庭协同" : "决策者";
+}
+
+function identityEntryDefaultState(user = currentUser()) {
+  const profile = identityEntryProfile(user);
+  const storedMode = localStorage.getItem(STORE.identityMode) === "answerer" ? "answerer" : "planner";
+  const role = profile?.role || identityEntryRoleFromUser(user);
+  return {
+    step: 1,
+    role,
+    mode: role === "parent" ? "family" : profile?.mode || storedMode,
+    scope: profile?.scope || stageKeyFromUser(user) || currentStage,
+    reopen: false
+  };
+}
+
+function identityEntryChoiceMarkup(items, attribute, selected) {
+  return items.map((item) => `<button class="identity-entry-choice" type="button" aria-pressed="${item.key === selected}" data-identity-entry-${attribute}="${item.key}"><span class="identity-entry-choice-icon"><i data-lucide="${item.icon}"></i></span><span><strong>${item.title}</strong><small>${item.text}</small></span><i class="identity-entry-choice-check" data-lucide="check"></i></button>`).join("");
+}
+
+function identityEntryScopeMarkup(selected) {
+  return STAGE_SELECTION_OPTIONS.map((option) => `<button class="identity-entry-choice identity-entry-scope-choice" type="button" aria-pressed="${option.key === selected}" data-identity-entry-scope="${option.key}"><span class="identity-entry-choice-icon"><i data-lucide="${option.icon}"></i></span><span><strong>${option.title}</strong><small>${option.text}</small></span><i class="identity-entry-choice-check" data-lucide="check"></i></button>`).join("");
+}
+
+function createIdentityEntryModal() {
+  let backdrop = $("#identityEntryModal");
+  if (backdrop) return backdrop;
+  backdrop = document.createElement("div");
+  backdrop.id = "identityEntryModal";
+  backdrop.className = "modal-backdrop identity-entry-backdrop";
+  backdrop.setAttribute("aria-hidden", "true");
+  backdrop.innerHTML = `<section class="modal identity-entry-modal" role="dialog" aria-modal="true" aria-labelledby="identityEntryTitle"><header class="identity-entry-topbar"><div class="identity-entry-brand"><svg class="identity-entry-brand-mark brand-mark" viewBox="0 0 48 48" role="img" aria-label="引路标志"><path class="brand-mark-body" d="M13 9H30C34 9 37 12 37 16V37L25 30L13 37V9Z"/><path class="brand-mark-fold" d="M13 9H25C29 9 32 12 32 16V27"/><path class="brand-mark-gap" d="M25 16V29"/><circle class="brand-mark-dot" cx="25" cy="16" r="3"/></svg><span><strong>引路</strong><small>青年生涯决策信息平台</small></span></div><div class="identity-entry-progress" aria-label="身份设置进度"><span data-identity-entry-progress="1"><i>1</i>身份</span><span data-identity-entry-progress="2"><i>2</i>状态</span><span data-identity-entry-progress="3"><i>3</i>范围</span><span data-identity-entry-progress="4"><i>4</i>确认</span></div><button class="identity-entry-guest" type="button" data-identity-entry-guest>以游客身份浏览</button></header><div class="identity-entry-body"><aside class="identity-entry-context"><span class="identity-entry-kicker">先告诉我们你站在哪里</span><h1 id="identityEntryTitle">你现在以什么身份来到引路？</h1><p id="identityEntryCopy">身份只决定工作台入口，不限制你未来能做的选择。之后可以在身份中心随时切换。</p><div class="identity-entry-route"><span>当前将进入</span><strong id="identityEntryRoute">学生 · 决策工作台</strong><small id="identityEntryStage">高考志愿</small></div></aside><main class="identity-entry-panel"><div id="identityEntryStepContent"></div><div class="identity-entry-actions"><button class="quiet-button" type="button" data-identity-entry-back>上一步</button><button class="primary-button" type="button" data-identity-entry-next>继续</button></div></main></div></section>`;
+  backdrop.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const role = event.target.closest("[data-identity-entry-role]");
+    if (role) {
+      identityEntryState.role = role.dataset.identityEntryRole;
+      identityEntryState.mode = identityEntryState.role === "parent" ? "family" : identityEntryState.mode === "family" ? "planner" : identityEntryState.mode;
+      renderIdentityEntry();
+      return;
+    }
+    const mode = event.target.closest("[data-identity-entry-mode]");
+    if (mode) {
+      identityEntryState.mode = mode.dataset.identityEntryMode;
+      renderIdentityEntry();
+      return;
+    }
+    const scope = event.target.closest("[data-identity-entry-scope]");
+    if (scope) {
+      identityEntryState.scope = scope.dataset.identityEntryScope;
+      renderIdentityEntry();
+      return;
+    }
+    if (event.target.closest("[data-identity-entry-guest]")) {
+      if (identityEntryState?.reopen) {
+        closeModal("identityEntryModal");
+        identityEntryState = null;
+        return;
+      }
+      localStorage.removeItem(STORE.session);
+      localStorage.setItem("yinlu_guest_seen", "1");
+      closeModal("identityEntryModal");
+      updateAccountHeader();
+      showToast("已进入访客浏览，可随时注册保存数据");
+      return;
+    }
+    if (event.target.closest("[data-identity-entry-back]")) {
+      identityEntryState.step = identityEntryState.step === 3 && identityEntryState.role === "parent" ? 1 : Math.max(1, identityEntryState.step - 1);
+      renderIdentityEntry();
+      return;
+    }
+    if (event.target.closest("[data-identity-entry-next]")) {
+      if (identityEntryState.step === 1) identityEntryState.step = identityEntryState.role === "parent" ? 3 : 2;
+      else if (identityEntryState.step === 2) identityEntryState.step = 3;
+      else if (identityEntryState.step === 3) identityEntryState.step = 4;
+      else finishIdentityEntry();
+      renderIdentityEntry();
+    }
+  });
+  document.body.appendChild(backdrop);
+  return backdrop;
+}
+
+function renderIdentityEntry() {
+  const backdrop = createIdentityEntryModal();
+  const state = identityEntryState;
+  if (!backdrop || !state) return;
+  const content = $("#identityEntryStepContent", backdrop);
+  const answerer = state.mode === "answerer";
+  const family = state.role === "parent";
+  const scopeTitle = family ? "选择孩子当前决策阶段" : answerer ? "你能够回答哪个阶段" : "选择当前决策阶段";
+  const scopeCopy = family ? "阶段决定家庭协同里优先展示的内容。" : answerer ? "回答范围应该来自真实经历或认证信息，不能由当前决策阶段自动推断。" : "这个选择只决定当前优先展示的内容。";
+  if (content) {
+    if (state.step === 1) content.innerHTML = `<div class="identity-entry-heading"><div><h2>选择当前社会身份</h2><p>一个账号以后可以添加多个身份。</p></div><span>01 / 04</span></div><div class="identity-entry-choice-grid">${identityEntryChoiceMarkup(IDENTITY_ENTRY_ROLES, "role", state.role)}</div>`;
+    else if (state.step === 2) content.innerHTML = `<div class="identity-entry-heading"><div><h2>这次来到引路，你想做什么？</h2><p>工作状态可以随时切换，不会改变你的社会身份。</p></div><span>02 / 04</span></div><div class="identity-entry-choice-grid identity-entry-mode-grid">${identityEntryChoiceMarkup(IDENTITY_ENTRY_MODES, "mode", state.mode)}</div>`;
+    else if (state.step === 3) content.innerHTML = `<div class="identity-entry-heading"><div><h2>${scopeTitle}</h2><p>${scopeCopy}</p></div><span>03 / 04</span></div><div class="identity-entry-scope-list">${identityEntryScopeMarkup(state.scope)}</div>`;
+    else content.innerHTML = `<div class="identity-entry-heading"><div><h2>确认当前工作台</h2><p>这些设置之后都可以在身份中心调整。</p></div><span>04 / 04</span></div><div class="identity-entry-summary"><div><span>社会身份</span><strong>${identityEntryRoleLabel(state.role)}</strong></div><div><span>工作状态</span><strong>${identityEntryModeLabel(state.mode)}</strong></div><div><span>当前范围</span><strong>${identityEntryScopeLabel(state.scope)}</strong></div></div><div class="identity-entry-destination"><span>确认后进入</span><strong>${identityEntryRoleLabel(state.role)}${identityEntryModeLabel(state.mode)}工作台</strong><small>${family ? `关联孩子的${identityEntryScopeLabel(state.scope)}阶段，查看授权信息并参与讨论。` : answerer ? `优先展示${identityEntryScopeLabel(state.scope)}相关问题、信息求证任务和历史回答。` : `优先展示${identityEntryScopeLabel(state.scope)}相关信息、匿名提问和决策工具。`}</small></div>`;
+  }
+  $("#identityEntryRoute", backdrop).textContent = `${identityEntryRoleLabel(state.role)} · ${identityEntryModeLabel(state.mode)}工作台`;
+  $("#identityEntryStage", backdrop).textContent = identityEntryScopeLabel(state.scope);
+  $("#identityEntryTitle", backdrop).textContent = state.step === 1 ? "你现在以什么身份来到引路？" : state.step === 2 ? `${identityEntryRoleLabel(state.role)}身份下，你这次想做什么？` : state.step === 3 ? scopeTitle : "确认后进入专属工作台";
+  $("#identityEntryCopy", backdrop).textContent = state.step === 1 ? "身份只决定工作台入口，不限制你未来能做的选择。之后可以在身份中心随时切换。" : state.step === 2 ? "决策和回答是两种工作状态，可以随时切换。社会身份不会因此改变。" : state.step === 3 ? scopeCopy : "系统会保留这次选择。身份、工作状态和阶段都可以分别调整。";
+  $$('[data-identity-entry-progress]', backdrop).forEach((item) => item.classList.toggle("active", Number(item.dataset.identityEntryProgress) === state.step));
+  const back = $("[data-identity-entry-back]", backdrop);
+  const next = $("[data-identity-entry-next]", backdrop);
+  const guest = $("[data-identity-entry-guest]", backdrop);
+  if (back) back.disabled = state.step === 1;
+  if (next) next.textContent = state.step === 4 ? "进入工作台" : "继续";
+  if (guest) guest.textContent = state.reopen ? "取消切换" : "以游客身份浏览";
+  hydrateIcons();
+}
+
+function showIdentityEntry({ reopen = false } = {}) {
+  const user = currentUser();
+  if (!user) return showAccount();
+  identityEntryState = identityEntryDefaultState(user);
+  identityEntryState.reopen = reopen;
+  renderIdentityEntry();
+  openModal("identityEntryModal");
+}
+
+function finishIdentityEntry() {
+  const user = currentUser();
+  const state = identityEntryState;
+  if (!user || !state) return;
+  const targetView = state.mode === "answerer" ? "answerer" : state.mode === "family" ? "compare" : "home";
+  const record = upsertIdentityRecord(state, { lastView: targetView });
+  const profiles = read(STORE.identityProfile, {});
+  profiles[identityEntryKey(user)] = { role: state.role, mode: state.mode, scope: state.scope, recordId: record?.id || identityRecordId(state), complete: true, updatedAt: new Date().toISOString() };
+  write(STORE.identityProfile, profiles);
+  updateCurrentUser({ identityRole: identityEntryRoleLabel(state.role), identityMode: identityEntryModeLabel(state.mode), identityScope: identityEntryScopeLabel(state.scope), stage: identityEntryScopeLabel(state.scope) });
+  localStorage.setItem(STORE.identityMode, state.mode === "answerer" ? "answerer" : "planner");
+  if (state.mode === "answerer") localStorage.setItem("yinlu_answerer_stage", state.scope === "graduate" ? "kaoyan" : state.scope === "career" ? "jiuye" : "gaokao");
+  closeModal("identityEntryModal");
+  identityEntryState = null;
+  if (state.reopen) {
+    localStorage.setItem(stageSelectionKey(user), "1");
+    setStage(state.scope);
+    updateAccountHeader();
+    showToast(`已切换为：${identityEntryRoleLabel(state.role)} · ${identityEntryModeLabel(state.mode)}`);
+  } else {
+    finishStageSelection(state.scope);
+  }
+  setIdentityMode(state.mode === "answerer" ? "answerer" : "planner", { persist: true, switchContent: true });
+  if (state.mode === "family") switchView("compare");
+}
+
 const STAGE_SELECTION_STORE_PREFIX = "yinlu_stage_selection_v1:";
 
 function stageSelectionKey(user = currentUser()) {
@@ -2229,7 +2651,7 @@ function updateExperienceStageUi() {
   const candidateAction = $("#experienceCandidateAction");
   const institutionTab = $('[data-experience-content-tab="institution"]');
   const sameSchoolFilter = $("#sameSchoolFilter");
-  if (compareNavItem) compareNavItem.hidden = career;
+  if (compareNavItem) compareNavItem.hidden = career && currentIdentityRoleKey() !== "parent";
   if (candidateAction) candidateAction.hidden = career;
   if (institutionTab) institutionTab.hidden = career;
   if (sameSchoolFilter) sameSchoolFilter.hidden = career;
@@ -3231,10 +3653,37 @@ function deleteComparisonHistory(id) {
   showToast("这条历史对比已删除");
 }
 
+function parentFamilyConnection(user = currentUser()) {
+  if (!user) return null;
+  const families = read(STORE.family, {});
+  const entry = Object.entries(families).find(([, family]) => Array.isArray(family.parents) && family.parents.includes(user.id));
+  return entry ? { ownerId: entry[0], family: entry[1] } : null;
+}
+
+function renderParentSharedCandidates(panel, user) {
+  const connection = parentFamilyConnection(user);
+  if (!connection) {
+    panel.innerHTML = `<div class="compare-empty parent-shared-empty"><i data-lucide="users-round"></i><strong>还没有关联孩子的决策空间</strong><p>在上方输入学生提供的邀请码。关联后，这里只展示学生主动共享的候选。</p></div>`;
+    hydrateIcons();
+    return;
+  }
+  const owner = read(STORE.users, []).find((item) => item.id === connection.ownerId);
+  const sharedIds = read(STORE.favorites, {})[connection.ownerId] || [];
+  const sharedSchools = institutions.filter((item) => sharedIds.includes(`school-${item.id}`));
+  const statuses = read(STORE.candidateStatus, {})[connection.ownerId] || {};
+  const rows = sharedSchools.map((item) => `<article class="candidate-row parent-shared-row"><div class="candidate-identity"><span class="candidate-mark">${escapeHtml(item.school.slice(0, 1))}</span><div><strong>${escapeHtml(item.school)}</strong><small>${escapeHtml(item.city)} · ${escapeHtml(item.type)}</small></div></div><div class="candidate-summary"><span>学生当前判断</span><p>${escapeHtml(statuses[`school:${item.id}`] || "待了解")}</p><div>${item.majors.slice(0, 3).map((major) => `<span class="content-tag">${escapeHtml(major)}</span>`).join("")}</div></div><div class="candidate-actions"><span class="parent-shared-readonly"><i data-lucide="eye"></i>仅查看</span><button class="text-button" type="button" data-school-detail="${escapeHtml(item.id)}">查看详情<i data-lucide="arrow-up-right"></i></button></div></article>`).join("");
+  panel.innerHTML = `<div class="parent-shared-heading"><div><span class="subsection-kicker"><i data-lucide="link"></i>已关联家庭</span><h2>${escapeHtml(owner?.nickname || "学生")}共享的候选</h2><p>当前原型将关联学生的候选视为主动授权内容，正式版本会增加逐项授权开关。</p></div><span>${sharedSchools.length} 所院校</span></div>${rows ? `<div class="candidate-list">${rows}</div>` : `<div class="compare-empty compact"><i data-lucide="school"></i><strong>暂时没有共享院校</strong><p>学生添加并授权候选后会显示在这里。</p></div>`}`;
+  hydrateIcons();
+}
+
 function renderCompare() {
   const panel = $("#compareContent");
   if (!panel) return;
   const user = currentUser();
+  if (currentIdentityRoleKey() === "parent") {
+    renderParentSharedCandidates(panel, user);
+    return;
+  }
   const savedIds = userFavorites();
   const savedExperiences = experiences.filter((item) => savedIds.includes(item.id));
   const savedInstitutions = institutions.filter((item) => savedIds.includes(`school-${item.id}`));
@@ -3500,6 +3949,11 @@ function renderFamily() {
   if (!main) return;
   if (!user) {
     main.innerHTML = `<div class="family-compact-status"><span class="linked-status inactive"><span></span>未关联</span><small>登录后创建家庭关联</small></div><button class="primary-button" type="button" data-open-account><i data-lucide="log-in"></i>登录后关联</button>`;
+  } else if (currentIdentityRoleKey() === "parent") {
+    const connection = parentFamilyConnection(user);
+    main.innerHTML = connection
+      ? `<div class="family-compact-status"><span class="linked-status"><span></span>已关联学生</span><small>仅查看主动共享的候选</small></div><span class="family-parent-linked"><i data-lucide="shield-check"></i>隐私边界生效</span>`
+      : `<div class="family-parent-join"><label for="familyCodeInput">学生邀请码</label><input id="familyCodeInput" type="text" maxlength="11" placeholder="YL-XXXXXXXX" autocomplete="off"><button class="primary-button" id="joinFamily" type="button">加入家庭</button></div>`;
   } else {
     const family = read(STORE.family, {})[user.id];
     main.innerHTML = family
@@ -3571,6 +4025,7 @@ function updateAccountHeader() {
   setUserAvatar(accountButton, user);
   const profileNameEl = $("#profileName");
   if (profileNameEl) profileNameEl.textContent = user ? user.nickname : "访客浏览";
+  applyIdentityRoleContext();
   renderQuestions(); renderAnswerHistory(); renderExperiences(); renderCompare(); renderFamily(); renderTrust();
 }
 
@@ -3625,6 +4080,10 @@ function showAccount() {
 
 function continueAfterAuthentication(message) {
   updateAccountHeader();
+  if (!identityEntryIsComplete()) {
+    showIdentityEntry();
+    return;
+  }
   if (!stageSelectionIsComplete()) {
     showStageSelection();
     return;
@@ -3833,7 +4292,7 @@ function generateFamilyInvite() {
   const all = read(STORE.family, {});
 
   // 只有学生可以生成邀请码
-  if (user.role !== "学生") {
+  if (currentIdentityRoleKey() !== "student") {
     showToast("只有学生可以生成家庭邀请码");
     return;
   }
@@ -3855,6 +4314,7 @@ function generateFamilyInvite() {
 
   write(STORE.family, all);
   renderFamily();
+  renderCompare();
   showToast("家庭邀请码已生成");
 }
 
@@ -3864,7 +4324,7 @@ function joinFamilyInvite(code) {
   const user = currentUser();
 
   // 只有家长可以加入
-  if (user.role !== "家长") {
+  if (currentIdentityRoleKey() !== "parent") {
     showToast("只有家长可以使用邀请码加入家庭");
     return;
   }
@@ -3905,6 +4365,7 @@ function joinFamilyInvite(code) {
 
   write(STORE.family, all);
   renderFamily();
+  renderCompare();
   showToast("家庭关联成功");
 }
 
@@ -4072,6 +4533,36 @@ document.addEventListener("click", (event) => {
   if (calendarDate) { selectDecisionDate(calendarDate.dataset.calendarDate); return; }
   const deleteDecision = event.target.closest("[data-delete-decision-event]");
   if (deleteDecision) { deleteDecisionEvent(deleteDecision.dataset.deleteDecisionEvent); return; }
+  if (event.target.closest("[data-identity-center-new]")) { showIdentityCenterEditor(); return; }
+  if (event.target.closest("[data-identity-center-records]")) { identityCenterState = { screen: "records" }; renderIdentityCenter(); return; }
+  const identityRecordUse = event.target.closest("[data-identity-record-use]");
+  if (identityRecordUse) { enterIdentityRecord(identityRecordsForUser().find((record) => record.id === identityRecordUse.dataset.identityRecordUse)); return; }
+  const identityRecordEdit = event.target.closest("[data-identity-record-edit]");
+  if (identityRecordEdit) { showIdentityCenterEditor(identityRecordsForUser().find((record) => record.id === identityRecordEdit.dataset.identityRecordEdit)); return; }
+  const identityCenterRole = event.target.closest("[data-identity-center-role]");
+  if (identityCenterRole && identityCenterState?.screen === "editor") {
+    identityCenterState.role = identityCenterRole.dataset.identityCenterRole;
+    identityCenterState.mode = identityCenterState.role === "parent" ? "family" : identityCenterState.mode === "family" ? "planner" : identityCenterState.mode;
+    renderIdentityCenter();
+    return;
+  }
+  const identityCenterMode = event.target.closest("[data-identity-center-mode]");
+  if (identityCenterMode && identityCenterState?.screen === "editor") { identityCenterState.mode = identityCenterMode.dataset.identityCenterMode; renderIdentityCenter(); return; }
+  const identityCenterScope = event.target.closest("[data-identity-center-scope]");
+  if (identityCenterScope && identityCenterState?.screen === "editor") { identityCenterState.scope = identityCenterScope.dataset.identityCenterScope; renderIdentityCenter(); return; }
+  if (event.target.closest("[data-identity-center-back]") && identityCenterState?.screen === "editor") {
+    identityCenterState.step = identityCenterState.step === 3 && identityCenterState.role === "parent" ? 1 : Math.max(1, identityCenterState.step - 1);
+    renderIdentityCenter();
+    return;
+  }
+  if (event.target.closest("[data-identity-center-next]") && identityCenterState?.screen === "editor") {
+    if (identityCenterState.step === 1) identityCenterState.step = identityCenterState.role === "parent" ? 3 : 2;
+    else if (identityCenterState.step === 2) identityCenterState.step = 3;
+    else if (identityCenterState.step === 3) identityCenterState.step = 4;
+    else { finishIdentityCenterEditor(); return; }
+    renderIdentityCenter();
+    return;
+  }
   const answererQuestion = event.target.closest("[data-answerer-question]");
   if (answererQuestion) {
     switchView("questions");
@@ -4271,38 +4762,12 @@ document.addEventListener("submit", (event) => {
 // 安全绑定核心交互（检查元素存在后绑定）
 const menuButton = $("#menuButton"); if (menuButton) menuButton.addEventListener("click", () => $("#sidebar").classList.toggle("open"));
 const identityModeToggle = $("#identityModeToggle"); if (identityModeToggle) identityModeToggle.addEventListener("click", () => {
-  const nextMode = currentIdentityMode === "answerer" ? "planner" : "answerer";
-  const nextAnswererStage = nextMode === "answerer" ? preferredAnswererStageRoute(currentStage) : "";
-  if (nextMode === "answerer" && !nextAnswererStage) {
-    showToast("当前决策阶段还没有可回答的更早阶段");
+  if (!currentUser()) {
+    showAccount();
+    showToast("登录后可以保存和切换身份");
     return;
   }
-  const nextLabel = nextMode === "answerer" ? "回答者工作台" : "决策工作台";
-  openSwitchConfirm({
-    title: `切换到${nextLabel}？`,
-    description: nextMode === "answerer"
-      ? "切换后将进入回答者工作台，你可以在回答中心查看并回答匹配的问题。"
-      : "切换后将回到决策工作台，你可以继续使用阶段规划、院校检索和匿名提问。",
-    action: () => {
-      if (nextMode === "answerer") {
-        localStorage.setItem(STORE.identityMode, "answerer");
-        window.location.href = answererStageUrl(nextAnswererStage, currentStage);
-        return;
-      }
-      if (isStandaloneAnswererPage()) {
-        localStorage.setItem(STORE.identityMode, "planner");
-        window.location.href = `./index.html?view=home&stage=${encodeURIComponent(currentStage)}&identity=planner`;
-        return;
-      }
-      setIdentityMode(nextMode);
-      const url = new URL(window.location.href);
-      const activeView = $(".view.active")?.id.replace("view-", "") || (nextMode === "answerer" ? "questions" : "home");
-      url.searchParams.set("view", activeView);
-      url.searchParams.set("identity", nextMode);
-      if (nextMode === "planner") url.searchParams.delete("answerStage");
-      window.history.replaceState(null, "", url);
-    }
-  });
+  openIdentityCenter();
 });
 const switchConfirmProceed = $("#switchConfirmProceed"); if (switchConfirmProceed) switchConfirmProceed.addEventListener("click", confirmSwitchAction);
 const accountButton = $("#accountButton"); if (accountButton) accountButton.addEventListener("click", showAccount);
@@ -4532,7 +4997,7 @@ window.addEventListener("popstate", () => {
   const requestedStage = params.get("stage");
   if (stageOrder.includes(requestedStage) && requestedStage !== currentStage) setStage(requestedStage);
   const requestedView = params.get("view") || "home";
-  const allowedViews = new Set(["home", "experience", "questions", "answerer", "compare", "planning", "trust"]);
+  const allowedViews = new Set(["home", "experience", "questions", "answerer", "compare", "planning", "trust", "identity"]);
   const targetView = currentStage === "career" && requestedView === "compare" ? "experience" : requestedView;
   if (!allowedViews.has(targetView)) return;
   if (currentIdentityMode === "answerer" && ["home", "experience", "compare", "planning"].includes(targetView)) {
@@ -4566,13 +5031,14 @@ window.addEventListener("resize", () => {
   const pet = $("#cyberPet");
   if (pet) setCyberPetPosition(pet.getBoundingClientRect().left, pet.getBoundingClientRect().top);
 });
-setStage(currentStage); updateAccountHeader(); updateOnboardingReplayButton(); hydrateIcons();
-setIdentityMode(localStorage.getItem(STORE.identityMode) === "answerer" ? "answerer" : "planner", { persist: false, switchContent: false });
-switchQaTab(currentIdentityMode === "answerer" ? "answer" : "ask");
-applyInitialRouteState();
-updateBackToTopButton();
-setGlobalStageBarCollapsed(false);
-const portalEntryActive = initializePortalHome();
-if (!currentUser() && !localStorage.getItem("yinlu_guest_seen")) window.setTimeout(showAccount, 500);
-else if (!portalEntryActive && !stageSelectionIsComplete()) window.setTimeout(showStageSelection, 500);
-else if (!portalEntryActive) scheduleOnboarding(900);
+  setStage(currentStage); updateAccountHeader(); updateOnboardingReplayButton(); hydrateIcons();
+  setIdentityMode(localStorage.getItem(STORE.identityMode) === "answerer" ? "answerer" : "planner", { persist: false, switchContent: false });
+  switchQaTab(currentIdentityMode === "answerer" ? "answer" : "ask");
+  applyInitialRouteState();
+  updateBackToTopButton();
+  setGlobalStageBarCollapsed(false);
+  const portalEntryActive = initializePortalHome();
+  if (!currentUser() && !localStorage.getItem("yinlu_guest_seen")) window.setTimeout(showAccount, 500);
+  else if (!portalEntryActive && currentUser() && !identityEntryIsComplete()) window.setTimeout(showIdentityEntry, 500);
+  else if (!portalEntryActive && !stageSelectionIsComplete()) window.setTimeout(showStageSelection, 500);
+  else if (!portalEntryActive) scheduleOnboarding(900);
