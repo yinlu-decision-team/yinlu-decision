@@ -437,7 +437,7 @@ const PROFESSIONAL_ANSWERER_QUESTION_EXAMPLES = {
     { title: "行业变化时，哪些能力更容易迁移到下一份工作？", meta: "职业发展 · 能力迁移", tag: "职业经验" }
   ]
 };
-const STORE = { users: "yinlu_users", session: "yinlu_session", questions: "yinlu_questions", answers: "yinlu_answers", favorites: "yinlu_favorites", candidateStatus: "yinlu_candidate_status", compareHistory: "yinlu_compare_history", family: "yinlu_family", familySuggestions: "yinlu_family_suggestions_v1", verification: "yinlu_verification", theme: "yinlu_theme", experienceLayout: "yinlu_experience_layout", history: "yinlu_history", decisionEvents: "yinlu_decision_events", petPosition: "yinlu_pet_position_v2", petAvatar: "yinlu_pet_avatar", petMotion: "yinlu_pet_reduce_motion", pageFeedback: "yinlu_page_feedback", onboarding: "yinlu_onboarding_complete_v1", identityMode: "yinlu_identity_mode", identityProfile: "yinlu_identity_profile_v1", identityRecords: "yinlu_identity_records_v1", planning: "yinlu_planning_workspace_v1" };
+const STORE = { users: "yinlu_users", session: "yinlu_session", questions: "yinlu_questions", answers: "yinlu_answers", answerDrafts: "yinlu_answer_drafts_v1", favorites: "yinlu_favorites", collections: "yinlu_collections_v1", candidateStatus: "yinlu_candidate_status", compareHistory: "yinlu_compare_history", family: "yinlu_family", familyActiveChild: "yinlu_family_active_child_v1", familySuggestions: "yinlu_family_suggestions_v1", familyPermissions: "yinlu_family_permissions_v1", verification: "yinlu_verification", theme: "yinlu_theme", experienceLayout: "yinlu_experience_layout", history: "yinlu_history", decisionEvents: "yinlu_decision_events", petPosition: "yinlu_pet_position_v2", petAvatar: "yinlu_pet_avatar", petMotion: "yinlu_pet_reduce_motion", pageFeedback: "yinlu_page_feedback", onboarding: "yinlu_onboarding_complete_v1", identityMode: "yinlu_identity_mode", identityProfile: "yinlu_identity_profile_v1", identityRecords: "yinlu_identity_records_v1", planning: "yinlu_planning_workspace_v1", careerFilterCollapsed: "yinlu_career_filter_collapsed_v1" };
 const CYBER_PET_AVATARS = {
   egret: { name: "鹭小引", src: "./pet-t-egret-guide.svg?v=20260815" },
   deer: { name: "不迷鹿", src: "./pet-s-never-lost-deer.svg?v=20260815" },
@@ -530,6 +530,39 @@ const MAJOR_CATEGORY_BY_NAME = {
   "数学与应用数学": "理学", "地理科学": "理学", "汉语言文学": "文学", "新闻传播学": "文学",
   "新闻与传播": "文学", "教育学": "教育学", "应用心理": "教育学", "经济学": "经济学", "应用经济学": "经济学", "金融": "经济学", "工商管理": "管理学", "农学": "农学", "植物保护": "农学", "临床医学": "医学"
 };
+const SCHOOL_EMBLEMS = {
+  "福建师范大学": "./school-emblem-fjnu.png",
+  "福州大学": "./school-emblem-fzu.png",
+  "福建农林大学": "./school-emblem-fafu.png",
+  "华侨大学": "./school-emblem-hqu.png",
+  "集美大学": "./school-emblem-jmu.png",
+  "厦门大学": "./school-emblem-xmu.png",
+  "华东师范大学": "./school-emblem-ecnu.png",
+  "深圳大学": "./school-emblem-szu.png"
+};
+
+function schoolEmblemMarkup(school, className = "") {
+  const name = String(school || "");
+  const src = SCHOOL_EMBLEMS[name];
+  return `<span class="${className} school-emblem"><span class="school-emblem-fallback">${escapeHtml(name.slice(0, 1) || "校")}</span>${src ? `<img src="${src}" alt="${escapeHtml(name)}校徽" loading="lazy" onerror="this.hidden=true">` : ""}</span>`;
+}
+const CAREER_FILTER_GROUPS = {
+  "技术研发": ["软件开发", "前端开发", "数据分析", "算法工程", "测试与质量", "运维与安全"],
+  "产品与设计": ["产品经理", "用户研究", "交互设计", "视觉设计"],
+  "市场与运营": ["内容运营", "产品运营", "市场营销", "电商运营"],
+  "职能支持": ["项目管理", "人力资源", "财务分析", "行政支持"],
+  "教育服务": ["课堂教学", "课程教研", "教育运营", "公共教育服务"],
+  "工程制造": ["研发工程", "生产管理", "质量工程", "供应链管理"]
+};
+const CAREER_ABILITIES = ["编程开发", "数据处理", "问题分析", "团队协作", "文档表达", "项目推进", "用户研究", "商业分析", "课程设计", "沟通表达"];
+const CAREER_ITEM_FILTERS = {
+  "career-software-role": { industry: "互联网与软件", group: "技术研发", roles: ["软件开发", "测试与质量", "运维与安全"], abilities: ["编程开发", "问题分析", "团队协作"] },
+  "career-product-skill": { industry: "互联网与数字产品", group: "产品与设计", roles: ["产品经理", "用户研究"], abilities: ["用户研究", "数据处理", "文档表达", "项目推进"] },
+  "career-finance-entry": { industry: "金融与商业服务", group: "职能支持", roles: ["财务分析", "项目管理"], abilities: ["数据处理", "商业分析", "文档表达"] },
+  "career-education-path": { industry: "教育与公共服务", group: "教育服务", roles: ["课堂教学", "课程教研", "教育运营", "公共教育服务"], abilities: ["课程设计", "沟通表达", "项目推进"] },
+  "career-internship-prepare": { industry: "通用求职参考", group: "职能支持", roles: ["项目管理", "行政支持"], abilities: ["问题分析", "文档表达", "团队协作"] },
+  "career-industry-change": { industry: "行业发展参考", group: "市场与运营", roles: ["产品运营", "市场营销"], abilities: ["问题分析", "商业分析", "沟通表达"] }
+};
 let currentStage = "gaokao";
 let currentSchoolSearch = "";
 let currentMajorSearch = "";
@@ -553,12 +586,24 @@ let currentSourceFilter = "all";
 let currentTimeFilter = "all";
 let currentExperienceSort = "relevance";
 let currentSearch = "";
+let currentCollectionTab = "all";
+let currentCollectionSearch = "";
+let currentCollectionStage = "all";
+let currentCollectionSort = "recent";
+let currentCareerIndustrySearch = "";
+let currentCareerKeywordSearch = "";
+let currentCareerFilterMode = "role";
+let currentCareerGroup = "技术研发";
+let currentCareerFilterCollapsed = localStorage.getItem(STORE.careerFilterCollapsed) === "1";
+const currentCareerRoleFilters = new Set();
+const currentCareerAbilityFilters = new Set();
 let currentSchoolDetail = "fjnu";
 let currentCandidateTab = "school";
 let currentSchoolReturnView = "experience";
 let currentIdentityMode = "planner";
 let pendingSwitchAction = null;
 let plannerViewBeforeIdentity = "home";
+let activeAnswerEditor = null;
 let schoolCompareMode = false;
 const selectedSchoolCandidateIds = new Set();
 let schoolMajorSelectionMode = false;
@@ -664,7 +709,57 @@ const majorCandidateId = (schoolId, major) => `major-${schoolId}-${encodeURIComp
 const majorDecisionKey = (school, major) => encodeURIComponent(`${school}::${major}`);
 const candidateStatuses = ["待了解", "正在比较", "已倾向", "暂不考虑"];
 const currentUser = () => { const id = localStorage.getItem(STORE.session); return read(STORE.users, []).find((user) => user.id === id) || null; };
-const userFavorites = () => { const user = currentUser(); return user ? read(STORE.favorites, {})[user.id] || [] : []; };
+const candidateExperienceIds = new Set([...experiences, ...graduateExperiences].map((item) => item.id));
+const isCandidateFavoriteId = (id) => String(id || "").startsWith("school-") || String(id || "").startsWith("major-") || candidateExperienceIds.has(id);
+const userFavorites = () => {
+  const user = currentUser();
+  return user ? (read(STORE.favorites, {})[user.id] || []).filter(isCandidateFavoriteId) : [];
+};
+
+function userCollectionEntries() {
+  const user = currentUser();
+  if (!user) return [];
+  const all = read(STORE.collections, {});
+  if (!Array.isArray(all[user.id])) {
+    const legacyIds = (read(STORE.favorites, {})[user.id] || []).filter((id) => !isCandidateFavoriteId(id));
+    all[user.id] = legacyIds.map((id, index) => ({ id, savedAt: new Date(Date.now() - index * 1000).toISOString() }));
+    write(STORE.collections, all);
+  }
+  return all[user.id].map((entry) => typeof entry === "string" ? { id: entry, savedAt: "" } : entry).filter((entry) => entry?.id);
+}
+
+const userCollectionIds = () => userCollectionEntries().map((entry) => entry.id);
+function collectionCatalog() {
+  return careerExperiences.map((item) => {
+    const type = ["official", "data"].includes(item.source) ? "official" : item.source;
+    const dimensions = item.dimensions || [];
+    const scopes = [];
+    if (dimensions.includes("岗位内容") || String(item.major || "").includes("岗位")) scopes.push("role");
+    if (dimensions.includes("实习准备") || (item.tags || []).some((tag) => String(tag).includes("求职") || String(tag).includes("实习"))) scopes.push("preparation");
+    if (dimensions.includes("行业变化") || dimensions.includes("职业发展") || scopes.length === 0) scopes.push("industry");
+    return {
+      id: item.id,
+      stage: "career",
+      stageLabel: "就业选择",
+      type,
+      typeLabel: type === "official" ? "招聘资料" : type === "student" ? "求职经验" : "岗位参考",
+      scopes,
+      title: item.title || `${item.school || ""}${item.major ? ` · ${item.major}` : ""}`,
+      description: item.text || item.value || "查看收藏内容与来源信息。",
+      sourceName: item.sourceName || item.level || (type === "official" ? "公开来源" : "经历边界已标注"),
+      sourceUrl: item.sourceUrl || "",
+      publishedAt: item.publishedAt || "",
+      school: item.school || "",
+      major: item.major || "",
+      city: item.city || "",
+      searchValue: [item.title, item.school, item.major, item.city, item.text, ...(item.tags || []), ...dimensions].filter(Boolean).join(" ")
+    };
+  });
+}
+
+function collectionItemById(id) {
+  return collectionCatalog().find((item) => item.id === id);
+}
 
 function planningCandidateCatalog() {
   const user = currentUser();
@@ -985,6 +1080,7 @@ function closeModal(id) {
   const modal = $(`#${id}`);
   if (!modal) return;
   const wasOpen = modal.classList.contains("open");
+  if (id === "answerEditorModal" && wasOpen && activeAnswerEditor?.dirty) saveAnswerDraft({ notify: false });
   modal.classList.remove("open");
   modal.setAttribute("aria-hidden", "true");
   if (id === "accountModal" && wasOpen) {
@@ -992,6 +1088,7 @@ function closeModal(id) {
     if (!isPortalEntry() && !currentUserIdentityEntryPending()) scheduleOnboarding(420);
   }
   if (id === "switchConfirmModal") pendingSwitchAction = null;
+  if (id === "answerEditorModal") activeAnswerEditor = null;
 }
 
 function openSwitchConfirm({ title, description, confirmLabel = "确认切换", action }) {
@@ -1373,7 +1470,7 @@ function restoreCyberPetPosition() {
   const saved = read(STORE.petPosition, null);
   const mobile = window.matchMedia("(max-width: 540px)").matches;
   const fallback = {
-    x: mobile ? 14 : 22,
+    x: mobile ? 14 : 30,
     y: window.innerHeight - (pet?.offsetHeight || 92) - (mobile ? 126 : 142)
   };
   setCyberPetPosition(Number(saved?.x ?? fallback.x), Number(saved?.y ?? fallback.y));
@@ -1581,7 +1678,13 @@ function identityModeLabel(mode = currentIdentityMode) {
   return mode === "answerer" ? "回答者" : "决策者";
 }
 
+function identityRoleIcon(role, mode = "planner") {
+  return ({ student: "graduation-cap", parent: "users-round", teacher: "presentation", professional: "briefcase-business" })[role]
+    || (mode === "answerer" ? "message-square-reply" : "compass");
+}
+
 function identitySwitcherLabel(mode = currentIdentityMode) {
+  if (!currentUser()) return "游客 · 公开浏览";
   const profile = identityEntryProfile();
   const role = profile?.role || identityEntryRoleFromUser();
   return `${identityEntryRoleLabel(role)} · ${role === "parent" ? "家庭协同" : identityModeLabel(mode)}`;
@@ -1590,25 +1693,104 @@ function identitySwitcherLabel(mode = currentIdentityMode) {
 let identityCenterState = null;
 
 function identityRecordId(profile) {
-  return [profile?.role || "student", profile?.mode || "planner", profile?.scope || "gaokao"].join(":");
+  const role = profile?.role || "student";
+  const mode = role === "parent" ? "family" : profile?.mode || "planner";
+  return [role, mode, profile?.scope || "gaokao"].join(":");
+}
+
+function identityCredentialDefinition(record = identityEntryProfile()) {
+  const role = record?.role || "student";
+  const scope = record?.scope || "gaokao";
+  if (role === "teacher") return { key: `teacher:${scope}`, label: ({ gaokao: "高中教学/升学指导资质", graduate: "高校教学/研究生培养资质", career: "就业指导/职业教育资质" })[scope] || "教师资质" };
+  if (role === "professional") return { key: `professional:${scope}`, label: ({ gaokao: "高考经历", graduate: "考研/深造经历", career: "从业经历" })[scope] || "专业经历" };
+  if (role === "parent") return { key: "parent:family", label: "家长身份" };
+  return { key: `student:${scope}`, label: ({ gaokao: "高考经历", graduate: "考研经历", career: "实习/职业经历" })[scope] || "学生经历" };
+}
+
+function identityCredentialState(record, user = currentUser()) {
+  const definition = identityCredentialDefinition(record);
+  if (!user) return { ...definition, keyState: "guest", label: `${definition.label}未认证`, icon: "circle-dashed" };
+  const verification = read(STORE.verification, {})[user.id] || {};
+  const credentials = verification.credentials || {};
+  const credential = Array.isArray(credentials)
+    ? credentials.find((item) => item?.key === definition.key) || {}
+    : credentials[definition.key] || {};
+  const status = credential.status || "未认证";
+  if (["已认证", "认证通过"].includes(status)) return { ...definition, keyState: "verified", label: credential.label || `${definition.label}已认证`, icon: "badge-check" };
+  if (status === "申请中") return { ...definition, keyState: "pending", label: `${definition.label}审核中`, icon: "clock-3" };
+  return { ...definition, keyState: "unverified", label: `${definition.label}待认证`, icon: "circle-dashed" };
+}
+
+function identityRecordForProfile(profile, { excludeId = "", user = currentUser() } = {}) {
+  const key = identityRecordId(profile);
+  return identityRecordsForUser(user).find((record) => record.id !== excludeId && identityRecordId(record) === key) || null;
+}
+
+function dedupeIdentityRecords(records, activeId = "") {
+  const grouped = new Map();
+  records.map(normalizeIdentityRecord).forEach((record) => {
+    const key = identityRecordId(record);
+    const previous = grouped.get(key);
+    if (!previous) { grouped.set(key, record); return; }
+    const previousTime = new Date(previous.lastUsedAt || previous.updatedAt || 0).getTime();
+    const recordTime = new Date(record.lastUsedAt || record.updatedAt || 0).getTime();
+    const preferred = record.id === activeId || (previous.id !== activeId && recordTime > previousTime) ? record : previous;
+    const secondary = preferred === record ? previous : record;
+    grouped.set(key, normalizeIdentityRecord({
+      ...secondary,
+      ...preferred,
+      name: preferred.name || secondary.name,
+      goal: preferred.goal || secondary.goal,
+      createdAt: [previous.createdAt, record.createdAt].filter(Boolean).sort()[0] || preferred.createdAt,
+      updatedAt: [previous.updatedAt, record.updatedAt].filter(Boolean).sort().at(-1) || preferred.updatedAt,
+      lastUsedAt: [previous.lastUsedAt, record.lastUsedAt].filter(Boolean).sort().at(-1) || preferred.lastUsedAt
+    }));
+  });
+  return [...grouped.values()];
 }
 
 function identityRecordLabel(record) {
   const role = identityEntryRoleLabel(record.role);
   const mode = identityEntryModeLabel(record.mode);
   const scope = identityEntryScopeLabel(record.scope);
-  return { role, mode, scope, title: `${role} · ${mode}`, subtitle: `${scope} · ${mode}` };
+  return { role, mode, scope, title: record.name || `${scope}${record.mode === "answerer" ? "回答记录" : record.mode === "family" ? "家庭协同" : "决策空间"}`, subtitle: `${role} · ${mode} · ${scope}` };
+}
+
+function identityDefaultWorkspaceName(record) {
+  const scope = identityEntryScopeLabel(record?.scope || "gaokao");
+  if (record?.role === "parent" || record?.mode === "family") return `${scope}家庭协同`;
+  if (record?.mode === "answerer") return `${scope}经验回答`;
+  return `${scope}决策空间`;
+}
+
+function normalizeIdentityRecord(record) {
+  const normalized = { ...record };
+  const generatedNamePattern = /^(高考志愿|考研择校|就业选择)(决策空间|经验回答|家庭协同)$/;
+  const name = !normalized.name || generatedNamePattern.test(normalized.name)
+    ? identityDefaultWorkspaceName(normalized)
+    : normalized.name;
+  return { ...normalized, name, goal: normalized.goal || "", archived: Boolean(normalized.archived), lastAction: normalized.lastAction || `停留在${identityViewLabel(identityRecordView(normalized))}` };
 }
 
 function identityRecordView(record) {
   if (record.role === "parent" || record.mode === "family") return "family-overview";
   if (record.mode === "answerer") return ["answerer", "trust"].includes(record.lastView) ? record.lastView : "answerer";
   if (record.scope === "career" && record.lastView === "compare") return "experience";
-  return ["home", "experience", "questions", "compare", "planning", "trust"].includes(record.lastView) ? record.lastView : "home";
+  if (record.scope !== "career" && record.lastView === "collections") return "experience";
+  return ["home", "experience", "questions", "collections", "compare", "planning", "trust"].includes(record.lastView) ? record.lastView : "home";
+}
+
+function identityWorkspaceHref(record) {
+  const scope = GLOBAL_STAGE_CONFIG.some((item) => item.key === record?.scope) ? record.scope : "gaokao";
+  const view = identityRecordView({ ...record, scope });
+  if (record?.role === "parent" || record?.mode === "family") return familyPortalHref(view, scope);
+  const params = new URLSearchParams({ view, stage: scope });
+  if (record?.mode === "answerer") params.set("identity", "answerer");
+  return `./index.html?${params.toString()}`;
 }
 
 function identityViewLabel(view) {
-  return ({ home: "首页", experience: "院校与经验", questions: "匿名提问", answerer: "回答中心", compare: "我的候选", planning: "人生规划", trust: "信任与认证", "family-overview": "协同概览", "family-discussion": "家庭讨论", "family-advice": "家庭建议", "family-planning": "授权人生规划", "family-permissions": "授权边界" })[view] || "工作台";
+  return ({ home: "首页", experience: "院校与经验", questions: "匿名提问", collections: "我的收藏", answerer: "回答中心", compare: "我的候选", planning: "人生规划", trust: "信任与认证", "family-overview": "协同概览", "family-discussion": "家庭讨论", "family-advice": "家庭建议", "family-planning": "授权人生规划", "family-permissions": "授权边界" })[view] || "工作台";
 }
 
 function identityRecordTime(value) {
@@ -1620,25 +1802,31 @@ function identityRecordTime(value) {
 function identityRecordsForUser(user = currentUser()) {
   if (!user) return [];
   const all = read(STORE.identityRecords, {});
-  const records = Array.isArray(all[user.id]) ? all[user.id].map((record) => ["teacher", "professional"].includes(record.role) ? { ...record, mode: "answerer", lastView: record.lastView === "home" ? "answerer" : record.lastView } : { ...record }) : [];
+  const storedRecords = Array.isArray(all[user.id]) ? all[user.id] : [];
+  const records = storedRecords.map(normalizeIdentityRecord);
   const profile = identityEntryProfile(user);
   if (profile?.complete) {
     const id = profile.recordId || identityRecordId(profile);
-    if (!records.some((record) => record.id === id)) records.push({ id, role: profile.role, mode: profile.mode, scope: profile.scope, lastView: "home", createdAt: profile.updatedAt || new Date().toISOString(), updatedAt: profile.updatedAt || new Date().toISOString(), lastUsedAt: profile.updatedAt || new Date().toISOString() });
+    if (!records.some((record) => record.id === id)) records.push(normalizeIdentityRecord({ id, role: profile.role, mode: profile.mode, scope: profile.scope, lastView: "home", createdAt: profile.updatedAt || new Date().toISOString(), updatedAt: profile.updatedAt || new Date().toISOString(), lastUsedAt: profile.updatedAt || new Date().toISOString() }));
   }
-  return records.sort((a, b) => new Date(b.lastUsedAt || b.updatedAt || 0) - new Date(a.lastUsedAt || a.updatedAt || 0));
+  const uniqueRecords = dedupeIdentityRecords(records, profile?.recordId || "");
+  if (uniqueRecords.length !== records.length || storedRecords.length !== uniqueRecords.length) {
+    all[user.id] = uniqueRecords;
+    write(STORE.identityRecords, all);
+  }
+  return uniqueRecords.sort((a, b) => new Date(b.lastUsedAt || b.updatedAt || 0) - new Date(a.lastUsedAt || a.updatedAt || 0));
 }
 
-function upsertIdentityRecord(profile, { lastView = "home", replaceId = "" } = {}) {
+function upsertIdentityRecord(profile, { lastView = "home", replaceId = "", createNew = false, metadata = {} } = {}) {
   const user = currentUser();
   if (!user || !profile) return null;
   const all = read(STORE.identityRecords, {});
   const records = Array.isArray(all[user.id]) ? all[user.id] : [];
-  const id = identityRecordId(profile);
+  const id = replaceId || profile.recordId || (createNew ? uid("workspace") : identityRecordId(profile));
   const now = new Date().toISOString();
-  const previous = records.find((record) => record.id === id) || records.find((record) => record.id === replaceId);
-  const next = { id, role: profile.role, mode: profile.mode, scope: profile.scope, lastView: identityRecordView({ ...profile, lastView }), createdAt: previous?.createdAt || now, updatedAt: now, lastUsedAt: now };
-  all[user.id] = [next, ...records.filter((record) => record.id !== id && record.id !== replaceId)];
+  const previous = records.find((record) => record.id === id);
+  const next = normalizeIdentityRecord({ ...previous, id, role: profile.role, mode: profile.mode, scope: profile.scope, lastView: identityRecordView({ ...profile, lastView }), name: metadata.name ?? previous?.name, goal: metadata.goal ?? previous?.goal, archived: metadata.archived ?? previous?.archived ?? false, lastAction: metadata.lastAction || previous?.lastAction || `进入${identityViewLabel(lastView)}`, createdAt: previous?.createdAt || now, updatedAt: now, lastUsedAt: now });
+  all[user.id] = [next, ...records.filter((record) => record.id !== id)];
   write(STORE.identityRecords, all);
   return next;
 }
@@ -1653,6 +1841,8 @@ function captureCurrentIdentityRecordView(view) {
   const current = records.find((record) => record.id === id);
   if (!current) { upsertIdentityRecord(profile, { lastView: view }); return; }
   current.lastView = identityRecordView({ ...current, lastView: view });
+  current.lastAction = `查看${identityViewLabel(current.lastView)}`;
+  current.updatedAt = new Date().toISOString();
   current.lastUsedAt = new Date().toISOString();
   all[user.id] = records;
   write(STORE.identityRecords, all);
@@ -1661,24 +1851,38 @@ function captureCurrentIdentityRecordView(view) {
 function identityRecordSummary(record, user) {
   const questions = read(STORE.questions, []).filter((item) => item.userId === user?.id).length;
   const answers = read(STORE.answers, []).filter((item) => item.userId === user?.id).length;
-  const favorites = userFavorites().length;
+  const favorites = (read(STORE.favorites, {})[user?.id] || []).filter(isCandidateFavoriteId).length;
+  const collections = (read(STORE.collections, {})[user?.id] || []).length;
   if (record.role === "parent") return "已关联家庭 · 仅查看授权内容";
   if (record.mode === "answerer") return `历史回答 ${answers} · 回答范围 ${identityEntryScopeLabel(record.scope)}`;
-  return `候选 ${favorites} · 提问 ${questions}`;
+  return record.scope === "career" ? `就业收藏 ${collections} · 提问 ${questions}` : `候选 ${favorites} · 提问 ${questions}`;
+}
+
+function identityWorkspaceNextMilestone() {
+  const next = decisionEvents().find((item) => daysUntilDecision(item.date) >= 0);
+  return next ? `${next.title} · ${decisionDistanceText(daysUntilDecision(next.date))}` : "暂未设置下一节点";
 }
 
 function identityCenterChoiceMarkup(items, attribute, selected) {
   return items.map((item) => `<button class="identity-entry-choice" type="button" aria-pressed="${item.key === selected}" data-identity-center-${attribute}="${item.key}"><span class="identity-entry-choice-icon"><i data-lucide="${item.icon}"></i></span><span><strong>${item.title}</strong><small>${item.text}</small></span><i class="identity-entry-choice-check" data-lucide="check"></i></button>`).join("");
 }
 
-function identityCenterScopeMarkup(selected) {
-  return STAGE_SELECTION_OPTIONS.map((option) => `<button class="identity-entry-choice identity-entry-scope-choice" type="button" aria-pressed="${option.key === selected}" data-identity-center-scope="${option.key}"><span class="identity-entry-choice-icon"><i data-lucide="${option.icon}"></i></span><span><strong>${option.title}</strong><small>${option.text}</small></span><i class="identity-entry-choice-check" data-lucide="check"></i></button>`).join("");
+function identityCenterScopeOptions(state) {
+  if (["teacher", "professional"].includes(state?.role) && state.mode === "planner") return STAGE_SELECTION_OPTIONS.filter((option) => ["graduate", "career"].includes(option.key));
+  return STAGE_SELECTION_OPTIONS;
+}
+
+function identityCenterScopeMarkup(selected, options = STAGE_SELECTION_OPTIONS) {
+  return options.map((option) => `<button class="identity-entry-choice identity-entry-scope-choice" type="button" aria-pressed="${option.key === selected}" data-identity-center-scope="${option.key}"><span class="identity-entry-choice-icon"><i data-lucide="${option.icon}"></i></span><span><strong>${option.title}</strong><small>${option.text}</small></span><i class="identity-entry-choice-check" data-lucide="check"></i></button>`).join("");
 }
 
 function identityCenterEditorState(record = null) {
   const base = record || identityEntryDefaultState();
   const role = base.role || "student";
-  return { step: 1, role, mode: role === "parent" ? "family" : ["teacher", "professional"].includes(role) ? "answerer" : base.mode || "planner", scope: base.scope || currentStage, editingId: record?.id || "" };
+  const mode = role === "parent" ? "family" : base.mode || "planner";
+  const requestedScope = base.scope || currentStage;
+  const scope = ["teacher", "professional"].includes(role) && mode === "planner" && requestedScope === "gaokao" ? "graduate" : requestedScope;
+  return { step: 1, role, mode, scope, editingId: record?.id || "", workspaceName: record?.name || identityDefaultWorkspaceName({ ...base, role, mode, scope }), workspaceGoal: record?.goal || "" };
 }
 
 function renderIdentityCenter() {
@@ -1688,9 +1892,16 @@ function renderIdentityCenter() {
   if (!identityCenterState || identityCenterState.screen === "records") {
     const profile = identityEntryProfile(user);
     const activeId = profile?.recordId || (profile ? identityRecordId(profile) : "");
-    const records = identityRecordsForUser(user);
-    const current = records.find((record) => record.id === activeId) || records[0];
-    panel.innerHTML = `<div class="identity-center-header"><div><span class="section-kicker">身份中心</span><h1>选择你这次来到引路的位置</h1><p>每条记录保留独立的身份、阶段和工作状态，切换后原有候选与提问仍然保留。</p></div><button class="primary-button" type="button" data-identity-center-new><i data-lucide="plus"></i>新建身份状态</button></div>${current ? `<section class="identity-current-record"><span class="identity-current-icon"><i data-lucide="${current.mode === "answerer" ? "message-square-reply" : current.role === "parent" ? "users-round" : "compass"}"></i></span><div><small>当前正在使用</small><strong>${escapeHtml(identityRecordLabel(current).title)} · ${escapeHtml(identityRecordLabel(current).scope)}</strong><small>上次停留：${escapeHtml(identityViewLabel(identityRecordView(current)))} · ${escapeHtml(identityRecordTime(current.lastUsedAt || current.updatedAt))}</small></div><b>使用中</b></section>` : ""}<div class="identity-records-heading"><h2>我的身份记录</h2><span>${records.length} 条记录</span></div><div class="identity-record-grid">${records.length ? records.map((record) => { const label = identityRecordLabel(record); const active = record.id === activeId; const icon = record.mode === "answerer" ? "message-square-reply" : record.role === "parent" ? "users-round" : "compass"; return `<article class="identity-record-card ${active ? "is-current" : ""}"><span class="identity-record-icon"><i data-lucide="${icon}"></i></span><strong>${escapeHtml(label.title)}</strong><small>${escapeHtml(label.scope)} · ${record.mode === "answerer" ? "回答对应阶段问题" : record.role === "parent" ? "查看家庭授权内容" : "继续自己的决策"}</small><div class="identity-record-meta"><span>上次进入：${escapeHtml(identityRecordTime(record.lastUsedAt || record.updatedAt))}</span><span>${escapeHtml(identityRecordSummary(record, user))}</span></div><div class="identity-record-actions"><button class="quiet-button" type="button" data-identity-record-use="${escapeHtml(record.id)}">${active ? "继续使用" : "切换进入"}</button><button class="text-button" type="button" data-identity-record-edit="${escapeHtml(record.id)}">编辑</button></div></article>`; }).join("") : `<div class="identity-record-empty"><i data-lucide="layers-3"></i><strong>还没有身份记录</strong><p>新建一条身份状态后，之后可以从这里继续进入。</p></div>`}</div>`;
+    const allRecords = identityRecordsForUser(user);
+    const showArchived = Boolean(identityCenterState?.showArchived);
+    const records = allRecords.filter((record) => showArchived ? record.archived : !record.archived);
+    const current = allRecords.find((record) => record.id === activeId) || allRecords[0];
+    const viewMode = identityCenterState?.viewMode || "cards";
+    const credentialBadge = (record) => { const credential = identityCredentialState(record, user); return `<span class="identity-credential-badge is-${credential.keyState}"><i data-lucide="${credential.icon}"></i>${escapeHtml(credential.label)}</span>`; };
+    const cardMarkup = (record) => { const label = identityRecordLabel(record); const active = record.id === activeId; return `<article class="identity-record-card ${active ? "is-current" : ""} ${record.archived ? "is-archived" : ""}"><header><span class="identity-record-icon"><i data-lucide="${identityRoleIcon(record.role, record.mode)}"></i></span><div><strong>${escapeHtml(label.title)}</strong><small>${escapeHtml(label.subtitle)}</small></div><div class="identity-record-statuses">${credentialBadge(record)}${active ? "<b>使用中</b>" : ""}</div></header><p>${escapeHtml(record.goal || (record.mode === "answerer" ? "继续分享这一阶段的真实经验" : record.role === "parent" ? "继续参与家庭共同决策" : "继续整理这一阶段的选择"))}</p><div class="identity-workspace-activity"><span><i data-lucide="mouse-pointer-click"></i>${escapeHtml(record.lastAction || `停留在${identityViewLabel(identityRecordView(record))}`)}</span><span><i data-lucide="bar-chart-3"></i>${escapeHtml(identityRecordSummary(record, user))}</span><span><i data-lucide="calendar-clock"></i>${escapeHtml(identityWorkspaceNextMilestone())}</span><span><i data-lucide="clock-3"></i>${escapeHtml(identityRecordTime(record.updatedAt || record.lastUsedAt))}更新</span></div><div class="identity-record-actions"><button class="quiet-button" type="button" data-identity-record-use="${escapeHtml(record.id)}">${active ? "继续使用" : "切换进入"}</button><button class="icon-button" type="button" data-identity-record-edit="${escapeHtml(record.id)}" title="编辑工作空间" aria-label="编辑${escapeHtml(label.title)}"><i data-lucide="pencil"></i></button><button class="icon-button" type="button" data-identity-record-archive="${escapeHtml(record.id)}" title="${record.archived ? "恢复" : "归档"}" aria-label="${record.archived ? "恢复" : "归档"}${escapeHtml(label.title)}"><i data-lucide="${record.archived ? "archive-restore" : "archive"}"></i></button><button class="icon-button identity-record-delete" type="button" data-identity-record-delete="${escapeHtml(record.id)}" title="删除" aria-label="删除${escapeHtml(label.title)}"><i data-lucide="trash-2"></i></button></div></article>`; };
+    const pathGroups = [{ key: "decision", icon: "signpost", title: "我的决策路径", records: records.filter((record) => record.mode === "planner" && record.role !== "parent") }, { key: "contribution", icon: "message-square-reply", title: "我的贡献", records: records.filter((record) => record.mode === "answerer") }, { key: "family", icon: "users-round", title: "家庭协同", records: records.filter((record) => record.role === "parent" || record.mode === "family") }];
+    const pathMarkup = `<div class="identity-path-view">${pathGroups.map((group) => `<section class="identity-path-lane lane-${group.key}"><header><span><i data-lucide="${group.icon}"></i></span><div><strong>${group.title}</strong><small>${group.records.length} 个工作空间</small></div></header><div>${group.records.length ? group.records.map((record) => `<button class="identity-path-node ${record.id === activeId ? "active" : ""}" type="button" data-identity-record-use="${escapeHtml(record.id)}"><span>${escapeHtml(identityEntryScopeLabel(record.scope))}</span><strong>${escapeHtml(identityRecordLabel(record).title)}</strong><small>${escapeHtml(record.lastAction || identityViewLabel(identityRecordView(record)))}</small><i data-lucide="arrow-right"></i></button>`).join("") : `<p class="identity-path-empty">暂无记录</p>`}</div></section>`).join("")}</div>`;
+    panel.innerHTML = `<div class="identity-center-header"><div><span class="section-kicker">身份与工作空间</span><h1>回到你正在推进的那件事</h1><p>社会身份说明你是谁，工作空间记录你正在做什么。每条经历认证独立保存，可以同时证明多段经历。</p></div><button class="primary-button" type="button" data-identity-center-new><i data-lucide="plus"></i>新建工作空间</button></div>${current ? `<section class="identity-current-record"><span class="identity-current-icon"><i data-lucide="${identityRoleIcon(current.role, current.mode)}"></i></span><div><small>当前正在使用</small><strong>${escapeHtml(identityRecordLabel(current).title)}</strong><small>${escapeHtml(current.lastAction || `上次停留：${identityViewLabel(identityRecordView(current))}`)} · ${escapeHtml(identityRecordTime(current.lastUsedAt || current.updatedAt))}</small></div><div class="identity-current-status">${credentialBadge(current)}<b>使用中</b></div></section>` : ""}<div class="identity-workspace-toolbar"><div class="identity-view-tabs" role="tablist" aria-label="工作空间查看方式"><button class="${viewMode === "cards" ? "active" : ""}" type="button" role="tab" data-identity-view-mode="cards" aria-selected="${viewMode === "cards"}"><i data-lucide="layout-grid"></i>工作空间</button><button class="${viewMode === "path" ? "active" : ""}" type="button" role="tab" data-identity-view-mode="path" aria-selected="${viewMode === "path"}"><i data-lucide="route"></i>人生路径</button></div><button class="text-button" type="button" data-identity-show-archived aria-pressed="${showArchived}"><i data-lucide="archive"></i>${showArchived ? "返回使用中" : `查看归档（${allRecords.filter((record) => record.archived).length}）`}</button></div>${viewMode === "path" ? pathMarkup : `<div class="identity-record-grid">${records.length ? records.map(cardMarkup).join("") : `<div class="identity-record-empty"><i data-lucide="layers-3"></i><strong>${showArchived ? "没有归档的工作空间" : "还没有工作空间"}</strong><p>${showArchived ? "归档后可以在这里恢复或删除。" : "新建后可以命名目标，并从这里继续上次的工作。"}</p></div>`}</div>`}`;
     hydrateIcons();
     return;
   }
@@ -1699,21 +1910,21 @@ function renderIdentityCenter() {
   const teacher = state.role === "teacher";
   const professional = state.role === "professional";
   const answerer = state.mode === "answerer";
+  const proposedProfile = { role: state.role, mode: state.role === "parent" ? "family" : state.mode, scope: state.scope };
+  const existingWorkspace = identityRecordForProfile(proposedProfile, { excludeId: state.editingId || "", user });
   const scopeTitle = family ? "选择孩子当前决策阶段" : answerer ? "你能够回答哪个阶段" : "选择当前决策阶段";
   const scopeCopy = family ? "阶段决定家庭协同里优先展示的内容。" : answerer ? "回答范围应该来自真实经历或认证信息。" : "这个选择只决定当前优先展示的内容。";
   const availableModes = family
     ? [{ key: "family", title: "进入家庭协同", icon: "users-round", text: "查看孩子主动共享的候选，表达建议并参与家庭讨论。" }]
-    : teacher
-      ? [{ key: "answerer", title: "作为教师回答者", icon: "presentation", text: "分享课程、培养、升学指导和职业认知中的真实观察。" }]
-      : professional
-        ? [{ key: "answerer", title: "作为从业者回答者", icon: "briefcase-business", text: "分享岗位、行业、城市和职业发展的真实观察。" }]
-      : IDENTITY_ENTRY_MODES;
+    : IDENTITY_ENTRY_MODES;
   let content = "";
   if (state.step === 1) content = `<div class="identity-center-editor-heading"><span>01 / 04</span><h2>选择当前社会身份</h2><p>一个账号可以保存多条身份记录。</p></div><div class="identity-entry-choice-grid">${identityCenterChoiceMarkup(IDENTITY_ENTRY_ROLES, "role", state.role)}</div>`;
-  else if (state.step === 2) content = `<div class="identity-center-editor-heading"><span>02 / 04</span><h2>${teacher ? "教师身份进入回答工作台" : professional ? "从业者身份进入回答工作台" : "这次来到引路，你想做什么？"}</h2><p>${teacher ? "教师身份只开放回答者工作台，方便把教学与指导经验讲给正在选择的人。" : professional ? "从业者身份只开放回答者工作台，方便把岗位与行业经验讲给正在选择的人。" : "工作状态可以随时切换，不会改变社会身份。"}</p></div><div class="identity-entry-choice-grid identity-entry-mode-grid">${identityCenterChoiceMarkup(availableModes, "mode", state.mode)}</div>`;
-  else if (state.step === 3) content = `<div class="identity-center-editor-heading"><span>03 / 04</span><h2>${scopeTitle}</h2><p>${scopeCopy}</p></div><div class="identity-entry-scope-list">${identityCenterScopeMarkup(state.scope)}</div>`;
-  else content = `<div class="identity-center-editor-heading"><span>04 / 04</span><h2>确认这条身份记录</h2><p>保存后可以从身份中心再次进入。</p></div><div class="identity-center-summary"><div><span>社会身份</span><strong>${identityEntryRoleLabel(state.role)}</strong></div><div><span>工作状态</span><strong>${identityEntryModeLabel(state.mode)}</strong></div><div><span>当前范围</span><strong>${identityEntryScopeLabel(state.scope)}</strong></div></div><div class="identity-center-destination"><span>确认后进入</span><strong>${identityEntryRoleLabel(state.role)} · ${identityEntryModeLabel(state.mode)}工作台</strong><small>${family ? "进入家庭协同，查看学生主动授权的候选。" : answerer ? "进入回答中心，查看对应阶段的问题。" : "进入决策工作台，继续查看信息和候选。"}</small></div>`;
-  panel.innerHTML = `<div class="identity-center-editor"><button class="text-button identity-center-back" type="button" data-identity-center-records><i data-lucide="arrow-left"></i>返回身份记录</button><div class="identity-center-editor-body"><aside><span class="section-kicker">身份中心</span><h1>${state.step === 4 ? "确认并保存" : "建立一条新的工作台记录"}</h1><p>身份记录让不同的使用目标彼此独立，之后可以快速回到上次工作位置。</p><div class="identity-center-route"><span>当前将进入</span><strong>${identityEntryRoleLabel(state.role)} · ${identityEntryModeLabel(state.mode)}</strong><small>${identityEntryScopeLabel(state.scope)}</small></div></aside><main>${content}<div class="identity-center-actions"><button class="quiet-button" type="button" data-identity-center-back ${state.step === 1 ? "disabled" : ""}>上一步</button><button class="primary-button" type="button" data-identity-center-next>${state.step === 4 ? "保存并进入" : "继续"}</button></div></main></div></div>`;
+  else if (state.step === 2) content = `<div class="identity-center-editor-heading"><span>02 / 04</span><h2>这次来到引路，你想做什么？</h2><p>${teacher ? "可以为继续深造、转岗或求职做决定，也可以分享教学与指导经验。" : professional ? "可以为继续深造、转行或求职做决定，也可以分享真实从业经验。" : "工作状态可以随时切换，不会改变社会身份。"}</p></div><div class="identity-entry-choice-grid identity-entry-mode-grid">${identityCenterChoiceMarkup(availableModes, "mode", state.mode)}</div>`;
+  else if (state.step === 3) content = `<div class="identity-center-editor-heading"><span>03 / 04</span><h2>${scopeTitle}</h2><p>${["teacher", "professional"].includes(state.role) && state.mode === "planner" ? "当前身份可以选择考研深造或就业方向，之后仍可随时切换。" : scopeCopy}</p></div><div class="identity-entry-scope-list">${identityCenterScopeMarkup(state.scope, identityCenterScopeOptions(state))}</div>`;
+  else content = existingWorkspace
+    ? `<div class="identity-center-editor-heading"><span>04 / 04</span><h2>这个阶段已经创建过</h2><p>同一身份、工作状态和阶段只保留一个工作空间，避免记录被拆散。</p></div><div class="identity-existing-workspace"><span><i data-lucide="layers-3"></i></span><div><small>已有工作空间</small><strong>${escapeHtml(identityRecordLabel(existingWorkspace).title)}</strong><p>${escapeHtml(existingWorkspace.goal || existingWorkspace.lastAction || "继续上次的进度")}</p></div><b>将进入原空间</b></div><div class="identity-center-summary"><div><span>社会身份</span><strong>${identityEntryRoleLabel(state.role)}</strong></div><div><span>工作状态</span><strong>${identityEntryModeLabel(proposedProfile.mode)}</strong></div><div><span>当前范围</span><strong>${identityEntryScopeLabel(state.scope)}</strong></div></div>`
+    : `<div class="identity-center-editor-heading"><span>04 / 04</span><h2>给这次工作起一个容易记住的名字</h2><p>名称和目标会显示在工作空间与人生路径里，之后都可以修改。</p></div><div class="identity-workspace-fields"><label for="identityWorkspaceName"><span>工作空间名称</span><input id="identityWorkspaceName" type="text" maxlength="24" value="${escapeHtml(state.workspaceName || identityDefaultWorkspaceName(state))}" placeholder="例如：冲刺福州大学计算机"></label><label for="identityWorkspaceGoal"><span>这次要解决什么</span><textarea id="identityWorkspaceGoal" maxlength="100" placeholder="例如：确认三所候选院校，并在报名截止前完成专业比较。">${escapeHtml(state.workspaceGoal || "")}</textarea></label></div><div class="identity-center-summary"><div><span>社会身份</span><strong>${identityEntryRoleLabel(state.role)}</strong></div><div><span>工作状态</span><strong>${identityEntryModeLabel(state.mode)}</strong></div><div><span>当前范围</span><strong>${identityEntryScopeLabel(state.scope)}</strong></div></div><div class="identity-center-destination"><span>确认后进入</span><strong>${identityEntryRoleLabel(state.role)} · ${identityEntryModeLabel(state.mode)}工作台</strong><small>${family ? "进入家庭协同，查看学生主动授权的候选。" : answerer ? "进入回答中心，查看对应阶段的问题。" : "进入决策工作台，继续查看信息和候选。"}</small></div>`;
+  panel.innerHTML = `<div class="identity-center-editor"><button class="text-button identity-center-back" type="button" data-identity-center-records><i data-lucide="arrow-left"></i>返回身份记录</button><div class="identity-center-editor-body"><aside><span class="section-kicker">身份中心</span><h1>${state.step === 4 ? existingWorkspace ? "继续已有工作" : "确认并保存" : "建立一条新的工作台记录"}</h1><p>身份记录让不同的使用目标彼此独立，之后可以快速回到上次工作位置。</p><div class="identity-center-route"><span>当前将进入</span><strong>${identityEntryRoleLabel(state.role)} · ${identityEntryModeLabel(state.mode)}</strong><small>${identityEntryScopeLabel(state.scope)}</small></div></aside><main>${content}<div class="identity-center-actions"><button class="quiet-button" type="button" data-identity-center-back ${state.step === 1 ? "disabled" : ""}>上一步</button><button class="primary-button" type="button" data-identity-center-next>${state.step === 4 ? existingWorkspace ? "进入已有空间" : "保存并进入" : "继续"}</button></div></main></div></div>`;
   hydrateIcons();
 }
 
@@ -1727,7 +1938,7 @@ function showIdentityCenterEditor(record = null) {
 
 function openIdentityCenter() {
   if (!currentUser()) return showAccount();
-  identityCenterState = { screen: "records" };
+  identityCenterState = { screen: "records", viewMode: "cards", showArchived: false };
   switchView("identity");
   updateShellViewUrl("identity");
 }
@@ -1735,58 +1946,107 @@ function openIdentityCenter() {
 function enterIdentityRecord(record) {
   const user = currentUser();
   if (!user || !record) return;
-  const normalizedRecord = ["teacher", "professional"].includes(record.role) ? { ...record, mode: "answerer", id: identityRecordId({ ...record, mode: "answerer" }) } : record;
+  const normalizedRecord = record;
   const profile = identityEntryProfile(user);
   const activeId = profile?.recordId || (profile ? identityRecordId(profile) : "");
   const enter = () => {
     const profiles = read(STORE.identityProfile, {});
     profiles[identityEntryKey(user)] = { role: normalizedRecord.role, mode: normalizedRecord.mode, scope: normalizedRecord.scope, recordId: normalizedRecord.id, complete: true, updatedAt: new Date().toISOString() };
     write(STORE.identityProfile, profiles);
-    updateCurrentUser({ identityRole: identityEntryRoleLabel(normalizedRecord.role), identityMode: identityEntryModeLabel(normalizedRecord.mode), identityScope: identityEntryScopeLabel(normalizedRecord.scope), stage: identityEntryScopeLabel(normalizedRecord.scope) });
+    updateCurrentUser({ role: identityEntryRoleLabel(normalizedRecord.role), identityRole: identityEntryRoleLabel(normalizedRecord.role), identityMode: identityEntryModeLabel(normalizedRecord.mode), identityScope: identityEntryScopeLabel(normalizedRecord.scope), stage: identityEntryScopeLabel(normalizedRecord.scope) });
     localStorage.setItem(STORE.identityMode, normalizedRecord.mode === "answerer" ? "answerer" : "planner");
     if (normalizedRecord.mode === "answerer") localStorage.setItem("yinlu_answerer_stage", normalizedRecord.scope === "graduate" ? "kaoyan" : normalizedRecord.scope === "career" ? "jiuye" : "gaokao");
-    upsertIdentityRecord(normalizedRecord, { lastView: identityRecordView(normalizedRecord), replaceId: record.id });
+    upsertIdentityRecord(normalizedRecord, { lastView: identityRecordView(normalizedRecord), replaceId: record.id, metadata: { name: normalizedRecord.name, goal: normalizedRecord.goal, archived: false, lastAction: `进入${identityViewLabel(identityRecordView(normalizedRecord))}` } });
     setStage(normalizedRecord.scope);
     setIdentityMode(normalizedRecord.mode === "answerer" ? "answerer" : "planner", { persist: true, switchContent: false });
     updateAccountHeader();
+    const target = identityRecordView(normalizedRecord);
     if (normalizedRecord.role === "parent" || normalizedRecord.mode === "family") {
-      navigateWithPageTransition(`./index.html?familyPortal=1&stage=${encodeURIComponent(normalizedRecord.scope)}`);
+      navigateWithPageTransition(familyPortalHref(target, normalizedRecord.scope));
       return;
     }
-    const target = identityRecordView(normalizedRecord);
     switchView(target);
-    updateShellViewUrl(target);
+    updateShellViewUrl(target, null, normalizedRecord.scope);
     showToast(`已进入：${identityRecordLabel(normalizedRecord).title}`);
   };
   if (normalizedRecord.id === activeId || record.id === activeId) enter();
   else openSwitchConfirm({ title: `切换到${identityRecordLabel(normalizedRecord).title}？`, description: `将进入${identityRecordLabel(normalizedRecord).scope}的${identityEntryModeLabel(normalizedRecord.mode)}工作台，原有记录不会被删除。`, action: enter });
 }
 
+function setIdentityRecordArchived(record, archived) {
+  const user = currentUser();
+  if (!user || !record) return;
+  const profile = identityEntryProfile(user);
+  const activeId = profile?.recordId || (profile ? identityRecordId(profile) : "");
+  if (archived && record.id === activeId) { showToast("正在使用的工作空间不能归档，请先切换到另一条记录"); return; }
+  const all = read(STORE.identityRecords, {});
+  const records = Array.isArray(all[user.id]) ? all[user.id] : [];
+  const target = records.find((item) => item.id === record.id);
+  if (!target) return;
+  target.archived = archived;
+  target.updatedAt = new Date().toISOString();
+  all[user.id] = records;
+  write(STORE.identityRecords, all);
+  renderIdentityCenter();
+  showToast(archived ? "工作空间已归档" : "工作空间已恢复");
+}
+
+function deleteIdentityRecord(record) {
+  const user = currentUser();
+  if (!user || !record) return;
+  const profile = identityEntryProfile(user);
+  const activeId = profile?.recordId || (profile ? identityRecordId(profile) : "");
+  if (record.id === activeId) { showToast("正在使用的工作空间不能删除，请先切换到另一条记录"); return; }
+  openSwitchConfirm({ title: `删除“${identityRecordLabel(record).title}”？`, description: "这会删除该工作空间的名称、目标和入口记录，不会删除账号中的候选、提问、收藏或日历内容。此操作无法撤回。", confirmLabel: "确认删除", action: () => {
+    const all = read(STORE.identityRecords, {});
+    all[user.id] = (all[user.id] || []).filter((item) => item.id !== record.id);
+    write(STORE.identityRecords, all);
+    renderIdentityCenter();
+    showToast("工作空间记录已删除");
+  } });
+}
+
 function finishIdentityCenterEditor() {
   const user = currentUser();
   const state = identityCenterState;
   if (!user || !state || state.screen !== "editor") return;
-  const profile = { role: state.role, mode: state.role === "parent" ? "family" : ["teacher", "professional"].includes(state.role) ? "answerer" : state.mode === "family" ? "family" : state.mode, scope: state.scope };
-  const record = upsertIdentityRecord(profile, { lastView: state.mode === "answerer" ? "answerer" : state.mode === "family" ? "family-overview" : "home", replaceId: state.editingId });
+  const workspaceName = $("#identityWorkspaceName")?.value.trim() || state.workspaceName?.trim() || identityDefaultWorkspaceName(state);
+  const workspaceGoal = $("#identityWorkspaceGoal")?.value.trim() || state.workspaceGoal?.trim() || "";
+  if (!workspaceName) { showToast("请填写工作空间名称"); $("#identityWorkspaceName")?.focus(); return; }
+  const profile = { role: state.role, mode: state.role === "parent" ? "family" : state.mode === "family" ? "family" : state.mode, scope: state.scope };
+  const targetView = profile.mode === "answerer" ? "answerer" : profile.mode === "family" ? "family-overview" : "home";
+  const existingWorkspace = identityRecordForProfile(profile, { excludeId: state.editingId || "", user });
+  if (existingWorkspace && state.editingId) {
+    const all = read(STORE.identityRecords, {});
+    all[user.id] = (all[user.id] || []).filter((item) => item.id !== state.editingId);
+    write(STORE.identityRecords, all);
+  }
+  const record = upsertIdentityRecord(profile, {
+    lastView: targetView,
+    replaceId: existingWorkspace?.id || state.editingId || identityRecordId(profile),
+    metadata: existingWorkspace
+      ? { archived: false, lastAction: `返回${identityViewLabel(targetView)}` }
+      : { name: workspaceName, goal: workspaceGoal, lastAction: state.editingId ? "更新工作空间信息" : `创建并进入${identityViewLabel(targetView)}` }
+  });
   if (!record) return;
   const profiles = read(STORE.identityProfile, {});
   profiles[identityEntryKey(user)] = { ...profile, recordId: record.id, complete: true, updatedAt: new Date().toISOString() };
   write(STORE.identityProfile, profiles);
-  updateCurrentUser({ identityRole: identityEntryRoleLabel(profile.role), identityMode: identityEntryModeLabel(profile.mode), identityScope: identityEntryScopeLabel(profile.scope), stage: identityEntryScopeLabel(profile.scope) });
+  updateCurrentUser({ role: identityEntryRoleLabel(profile.role), identityRole: identityEntryRoleLabel(profile.role), identityMode: identityEntryModeLabel(profile.mode), identityScope: identityEntryScopeLabel(profile.scope), stage: identityEntryScopeLabel(profile.scope) });
   localStorage.setItem(STORE.identityMode, profile.mode === "answerer" ? "answerer" : "planner");
   if (profile.mode === "answerer") localStorage.setItem("yinlu_answerer_stage", profile.scope === "graduate" ? "kaoyan" : profile.scope === "career" ? "jiuye" : "gaokao");
   setStage(profile.scope);
   setIdentityMode(profile.mode === "answerer" ? "answerer" : "planner", { persist: true, switchContent: false });
   identityCenterState = null;
   updateAccountHeader();
+  const target = identityRecordView(record);
   if (profile.role === "parent" || profile.mode === "family") {
-    navigateWithPageTransition(`./index.html?familyPortal=1&stage=${encodeURIComponent(profile.scope)}`);
+    navigateWithPageTransition(familyPortalHref(target, profile.scope));
     return;
   }
-  const target = identityRecordView(record);
   switchView(target);
-  updateShellViewUrl(target);
-  showToast("身份记录已保存");
+  updateShellViewUrl(target, null, profile.scope);
+  showToast(existingWorkspace ? "这个阶段已经创建过，已进入原工作空间" : "身份记录已保存");
 }
 
 function currentIdentityRoleKey() {
@@ -1796,14 +2056,40 @@ function currentIdentityRoleKey() {
 
 function identityBranchBreadcrumb() {
   const role = currentIdentityRoleKey();
-  const roleLabel = role === "guest" ? "学生" : identityEntryRoleLabel(role);
+  if (role === "guest") return { label: "游客浏览", href: "./index.html?view=home" };
+  const roleLabel = identityEntryRoleLabel(role);
+  const profile = identityEntryProfile();
+  const activeRecord = profile?.recordId ? identityRecordsForUser().find((record) => record.id === profile.recordId) : null;
+  if (activeRecord) {
+    return { label: `${roleLabel}${activeRecord.mode === "answerer" ? "回答者" : activeRecord.mode === "family" ? "家庭协同" : "决策者"}首页`, href: identityWorkspaceHref(activeRecord) };
+  }
   if (currentIdentityMode === "answerer") {
     return { label: `${roleLabel}回答者首页`, href: answererPortalHref("portal") };
   }
   if (role === "parent") {
     return { label: "家长家庭协同首页", href: familyPortalHref("portal", currentStage) };
   }
-  return { label: `${roleLabel}决策者首页`, href: "./index.html?workspace=1" };
+  return { label: `${roleLabel}决策者首页`, href: role === "student" ? "./index.html?workspace=1" : `./index.html?view=home&stage=${encodeURIComponent(currentStage)}` };
+}
+
+const ANSWERER_WORKSPACE_VIEWS = new Set(["answerer", "answerer-experience", "answerer-history", "answerer-stage", "trust"]);
+const FAMILY_WORKSPACE_VIEWS = new Set(["family-overview", "experience", "compare", "family-discussion", "family-advice", "family-planning", "family-permissions"]);
+const GUEST_WORKSPACE_VIEWS = new Set(["home", "experience", "questions", "school-detail"]);
+
+function normalizeViewForContext(name) {
+  const requested = name || "home";
+  if (requested === "school-detail") return requested;
+  if (requested === "identity") return currentUser() ? requested : "home";
+  const role = currentIdentityRoleKey();
+  if (role === "guest") return GUEST_WORKSPACE_VIEWS.has(requested) ? requested : "experience";
+  if (role === "parent") return FAMILY_WORKSPACE_VIEWS.has(requested) ? requested : "family-overview";
+  if (currentIdentityMode === "answerer") return ANSWERER_WORKSPACE_VIEWS.has(requested) ? requested : "answerer";
+  if (requested === "family-permissions" && role === "student") return requested;
+  const plannerViews = new Set(["home", "experience", "questions", "planning", "trust"]);
+  plannerViews.add(currentStage === "career" ? "collections" : "compare");
+  if (plannerViews.has(requested)) return requested;
+  if (["collections", "compare"].includes(requested)) return "experience";
+  return "home";
 }
 
 function updateBreadcrumbHierarchy() {
@@ -1817,12 +2103,13 @@ function updateBreadcrumbHierarchy() {
 
 function applyIdentityRoleContext() {
   const role = currentIdentityRoleKey();
+  const guest = role === "guest";
   const parent = role === "parent";
   const teacher = role === "teacher";
   const professional = role === "professional";
   document.body.dataset.identityRole = role;
   const workbenchLabel = $("#workbenchModeLabel");
-  if (workbenchLabel) workbenchLabel.textContent = currentIdentityMode === "answerer" ? "回答工作台" : parent ? "家庭协同" : "决策工作台";
+  if (workbenchLabel) workbenchLabel.textContent = guest ? "访客浏览" : currentIdentityMode === "answerer" ? "回答工作台" : parent ? "家庭协同" : "决策工作台";
   const identityLabel = $("#identityModeLabel");
   if (identityLabel) identityLabel.textContent = identitySwitcherLabel();
   const answererLabels = {
@@ -1832,10 +2119,22 @@ function applyIdentityRoleContext() {
     "#answererNavStageLabel": teacher ? "指导阶段" : "回答阶段"
   };
   Object.entries(answererLabels).forEach(([selector, label]) => { const element = $(selector); if (element) element.textContent = label; });
+  const questionsLabel = $("#questionsNavLabel");
+  if (questionsLabel) questionsLabel.textContent = guest ? "问答中心" : "匿名提问";
   const compareLabel = $("#compareNavItem span:not(.nav-dot-icon)");
-  if (compareLabel) compareLabel.textContent = parent ? "共享候选" : "我的候选";
+  if (compareLabel) compareLabel.textContent = parent ? (currentStage === "career" ? "共享职业收藏" : "共享候选") : "我的候选";
+  const familyInfoLabel = $("#familyInfoNavLabel");
+  if (familyInfoLabel) familyInfoLabel.textContent = currentStage === "career" ? "职业参考" : "院校与经验";
+  const familySharedLabel = $("#familySharedNavLabel");
+  if (familySharedLabel) familySharedLabel.textContent = currentStage === "career" ? "共享职业收藏" : "共享候选";
   const planningNavItem = $('#plannerNav .nav-item[data-view="planning"]');
   if (planningNavItem) planningNavItem.hidden = parent;
+  const compareNavItem = $("#compareNavItem");
+  const collectionsNavItem = $("#collectionsNavItem");
+  const plannerTrustNavItem = $("#plannerTrustNavItem");
+  if (compareNavItem) compareNavItem.hidden = guest || currentStage === "career";
+  if (collectionsNavItem) collectionsNavItem.hidden = guest || currentStage !== "career";
+  if (plannerTrustNavItem) plannerTrustNavItem.hidden = guest;
   const candidateTabs = $("#view-compare .candidate-tabs");
   const candidateActions = $("#view-compare .candidate-page-actions");
   if (candidateTabs) candidateTabs.hidden = parent;
@@ -1846,14 +2145,14 @@ function applyIdentityRoleContext() {
     const title = $("h1", compareHeader);
     const copy = $("p", compareHeader);
     if (kicker) kicker.textContent = parent ? "家庭协同" : "我的候选";
-    if (title) title.textContent = parent ? "查看孩子主动共享的候选" : "把选择放在同一张桌面上";
-    if (copy) copy.textContent = parent ? "家长只能查看学生主动授权的候选和对比结果，匿名提问、搜索记录与未授权收藏保持私密。" : "收藏学校和专业，按你在意的维度进行比较，也可以把候选清单授权给家长共同查看。";
+    if (title) title.textContent = parent ? (currentStage === "career" ? "查看孩子主动共享的职业收藏" : "查看孩子主动共享的候选") : "把选择放在同一张桌面上";
+    if (copy) copy.textContent = parent ? (currentStage === "career" ? "这里只显示学生主动授权的就业收藏与岗位参考，未授权收藏、提问和浏览记录保持私密。" : "家长只能查看学生主动授权的候选和对比结果，匿名提问、搜索记录与未授权收藏保持私密。") : "收藏学校和专业，按你在意的维度进行比较，也可以把候选清单授权给家长共同查看。";
   }
   const plannerNav = $("#plannerNav");
   const answererNav = $("#answererNav");
   const familyNav = $("#familyNav");
   const identityModeToggle = $("#identityModeToggle");
-  if (identityModeToggle) identityModeToggle.hidden = teacher || professional;
+  if (identityModeToggle) identityModeToggle.hidden = false;
   if (plannerNav) plannerNav.hidden = currentIdentityMode === "answerer" || parent;
   if (answererNav) answererNav.hidden = currentIdentityMode !== "answerer";
   if (familyNav) familyNav.hidden = currentIdentityMode === "answerer" || !parent;
@@ -1866,8 +2165,7 @@ function applyIdentityRoleContext() {
 }
 
 function setIdentityMode(mode, { persist = true, switchContent = true } = {}) {
-  const restrictedAnswerer = ["teacher", "professional"].includes(currentIdentityRoleKey());
-  const nextMode = restrictedAnswerer || mode === "answerer" ? "answerer" : "planner";
+  const nextMode = mode === "answerer" ? "answerer" : "planner";
   const previousMode = currentIdentityMode;
   if (nextMode === "answerer" && previousMode !== "answerer") {
     plannerViewBeforeIdentity = $(".view.active")?.id.replace("view-", "") || "home";
@@ -1892,8 +2190,8 @@ function setIdentityMode(mode, { persist = true, switchContent = true } = {}) {
   });
   const toggle = $("#identityModeToggle");
   if (toggle) {
-    toggle.hidden = restrictedAnswerer;
-    toggle.title = `切换到${nextMode === "answerer" ? "决策者" : "回答者"}`;
+    toggle.hidden = false;
+    toggle.title = parent ? "切换身份或家庭工作空间" : `切换到${nextMode === "answerer" ? "决策者" : "回答者"}`;
   }
   if (switchContent) {
     const targetView = nextMode === "answerer"
@@ -1907,6 +2205,7 @@ function setIdentityMode(mode, { persist = true, switchContent = true } = {}) {
 }
 
 function switchView(name) {
+  name = normalizeViewForContext(name);
   const previousView = $(".view.active")?.id.replace("view-", "");
   if (previousView && previousView !== name) captureCurrentIdentityRecordView(previousView);
   $$(".view").forEach((view) => view.classList.toggle("active", view.id === `view-${name}`));
@@ -1926,6 +2225,7 @@ function switchView(name) {
   updateGlobalStageSwitcher();
   if (name === "experience") renderExperiences();
   if (name === "questions") renderQuestions();
+  if (name === "collections") renderCollections();
   if (name === "compare") { renderCompare(); renderFamily(); }
   if (name === "trust") renderTrust();
   if (name === "answerer") renderAnswererWorkbench();
@@ -1938,51 +2238,72 @@ function switchView(name) {
   renderCyberPetContext();
   suppressBackToTopDuringViewChange();
   window.scrollTo({ top: 0, behavior: document.body.classList.contains("onboarding-active") ? "auto" : "smooth" });
+  return name;
 }
 
-function updateShellViewUrl(name, nav) {
+function updateShellViewUrl(name, nav, stageOverride = "") {
   const url = new URL(window.location.href);
   const navUrl = nav?.href ? new URL(nav.href, window.location.href) : null;
   url.searchParams.set("view", name);
+  if (stageOverride && stageOrder.includes(stageOverride)) url.searchParams.set("stage", stageOverride);
   const tab = name === "questions" ? navUrl?.searchParams.get("tab") : "";
   if (tab) url.searchParams.set("tab", tab);
   else url.searchParams.delete("tab");
   const section = name === "answerer" ? navUrl?.searchParams.get("section") : "";
   if (section) url.searchParams.set("section", section);
   else url.searchParams.delete("section");
+  url.searchParams.delete("workspace");
+  url.searchParams.delete("answererPortal");
+  url.searchParams.delete("familyPortal");
+  const profile = identityEntryProfile();
+  if (profile?.role === "parent" || profile?.mode === "family") url.searchParams.set("identity", "parent");
+  else if (profile?.mode === "answerer") url.searchParams.set("identity", "answerer");
+  else url.searchParams.delete("identity");
   if (url.href !== window.location.href) window.history.pushState(null, "", url);
 }
 
 function applyInitialRouteState() {
   const params = new URLSearchParams(window.location.search);
+  if (isPublicEntry()) return;
   const requestedStage = params.get("stage");
   const requestedView = params.get("view");
   const answererStage = params.get("answerStage");
   if (answererStage && ANSWERER_STAGE_CONFIG[answererStage]) {
     localStorage.setItem("yinlu_answerer_stage", answererStage);
   }
+  const profile = identityEntryIsComplete() ? identityEntryProfile() : null;
   const requestedMode = params.get("identity");
   const storedMode = localStorage.getItem(STORE.identityMode) === "answerer" ? "answerer" : "planner";
   const answererInternalViews = ["answerer", "answerer-experience", "answerer-history", "answerer-stage"];
   const familyInternalViews = ["family-overview", "family-discussion", "family-advice", "family-planning", "family-permissions"];
-  const initialMode = requestedMode === "answerer" || requestedView === "answerer" || answererInternalViews.includes(requestedView) || isAnswererPortalEntry()
+  const initialMode = profile
+    ? profile.mode === "answerer" ? "answerer" : "planner"
+    : requestedMode === "answerer" || requestedView === "answerer" || answererInternalViews.includes(requestedView) || isAnswererPortalEntry()
     ? "answerer"
     : requestedMode === "planner" ? "planner" : storedMode;
   setIdentityMode(initialMode, { persist: Boolean(requestedMode || requestedView === "answerer" || answererInternalViews.includes(requestedView) || isAnswererPortalEntry()), switchContent: false });
-  const allowedViews = new Set(["home", "experience", "questions", "answerer", "answerer-experience", "answerer-history", "answerer-stage", "compare", "planning", "trust", "identity", ...familyInternalViews]);
-  if (stageOrder.includes(requestedStage)) {
-    setStage(requestedStage);
-    if (GLOBAL_STAGE_CONFIG.some((item) => item.key === requestedStage)) localStorage.setItem("yinlu_portal_last_stage", requestedStage);
+  const allowedViews = new Set(["home", "experience", "questions", "collections", "answerer", "answerer-experience", "answerer-history", "answerer-stage", "compare", "planning", "trust", "identity", ...familyInternalViews]);
+  const restoredStage = profile?.scope || requestedStage;
+  if (stageOrder.includes(restoredStage)) {
+    setStage(restoredStage);
+    if (GLOBAL_STAGE_CONFIG.some((item) => item.key === restoredStage)) localStorage.setItem("yinlu_portal_last_stage", restoredStage);
+    if (profile && requestedStage !== restoredStage) {
+      const restoredUrl = new URL(window.location.href);
+      restoredUrl.searchParams.set("stage", restoredStage);
+      window.history.replaceState(null, "", restoredUrl);
+    }
   }
-  const stageSafeView = currentStage === "career" && requestedView === "compare" && currentIdentityRoleKey() !== "parent" ? "experience" : requestedView;
-  if (stageSafeView !== requestedView) {
+  const restoredRecord = profile ? identityRecordsForUser().find((record) => record.id === profile.recordId) || profile : null;
+  const stageSafeView = normalizeViewForContext(requestedView || (restoredRecord ? identityRecordView(restoredRecord) : "home"));
+  const canonicalIdentity = profile?.role === "parent" || profile?.mode === "family" ? "parent" : profile?.mode === "answerer" ? "answerer" : "";
+  if (stageSafeView !== requestedView || (profile && requestedMode !== canonicalIdentity)) {
     const safeUrl = new URL(window.location.href);
     safeUrl.searchParams.set("view", stageSafeView);
+    if (canonicalIdentity) safeUrl.searchParams.set("identity", canonicalIdentity);
+    else safeUrl.searchParams.delete("identity");
     window.history.replaceState(null, "", safeUrl);
   }
-  const initialView = currentIdentityMode === "answerer" && ["home", "experience", "compare", "planning"].includes(stageSafeView)
-    ? "answerer"
-    : stageSafeView;
+  const initialView = stageSafeView;
   if (allowedViews.has(initialView)) switchView(initialView);
   else if (!requestedView && currentIdentityMode === "answerer") switchView("answerer");
   if (currentIdentityMode === "answerer") switchQaTab("answer");
@@ -2145,7 +2466,7 @@ function isFamilyPortalEntry() {
 function isFamilyInternalEntry() {
   const view = new URLSearchParams(window.location.search).get("view");
   return ["family-overview", "family-discussion", "family-advice", "family-planning", "family-permissions"].includes(view)
-    || (view === "compare" && currentIdentityRoleKey() === "parent");
+    || (["compare", "experience"].includes(view) && currentIdentityRoleKey() === "parent");
 }
 
 function familyPortalHref(view = "portal", stage = currentStage) {
@@ -2165,6 +2486,10 @@ function updateFamilyNavigationLinks() {
     const view = link.dataset.view;
     link.href = familyPortalHref(view, stage);
   });
+  const infoLabel = $("#familyInfoNavLabel");
+  if (infoLabel) infoLabel.textContent = stage === "career" ? "职业参考" : "院校与经验";
+  const sharedLabel = $("#familySharedNavLabel");
+  if (sharedLabel) sharedLabel.textContent = stage === "career" ? "共享职业收藏" : "共享候选";
 }
 
 function updateFamilyPortalLinks() {
@@ -2340,6 +2665,242 @@ function setGlobalStageBarCollapsed(collapsed) {
   hydrateIcons();
 }
 
+const FLOATING_STAGE_POSITION_KEY = "yinlu_floating_stage_position";
+let floatingStageDragState = null;
+let floatingStageSuppressClick = false;
+let floatingStageOrbPosition = null;
+
+function clampFloatingStagePosition(left, top) {
+  const margin = 12;
+  const size = window.innerWidth <= 620 ? 52 : 56;
+  return {
+    left: Math.min(Math.max(Number(left) || margin, margin), Math.max(margin, window.innerWidth - size - margin)),
+    top: Math.min(Math.max(Number(top) || margin, margin), Math.max(margin, window.innerHeight - size - margin))
+  };
+}
+
+function setFloatingStagePosition(left, top, { persist = false } = {}) {
+  const assist = $("#floatingStageAssist");
+  if (!assist) return;
+  const position = clampFloatingStagePosition(left, top);
+  assist.style.left = `${position.left}px`;
+  assist.style.top = `${position.top}px`;
+  assist.style.right = "auto";
+  if (persist) {
+    try { localStorage.setItem(FLOATING_STAGE_POSITION_KEY, JSON.stringify(position)); } catch (error) {}
+  }
+}
+
+function restoreFloatingStagePosition() {
+  const assist = $("#floatingStageAssist");
+  if (!assist) return;
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(FLOATING_STAGE_POSITION_KEY) || "null"); } catch (error) {}
+  if (saved && Number.isFinite(saved.left) && Number.isFinite(saved.top)) {
+    setFloatingStagePosition(saved.left, saved.top);
+    return;
+  }
+  const size = window.innerWidth <= 620 ? 52 : 56;
+  const mobilePortalTop = isPortalEntry() || isAnswererPortalEntry() || isFamilyPortalEntry() ? 196 : 92;
+  setFloatingStagePosition(window.innerWidth - size - 18, window.innerWidth <= 620 ? mobilePortalTop : 82);
+}
+
+function setFloatingStageDrawerOpen(open) {
+  const assist = $("#floatingStageAssist");
+  const orb = $("#floatingStageOrb");
+  const drawer = $("#floatingStageDrawer");
+  if (!assist || !orb || !drawer) return;
+  if (open) {
+    const orbRect = orb.getBoundingClientRect();
+    floatingStageOrbPosition = { left: orbRect.left, top: orbRect.top };
+    assist.classList.add("is-open");
+    drawer.hidden = false;
+    orb.hidden = true;
+    const drawerWidth = drawer.offsetWidth;
+    const drawerHeight = drawer.offsetHeight;
+    const left = Math.min(Math.max(12, orbRect.right - drawerWidth), Math.max(12, window.innerWidth - drawerWidth - 12));
+    const top = Math.min(Math.max(84, orbRect.top), Math.max(84, window.innerHeight - drawerHeight - 12));
+    assist.style.left = `${left}px`;
+    assist.style.top = `${top}px`;
+  } else {
+    drawer.hidden = true;
+    assist.classList.remove("is-open");
+    orb.hidden = false;
+    const position = floatingStageOrbPosition;
+    if (position) setFloatingStagePosition(position.left, position.top);
+  }
+  orb.setAttribute("aria-expanded", String(open));
+}
+
+function floatingStageMenuModel() {
+  const role = currentIdentityRoleKey();
+  const roleLabel = role === "teacher" ? "教师" : role === "professional" ? "从业者" : role === "parent" ? "家长" : "学生";
+  if (role === "parent") {
+    return {
+      mode: "family",
+      kicker: "家庭协同入口",
+      current: `当前关注 · ${stageNames[currentStage] || "高考志愿"}`,
+      orbLabel: "协同",
+      orbIcon: "users-round",
+      aria: "展开家庭协同快捷入口",
+      drawerAria: "家庭协同快捷入口",
+      options: [
+        { key: "gaokao", label: "高考志愿", description: "一起核对学校、专业与来源", icon: "school", href: familyPortalHref("family-overview", "gaokao") },
+        { key: "graduate", label: "考研择校", description: "讨论方向、培养与备考成本", icon: "book-open", href: familyPortalHref("family-overview", "graduate") },
+        { key: "career", label: "就业选择", description: "把城市、岗位和学历放在一起看", icon: "briefcase-business", href: familyPortalHref("family-overview", "career") },
+        { key: "planning", label: "授权人生规划", description: "只查看孩子主动共享的路径摘要", icon: "route", href: familyPortalHref("family-planning", currentStage), className: "floating-stage-planning-option" }
+      ]
+    };
+  }
+  if (currentIdentityMode === "answerer") {
+    const experienceLabel = role === "teacher" ? "教学经历" : role === "professional" ? "职业经历" : "我的经历";
+    const historyLabel = role === "teacher" ? "教学回答" : role === "professional" ? "行业回答" : "历史回答";
+    const scopeDescription = role === "teacher" ? "课程、培养与指导经验" : role === "professional" ? "岗位、行业与职业经验" : "记录我的真实经历边界";
+    return {
+      mode: "answerer",
+      kicker: `${roleLabel} · 回答快捷入口`,
+      current: `${stageNames[currentStage] || "高考志愿"} · ${role === "teacher" ? "教学指导" : role === "professional" ? "行业观察" : "回答范围"}`,
+      orbLabel: "回答",
+      orbIcon: "message-square-reply",
+      aria: "展开回答快捷入口",
+      drawerAria: "回答工作台快捷入口",
+      options: [
+        { key: "answerer", label: "回答中心", description: `回答${stageNames[currentStage] || "当前阶段"}的问题`, icon: "message-square-reply", href: "./index.html?view=answerer&identity=answerer", view: "answerer" },
+        { key: "answerer-experience", label: experienceLabel, description: scopeDescription, icon: "notebook-pen", href: "./index.html?view=answerer-experience&identity=answerer", view: "answerer-experience" },
+        { key: "answerer-history", label: historyLabel, description: "查看已经发布和修改过的回答", icon: "history", href: "./index.html?view=answerer-history&identity=answerer", view: "answerer-history" },
+        { key: "trust", label: "信任与认证", description: "管理回答身份与信息边界", icon: "shield-check", href: "./index.html?view=trust&identity=answerer", view: "trust" }
+      ]
+    };
+  }
+  const planningActive = ["view-planning", "view-family-planning"].includes($(".view.active")?.id);
+  return {
+    mode: "planner",
+    kicker: "当前决策入口",
+    current: planningActive ? "人生规划" : stageNames[currentStage] || "高考志愿",
+    orbLabel: planningActive ? "规划" : "阶段",
+    orbIcon: planningActive ? "compass" : ({ gaokao: "school", graduate: "book-open", career: "briefcase-business" }[currentStage] || "school"),
+    aria: "展开决策阶段入口",
+    drawerAria: "切换决策阶段",
+    options: [
+      { key: "gaokao", label: "高考志愿", description: "从学校与专业开始", icon: "school", href: "./index.html?view=home&stage=gaokao", stage: "gaokao", planner: true },
+      { key: "graduate", label: "考研择校", description: "继续深造或转换方向", icon: "book-open", href: "./index.html?view=home&stage=graduate", stage: "graduate", planner: true },
+      { key: "career", label: "就业选择", description: "进入职业，也可以再深造", icon: "briefcase-business", href: "./index.html?view=home&stage=career", stage: "career", planner: true },
+      { key: "planning", label: "人生规划", description: "跨阶段入口", icon: "route", href: "./index.html?view=planning", stage: "planning", planner: true, className: "floating-stage-planning-option" }
+    ]
+  };
+}
+
+function renderFloatingStageOptions(model) {
+  const options = $("#floatingStageOptions");
+  if (!options || !model) return;
+  const signature = `${model.mode}:${model.options.map((item) => `${item.key}:${item.label}`).join("|")}`;
+  const activeView = $(".view.active")?.id.replace("view-", "");
+  const activeKey = model.mode === "planner"
+    ? (activeView === "planning" ? "planning" : currentStage)
+    : model.mode === "family"
+      ? (activeView === "family-planning" ? "planning" : currentStage)
+      : activeView;
+  if (options.dataset.modelSignature === signature) {
+    $$(".floating-stage-option", options).forEach((option) => option.classList.toggle("active", option.dataset.floatingStageOption === activeKey));
+    return;
+  }
+  options.dataset.modelSignature = signature;
+  options.innerHTML = model.options.map((item, index) => {
+    const attributes = [
+      `class="floating-stage-option${item.className ? ` ${item.className}` : ""}"`,
+      `href="${item.href}"`,
+      `data-floating-stage-option="${item.key}"`
+    ];
+    if (item.planner) attributes.push(`data-global-planner-stage="${item.stage}"`);
+    if (item.view) attributes.push(`data-view="${item.view}"`);
+    const node = item.planner && item.key !== "planning" ? String(index + 1).padStart(2, "0") : `<i data-lucide="${item.icon}" aria-hidden="true"></i>`;
+    return `<a ${attributes.join(" ")}><span class="floating-stage-option-node">${node}</span><span><strong>${escapeHtml(item.label)}</strong><small>${escapeHtml(item.description)}</small></span><i data-lucide="arrow-up-right"></i></a>`;
+  }).join("");
+  $$(".floating-stage-option", options).forEach((option) => option.classList.toggle("active", option.dataset.floatingStageOption === activeKey));
+  hydrateIcons();
+}
+
+function updateFloatingStageAssist() {
+  const model = floatingStageMenuModel();
+  const orbLabel = $("#floatingStageOrbLabel");
+  const orbIcon = $("#floatingStageOrbIcon");
+  const orb = $("#floatingStageOrb");
+  const currentLabel = $("#floatingStageCurrentLabel");
+  const assist = $("#floatingStageAssist");
+  const drawer = $("#floatingStageDrawer");
+  const close = $("#floatingStageClose");
+  if (orbLabel) orbLabel.textContent = model.orbLabel;
+  if (currentLabel) currentLabel.textContent = model.current;
+  if (assist) assist.setAttribute("aria-label", model.aria);
+  if (orb) orb.setAttribute("aria-label", model.aria);
+  if (drawer) drawer.setAttribute("aria-label", model.drawerAria);
+  if ($("#floatingStageDrawerKicker")) $("#floatingStageDrawerKicker").textContent = model.kicker;
+  if (close) close.setAttribute("aria-label", "收起快捷入口");
+  const nextIcon = model.orbIcon;
+  if (orbIcon && orbIcon.dataset.stageIcon !== nextIcon) {
+    orbIcon.dataset.stageIcon = nextIcon;
+    orbIcon.innerHTML = `<i data-lucide="${nextIcon}" aria-hidden="true"></i>`;
+    orb?.classList.remove("is-icon-changing");
+    void orb?.offsetWidth;
+    orb?.classList.add("is-icon-changing");
+    hydrateIcons();
+  }
+  renderFloatingStageOptions(model);
+}
+
+function initializeFloatingStageAssist() {
+  const assist = $("#floatingStageAssist");
+  const orb = $("#floatingStageOrb");
+  const close = $("#floatingStageClose");
+  if (!assist || !orb || !close) return;
+  restoreFloatingStagePosition();
+  orb.addEventListener("pointerdown", (event) => {
+    if (event.button !== undefined && event.button !== 0) return;
+    const rect = assist.getBoundingClientRect();
+    floatingStageDragState = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, left: rect.left, top: rect.top, moved: false };
+    floatingStageSuppressClick = false;
+    orb.setPointerCapture?.(event.pointerId);
+  });
+  orb.addEventListener("pointermove", (event) => {
+    const state = floatingStageDragState;
+    if (!state || state.pointerId !== event.pointerId) return;
+    const dx = event.clientX - state.startX;
+    const dy = event.clientY - state.startY;
+    if (!state.moved && Math.hypot(dx, dy) < 5) return;
+    state.moved = true;
+    assist.classList.add("is-dragging");
+    setFloatingStagePosition(state.left + dx, state.top + dy);
+    event.preventDefault();
+  });
+  const finishDrag = (event) => {
+    const state = floatingStageDragState;
+    if (!state || state.pointerId !== event.pointerId) return;
+    floatingStageDragState = null;
+    assist.classList.remove("is-dragging");
+    if (state.moved) {
+      const rect = assist.getBoundingClientRect();
+      setFloatingStagePosition(rect.left, rect.top, { persist: true });
+      floatingStageSuppressClick = true;
+      window.setTimeout(() => { floatingStageSuppressClick = false; }, 0);
+    }
+  };
+  orb.addEventListener("pointerup", finishDrag);
+  orb.addEventListener("pointercancel", finishDrag);
+  orb.addEventListener("click", (event) => {
+    if (floatingStageSuppressClick) {
+      event.preventDefault();
+      return;
+    }
+    setFloatingStageDrawerOpen(true);
+  });
+  close.addEventListener("click", () => setFloatingStageDrawerOpen(false));
+  window.addEventListener("resize", () => {
+    if (assist.classList.contains("is-open")) setFloatingStageDrawerOpen(false);
+    const rect = assist.getBoundingClientRect();
+    setFloatingStagePosition(rect.left, rect.top);
+  });
+}
+
 function scheduleGlobalStageBarUpdate() {
   if (stageBarScrollFrame) return;
   stageBarScrollFrame = window.requestAnimationFrame(() => {
@@ -2383,7 +2944,7 @@ function scheduleGlobalStageBarUpdate() {
   });
 }
 
-const ONBOARDING_STEPS = [
+const PLANNER_ONBOARDING_STEPS = [
   {
     view: "home",
     selector: "#stageCarousel",
@@ -2425,7 +2986,7 @@ const ONBOARDING_STEPS = [
     selector: "#qaAskLayout",
     placement: "top",
     title: "把具体问题交给经历过的人",
-    copy: "匿名发布问题，也可以切换到“我要回答”分享真实经历。"
+    copy: "决策者在这里匿名提问；需要分享经历时，可以从身份中心进入回答者工作台。"
   },
   {
     view: "compare",
@@ -2443,6 +3004,42 @@ const ONBOARDING_STEPS = [
   }
 ];
 
+const GUEST_ONBOARDING_STEPS = [
+  { view: "home", selector: "#stageCarousel", placement: "bottom", title: "先浏览不同决策阶段", copy: "游客可以查看各阶段的公开信息和示例内容。" },
+  { view: "experience", selector: "#experienceSection .filter-bar", placement: "bottom", title: "按条件缩小信息范围", copy: "使用学校、专业、地区和关注维度找到更相关的公开内容。" },
+  { view: "questions", selector: "#qaGuestBrowsePanel", placement: "top", title: "浏览公开问题与回答", copy: "游客可以阅读公开内容，登录后才能匿名提问并追踪状态。" },
+  { view: "home", selector: "#accountButton", placement: "bottom", title: "登录后保存进度", copy: "创建本机试用账号后，可以建立身份和独立工作空间。" }
+];
+
+const ANSWERER_ONBOARDING_STEPS = [
+  { view: "answerer", selector: ".answerer-stage-banner", placement: "bottom", title: "先确认当前回答阶段", copy: "回答中心只匹配与你真实经历范围相符的问题。" },
+  { view: "answerer", selector: ".answerer-inbox-panel", placement: "top", title: "从适合的问题开始回答", copy: "回答时写清学校、专业、岗位与经历发生时间。" },
+  { view: "answerer-experience", selector: "#view-answerer-experience .answerer-profile-strip", placement: "bottom", title: "整理自己的经历边界", copy: "经历信息用于匹配问题，公开回答仍保持脱敏。" },
+  { view: "answerer-history", selector: "#view-answerer-history .answerer-history-summary", placement: "bottom", title: "继续修改历史回答", copy: "草稿和已发布回答集中保存在这里。" },
+  { view: "trust", selector: ".trust-dashboard", placement: "top", title: "补充对应阶段的认证", copy: "实名与经历认证分开，回答只展示必要的认证标签。" },
+  { view: "answerer", selector: "#answererNav", placement: "right", mobileSidebar: true, title: "回答工作都在侧栏", copy: "回答中心、经历、历史记录和认证保持独立。" }
+];
+
+const FAMILY_ONBOARDING_STEPS = [
+  { view: "family-overview", selector: "#view-family-overview .family-connection-strip", placement: "bottom", title: "先确认家庭关联", copy: "家长只能查看孩子主动授权的内容。" },
+  { view: "family-overview", selector: "#view-family-overview .family-overview-layout", placement: "top", title: "从协同概览开始", copy: "共享内容、待讨论事项和家长建议彼此分开。" },
+  { view: "experience", selector: "#experienceSection .filter-bar", placement: "bottom", title: "共同核对公开信息", copy: "家长也可以查看院校、专业或职业参考，但不会替孩子保存判断。" },
+  { view: "compare", selector: "#view-compare .page-header", placement: "bottom", title: "查看孩子主动共享的内容", copy: "未授权的候选、收藏、提问和浏览记录始终不可见。" },
+  { view: "family-discussion", selector: "#view-family-discussion .family-discussion-grid", placement: "top", title: "把不同意见留在讨论区", copy: "家长建议单独保存，不会覆盖孩子的候选状态。" },
+  { view: "family-permissions", selector: "#view-family-permissions .family-permission-status", placement: "bottom", title: "在授权边界管理关联", copy: "新增、切换或解除关联统一在授权边界处理。" },
+  { view: "family-overview", selector: "#familyNav", placement: "right", mobileSidebar: true, title: "家庭协同功能都在侧栏", copy: "概览、讨论、建议和授权边界保持清楚分工。" }
+];
+
+function onboardingStepsForCurrentContext() {
+  const role = currentIdentityRoleKey();
+  if (role === "guest") return GUEST_ONBOARDING_STEPS;
+  if (role === "parent") return FAMILY_ONBOARDING_STEPS;
+  if (currentIdentityMode === "answerer") return ANSWERER_ONBOARDING_STEPS;
+  return PLANNER_ONBOARDING_STEPS.map((step) => step.selector === ".candidate-tabs" && currentStage === "career"
+    ? { view: "collections", selector: "#view-collections .collections-toolbar", placement: "bottom", title: "整理需要继续核对的就业参考", copy: "职业阶段使用我的收藏保存岗位、行业和求职资料。" }
+    : step);
+}
+
 const STAGE_SELECTION_OPTIONS = [
   { key: "gaokao", icon: "school", title: "高考志愿", text: "我正在了解学校、专业和招生信息。" },
   { key: "graduate", icon: "book-open", title: "考研择校", text: "我正在规划研究生阶段的学校和专业。" },
@@ -2451,8 +3048,8 @@ const STAGE_SELECTION_OPTIONS = [
 const IDENTITY_ENTRY_ROLES = [
   { key: "student", title: "学生", icon: "graduation-cap", text: "为自己的升学、专业或就业方向做决定，也可以分享已经经历过的阶段。" },
   { key: "parent", title: "家长", icon: "users-round", text: "关联孩子的决策空间，查看授权信息、表达建议并参与家庭讨论。" },
-  { key: "teacher", title: "教师", icon: "presentation", text: "以教师回答者身份，分享课程、培养、升学指导和职业认知。" },
-  { key: "professional", title: "从业者", icon: "briefcase-business", text: "以从业者回答者身份，分享岗位、行业、城市和职业发展的真实经验。" }
+  { key: "teacher", title: "教师", icon: "presentation", text: "可以规划继续深造或职业方向，也可以分享教学、培养与指导经验。" },
+  { key: "professional", title: "从业者", icon: "briefcase-business", text: "可以规划继续深造、转岗或求职，也可以分享真实行业与岗位经验。" }
 ];
 const IDENTITY_ENTRY_MODES = [
   { key: "planner", title: "作为决策者", icon: "compass", text: "查信息、提问、比较候选、记录自己的判断和下一步计划。" },
@@ -2505,11 +3102,13 @@ function identityEntryDefaultState(user = currentUser()) {
   const profile = identityEntryProfile(user);
   const storedMode = localStorage.getItem(STORE.identityMode) === "answerer" ? "answerer" : "planner";
   const role = profile?.role || identityEntryRoleFromUser(user);
+  const mode = role === "parent" ? "family" : profile?.mode || storedMode;
+  const requestedScope = profile?.scope || stageKeyFromUser(user) || currentStage;
   return {
     step: 1,
     role,
-    mode: role === "parent" ? "family" : ["teacher", "professional"].includes(role) ? "answerer" : profile?.mode || storedMode,
-    scope: profile?.scope || stageKeyFromUser(user) || currentStage,
+    mode,
+    scope: ["teacher", "professional"].includes(role) && mode === "planner" && requestedScope === "gaokao" ? "graduate" : requestedScope,
     reopen: false
   };
 }
@@ -2519,7 +3118,11 @@ function identityEntryChoiceMarkup(items, attribute, selected) {
 }
 
 function identityEntryScopeMarkup(selected) {
-  return STAGE_SELECTION_OPTIONS.map((option) => `<button class="identity-entry-choice identity-entry-scope-choice" type="button" aria-pressed="${option.key === selected}" data-identity-entry-scope="${option.key}"><span class="identity-entry-choice-icon"><i data-lucide="${option.icon}"></i></span><span><strong>${option.title}</strong><small>${option.text}</small></span><i class="identity-entry-choice-check" data-lucide="check"></i></button>`).join("");
+  const state = identityEntryState || identityEntryDefaultState();
+  const options = ["teacher", "professional"].includes(state.role) && state.mode === "planner"
+    ? STAGE_SELECTION_OPTIONS.filter((option) => option.key !== "gaokao")
+    : STAGE_SELECTION_OPTIONS;
+  return options.map((option) => `<button class="identity-entry-choice identity-entry-scope-choice" type="button" aria-pressed="${option.key === selected}" data-identity-entry-scope="${option.key}"><span class="identity-entry-choice-icon"><i data-lucide="${option.icon}"></i></span><span><strong>${option.title}</strong><small>${option.text}</small></span><i class="identity-entry-choice-check" data-lucide="check"></i></button>`).join("");
 }
 
 function createIdentityEntryModal() {
@@ -2529,19 +3132,21 @@ function createIdentityEntryModal() {
   backdrop.id = "identityEntryModal";
   backdrop.className = "modal-backdrop identity-entry-backdrop";
   backdrop.setAttribute("aria-hidden", "true");
-  backdrop.innerHTML = `<section class="modal identity-entry-modal" role="dialog" aria-modal="true" aria-labelledby="identityEntryTitle"><header class="identity-entry-topbar"><div class="identity-entry-brand"><svg class="identity-entry-brand-mark brand-mark" viewBox="0 0 48 48" role="img" aria-label="引路标志"><path class="brand-mark-body" d="M13 9H30C34 9 37 12 37 16V37L25 30L13 37V9Z"/><path class="brand-mark-fold" d="M13 9H25C29 9 32 12 32 16V27"/><path class="brand-mark-gap" d="M25 16V29"/><circle class="brand-mark-dot" cx="25" cy="16" r="3"/></svg><span><strong>引路</strong><small>青年生涯决策信息平台</small></span></div><div class="identity-entry-progress" aria-label="身份设置进度"><span data-identity-entry-progress="1"><i>1</i>身份</span><span data-identity-entry-progress="2"><i>2</i>状态</span><span data-identity-entry-progress="3"><i>3</i>确认</span></div><button class="identity-entry-guest" type="button" data-identity-entry-guest>以游客身份浏览</button></header><div class="identity-entry-body"><aside class="identity-entry-context"><span class="identity-entry-kicker">先告诉我们你站在哪里</span><h1 id="identityEntryTitle">你现在以什么身份来到引路？</h1><p id="identityEntryCopy">身份只决定工作台入口，不限制你未来能做的选择。之后可以在身份中心随时切换。</p><div class="identity-entry-route"><span>当前将进入</span><strong id="identityEntryRoute">学生 · 决策工作台</strong><small id="identityEntryStage">四个阶段入口</small></div></aside><main class="identity-entry-panel"><div id="identityEntryStepContent"></div><div class="identity-entry-actions"><button class="quiet-button" type="button" data-identity-entry-back>上一步</button><button class="primary-button" type="button" data-identity-entry-next>继续</button></div></main></div></section>`;
+  backdrop.innerHTML = `<section class="modal identity-entry-modal" role="dialog" aria-modal="true" aria-labelledby="identityEntryTitle"><header class="identity-entry-topbar"><div class="identity-entry-brand"><svg class="identity-entry-brand-mark brand-mark" viewBox="0 0 48 48" role="img" aria-label="引路标志"><path class="brand-mark-body" d="M13 9H30C34 9 37 12 37 16V37L25 30L13 37V9Z"/><path class="brand-mark-fold" d="M13 9H25C29 9 32 12 32 16V27"/><path class="brand-mark-gap" d="M25 16V29"/><circle class="brand-mark-dot" cx="25" cy="16" r="3"/></svg><span><strong>引路</strong><small>青年生涯决策信息平台</small></span></div><div class="identity-entry-progress" aria-label="身份设置进度"><span data-identity-entry-progress="1"><i>1</i>身份</span><span data-identity-entry-progress="2"><i>2</i>状态</span><span data-identity-entry-progress="3"><i>3</i>阶段</span><span data-identity-entry-progress="4"><i>4</i>确认</span></div><button class="identity-entry-guest" type="button" data-identity-entry-guest>以游客身份浏览</button></header><div class="identity-entry-body"><aside class="identity-entry-context"><span class="identity-entry-kicker">先告诉我们你站在哪里</span><h1 id="identityEntryTitle">你现在以什么身份来到引路？</h1><p id="identityEntryCopy">身份只决定工作台入口，不限制你未来能做的选择。之后可以在身份中心随时切换。</p><div class="identity-entry-route"><span>当前将进入</span><strong id="identityEntryRoute">学生 · 决策工作台</strong><small id="identityEntryStage">高考志愿</small></div></aside><main class="identity-entry-panel"><div id="identityEntryStepContent"></div><div class="identity-entry-actions"><button class="quiet-button" type="button" data-identity-entry-back>上一步</button><button class="primary-button" type="button" data-identity-entry-next>继续</button></div></main></div></section>`;
   backdrop.addEventListener("click", (event) => {
     event.stopPropagation();
     const role = event.target.closest("[data-identity-entry-role]");
     if (role) {
       identityEntryState.role = role.dataset.identityEntryRole;
-      identityEntryState.mode = identityEntryState.role === "parent" ? "family" : ["teacher", "professional"].includes(identityEntryState.role) ? "answerer" : identityEntryState.mode === "family" ? "planner" : identityEntryState.mode;
+      identityEntryState.mode = identityEntryState.role === "parent" ? "family" : identityEntryState.mode === "family" ? "planner" : identityEntryState.mode;
+      if (["teacher", "professional"].includes(identityEntryState.role) && identityEntryState.mode === "planner" && identityEntryState.scope === "gaokao") identityEntryState.scope = "graduate";
       renderIdentityEntry();
       return;
     }
     const mode = event.target.closest("[data-identity-entry-mode]");
     if (mode) {
       identityEntryState.mode = mode.dataset.identityEntryMode;
+      if (["teacher", "professional"].includes(identityEntryState.role) && identityEntryState.mode === "planner" && identityEntryState.scope === "gaokao") identityEntryState.scope = "graduate";
       renderIdentityEntry();
       return;
     }
@@ -2572,6 +3177,7 @@ function createIdentityEntryModal() {
     if (event.target.closest("[data-identity-entry-next]")) {
       if (identityEntryState.step === 1) identityEntryState.step = 2;
       else if (identityEntryState.step === 2) identityEntryState.step = 3;
+      else if (identityEntryState.step === 3) identityEntryState.step = 4;
       else finishIdentityEntry();
       renderIdentityEntry();
     }
@@ -2590,26 +3196,23 @@ function renderIdentityEntry() {
   const professional = state.role === "professional";
   const availableModes = family
     ? [{ key: "family", title: "进入家庭协同", icon: "users-round", text: "查看孩子主动共享的候选，表达建议并参与家庭讨论。" }]
-    : teacher
-      ? [{ key: "answerer", title: "作为教师回答者", icon: "presentation", text: "分享课程、培养、升学指导和职业认知中的真实观察。" }]
-      : professional
-        ? [{ key: "answerer", title: "作为从业者回答者", icon: "briefcase-business", text: "分享岗位、行业、城市和职业发展的真实观察。" }]
-        : IDENTITY_ENTRY_MODES;
+    : IDENTITY_ENTRY_MODES;
   if (content) {
-    if (state.step === 1) content.innerHTML = `<div class="identity-entry-heading"><div><h2>选择当前社会身份</h2><p>一个账号以后可以添加多个身份。</p></div><span>01 / 03</span></div><div class="identity-entry-choice-grid">${identityEntryChoiceMarkup(IDENTITY_ENTRY_ROLES, "role", state.role)}</div>`;
-    else if (state.step === 2) content.innerHTML = `<div class="identity-entry-heading"><div><h2>${teacher ? "教师身份进入回答工作台" : professional ? "从业者身份进入回答工作台" : "这次来到引路，你想做什么？"}</h2><p>${teacher ? "教师身份只开放回答者工作台，方便把教学与指导经验讲给正在选择的人。" : professional ? "从业者身份只开放回答者工作台，方便把岗位与行业经验讲给正在选择的人。" : "工作状态可以随时切换，不会改变你的社会身份。"}</p></div><span>02 / 03</span></div><div class="identity-entry-choice-grid identity-entry-mode-grid">${identityEntryChoiceMarkup(availableModes, "mode", state.mode)}</div>`;
-    else content.innerHTML = `<div class="identity-entry-heading"><div><h2>确认当前工作台</h2><p>这里不再选择决策阶段，进入后可以从对应入口继续。</p></div><span>03 / 03</span></div><div class="identity-entry-summary"><div><span>社会身份</span><strong>${identityEntryRoleLabel(state.role)}</strong></div><div><span>工作状态</span><strong>${identityEntryModeLabel(state.mode)}</strong></div><div><span>进入范围</span><strong>${state.role === "student" && state.mode === "planner" ? "四个阶段入口" : "对应工作台"}</strong></div></div><div class="identity-entry-destination"><span>确认后进入</span><strong>${identityEntryRoleLabel(state.role)} · ${identityEntryModeLabel(state.mode)}工作台</strong><small>${family ? "查看孩子主动共享的候选和家庭协同内容。" : state.mode === "answerer" ? "进入回答中心，分享自己真正经历过的经验。" : state.role === "student" ? "高考志愿、考研择校、就业选择与人生规划都可从主页面进入。" : "沿用现有工作台入口，继续查看信息与决策工具。"}</small></div>`;
+    if (state.step === 1) content.innerHTML = `<div class="identity-entry-heading"><div><h2>选择当前社会身份</h2><p>一个账号以后可以添加多个身份。</p></div><span>01 / 04</span></div><div class="identity-entry-choice-grid">${identityEntryChoiceMarkup(IDENTITY_ENTRY_ROLES, "role", state.role)}</div>`;
+    else if (state.step === 2) content.innerHTML = `<div class="identity-entry-heading"><div><h2>这次来到引路，你想做什么？</h2><p>${teacher ? "可以为继续深造或职业变化做决定，也可以分享教学与指导经验。" : professional ? "可以为继续深造、转岗或求职做决定，也可以分享真实从业经验。" : "工作状态可以随时切换，不会改变你的社会身份。"}</p></div><span>02 / 04</span></div><div class="identity-entry-choice-grid identity-entry-mode-grid">${identityEntryChoiceMarkup(availableModes, "mode", state.mode)}</div>`;
+    else if (state.step === 3) content.innerHTML = `<div class="identity-entry-heading"><div><h2>${family ? "选择孩子当前决策阶段" : state.mode === "answerer" ? "选择你的回答阶段" : "选择当前决策阶段"}</h2><p>${state.mode === "answerer" ? "阶段应与你能够证明的真实经历一致，之后可在信任与认证中补充材料。" : "阶段决定工作台优先展示的信息和工具。"}</p></div><span>03 / 04</span></div><div class="identity-entry-scope-list">${identityEntryScopeMarkup(state.scope)}</div>`;
+    else content.innerHTML = `<div class="identity-entry-heading"><div><h2>确认当前工作台</h2><p>确认后直接进入对应内容，不再重复选择阶段。</p></div><span>04 / 04</span></div><div class="identity-entry-summary"><div><span>社会身份</span><strong>${identityEntryRoleLabel(state.role)}</strong></div><div><span>工作状态</span><strong>${identityEntryModeLabel(state.mode)}</strong></div><div><span>当前阶段</span><strong>${identityEntryScopeLabel(state.scope)}</strong></div></div><div class="identity-entry-destination"><span>确认后进入</span><strong>${identityEntryRoleLabel(state.role)} · ${identityEntryModeLabel(state.mode)}工作台</strong><small>${family ? "进入该阶段的家庭协同概览。" : state.mode === "answerer" ? "进入该阶段回答中心，分享自己真正经历过的信息。" : `进入${identityEntryScopeLabel(state.scope)}决策工作台。`}</small></div>`;
   }
   $("#identityEntryRoute", backdrop).textContent = `${identityEntryRoleLabel(state.role)} · ${identityEntryModeLabel(state.mode)}工作台`;
-  $("#identityEntryStage", backdrop).textContent = state.role === "student" && state.mode === "planner" ? "四个阶段入口" : "对应工作台";
-  $("#identityEntryTitle", backdrop).textContent = state.step === 1 ? "你现在以什么身份来到引路？" : state.step === 2 ? `${identityEntryRoleLabel(state.role)}身份下，你这次想做什么？` : "确认后进入专属工作台";
-  $("#identityEntryCopy", backdrop).textContent = state.step === 1 ? "身份只决定工作台入口，不限制你未来能做的选择。之后可以在身份中心随时切换。" : state.step === 2 ? teacher ? "教师身份固定进入回答工作台，社会身份不会因此改变。" : professional ? "从业者身份固定进入回答工作台，社会身份不会因此改变。" : "决策和回答是两种工作状态，可以随时切换。社会身份不会因此改变。" : "系统会保留这次选择，之后可以在身份中心随时调整。";
+  $("#identityEntryStage", backdrop).textContent = identityEntryScopeLabel(state.scope);
+  $("#identityEntryTitle", backdrop).textContent = state.step === 1 ? "你现在以什么身份来到引路？" : state.step === 2 ? `${identityEntryRoleLabel(state.role)}身份下，你这次想做什么？` : state.step === 3 ? "这次要处理哪个阶段？" : "确认后进入专属工作台";
+  $("#identityEntryCopy", backdrop).textContent = state.step === 1 ? "身份只决定工作台入口，不限制你未来能做的选择。之后可以在身份中心随时切换。" : state.step === 2 ? "决策和回答是两种工作状态，可以随时切换。社会身份不会因此改变。" : state.step === 3 ? "每个阶段独立保存，返回身份中心可以继续之前的工作。" : "系统会保留这次选择，刷新后仍会回到同一工作空间。";
   $$('[data-identity-entry-progress]', backdrop).forEach((item) => item.classList.toggle("active", Number(item.dataset.identityEntryProgress) === state.step));
   const back = $("[data-identity-entry-back]", backdrop);
   const next = $("[data-identity-entry-next]", backdrop);
   const guest = $("[data-identity-entry-guest]", backdrop);
   if (back) back.disabled = state.step === 1;
-  if (next) next.textContent = state.step === 3 ? "进入工作台" : "继续";
+  if (next) next.textContent = state.step === 4 ? "进入工作台" : "继续";
   if (guest) guest.textContent = state.reopen ? "取消切换" : "以游客身份浏览";
   hydrateIcons();
 }
@@ -2627,118 +3230,43 @@ function finishIdentityEntry() {
   const user = currentUser();
   const state = identityEntryState;
   if (!user || !state) return;
-  const mode = ["teacher", "professional"].includes(state.role) ? "answerer" : state.mode;
-  const normalizedState = { ...state, mode };
+  const mode = state.role === "parent" ? "family" : state.mode;
+  const scope = ["teacher", "professional"].includes(state.role) && mode === "planner" && state.scope === "gaokao" ? "graduate" : state.scope;
+  const normalizedState = { ...state, mode, scope };
   const targetView = mode === "answerer" ? "answerer" : mode === "family" ? "family-overview" : "home";
-  const record = upsertIdentityRecord(normalizedState, { lastView: targetView });
+  const existingWorkspace = identityRecordForProfile(normalizedState, { user });
+  const record = upsertIdentityRecord(normalizedState, { lastView: targetView, replaceId: existingWorkspace?.id || identityRecordId(normalizedState), metadata: existingWorkspace ? { archived: false, lastAction: `返回${identityViewLabel(targetView)}` } : {} });
   const profiles = read(STORE.identityProfile, {});
   profiles[identityEntryKey(user)] = { role: normalizedState.role, mode: normalizedState.mode, scope: normalizedState.scope, recordId: record?.id || identityRecordId(normalizedState), complete: true, updatedAt: new Date().toISOString() };
   write(STORE.identityProfile, profiles);
-  updateCurrentUser({ identityRole: identityEntryRoleLabel(normalizedState.role), identityMode: identityEntryModeLabel(normalizedState.mode), identityScope: identityEntryScopeLabel(normalizedState.scope), stage: identityEntryScopeLabel(normalizedState.scope) });
+  updateCurrentUser({ role: identityEntryRoleLabel(normalizedState.role), identityRole: identityEntryRoleLabel(normalizedState.role), identityMode: identityEntryModeLabel(normalizedState.mode), identityScope: identityEntryScopeLabel(normalizedState.scope), stage: identityEntryScopeLabel(normalizedState.scope) });
   localStorage.setItem(STORE.identityMode, normalizedState.mode === "answerer" ? "answerer" : "planner");
   if (normalizedState.mode === "answerer") localStorage.setItem("yinlu_answerer_stage", normalizedState.scope === "graduate" ? "kaoyan" : normalizedState.scope === "career" ? "jiuye" : "gaokao");
   closeModal("identityEntryModal");
   identityEntryState = null;
-  if (normalizedState.reopen) {
-    localStorage.setItem(stageSelectionKey(user), "1");
-    setStage(normalizedState.scope);
-    updateAccountHeader();
-    showToast(`已切换为：${identityEntryRoleLabel(normalizedState.role)} · ${identityEntryModeLabel(normalizedState.mode)}`);
-    setIdentityMode(normalizedState.mode === "answerer" ? "answerer" : "planner", { persist: true, switchContent: true });
-    if (normalizedState.mode === "family") navigateWithPageTransition(`./index.html?familyPortal=1&stage=${encodeURIComponent(normalizedState.scope)}`);
-    return;
-  }
-  localStorage.setItem(stageSelectionKey(user), "1");
-  if (normalizedState.role === "student" && normalizedState.mode === "planner") {
-    navigateWithPageTransition("./index.html?workspace=1");
-    return;
-  }
-  if (normalizedState.mode === "family") {
-    navigateWithPageTransition(`./index.html?familyPortal=1&stage=${encodeURIComponent(normalizedState.scope)}`);
-    return;
-  }
-  if (normalizedState.mode === "answerer") {
-    const answerStage = normalizedState.scope === "graduate" ? "kaoyan" : normalizedState.scope === "career" ? "jiuye" : "gaokao";
-    navigateWithPageTransition(`./index.html?answererPortal=1&answerStage=${encodeURIComponent(answerStage)}&stage=${encodeURIComponent(normalizedState.scope)}`);
-    return;
-  }
-  navigateWithPageTransition(`./index.html?view=home&stage=${encodeURIComponent(normalizedState.scope)}`);
-}
-
-const STAGE_SELECTION_STORE_PREFIX = "yinlu_stage_selection_v1:";
-
-function stageSelectionKey(user = currentUser()) {
-  return user?.id ? `${STAGE_SELECTION_STORE_PREFIX}${user.id}` : "";
-}
-
-function stageSelectionIsComplete(user = currentUser()) {
-  const key = stageSelectionKey(user);
-  return Boolean(key && localStorage.getItem(key) === "1");
+  setStage(normalizedState.scope);
+  setIdentityMode(normalizedState.mode === "answerer" ? "answerer" : "planner", { persist: true, switchContent: false });
+  updateAccountHeader();
+  if (normalizedState.reopen) showToast(`已切换为：${identityEntryRoleLabel(normalizedState.role)} · ${identityEntryModeLabel(normalizedState.mode)}`);
+  navigateWithPageTransition(identityWorkspaceHref(record || normalizedState));
 }
 
 function stageKeyFromUser(user = currentUser()) {
   return Object.entries(stageNames).find(([, label]) => label === user?.stage)?.[0] || "gaokao";
 }
 
-function createStageSelectionModal() {
-  let backdrop = $("#stageSelectionModal");
-  if (backdrop) return backdrop;
-  backdrop = document.createElement("div");
-  backdrop.id = "stageSelectionModal";
-  backdrop.className = "modal-backdrop stage-selection-backdrop";
-  backdrop.setAttribute("aria-hidden", "true");
-  backdrop.innerHTML = `<section class="modal stage-selection-modal" role="dialog" aria-modal="true" aria-labelledby="stageSelectionTitle"><div class="stage-selection-kicker"><span></span>先确定你的决策位置</div><h2 id="stageSelectionTitle">你现在准备走哪一段路？</h2><p class="modal-description">这个选择会决定首页优先展示的阶段，也会帮助我们判断你之后可以回答哪些更早阶段的问题。</p><div class="stage-selection-grid">${STAGE_SELECTION_OPTIONS.map((option) => `<button class="stage-selection-option" type="button" data-stage-choice="${option.key}" aria-pressed="false"><span class="stage-selection-option-icon"><i data-lucide="${option.icon}"></i></span><span><strong>${option.title}</strong><small>${option.text}</small></span><i class="stage-selection-check" data-lucide="check"></i></button>`).join("")}</div><div class="stage-selection-footer"><span>之后可以在个人信息或顶部阶段线上调整</span><button type="button" class="text-button" data-stage-selection-skip>先用高考志愿</button></div></section>`;
-  document.body.appendChild(backdrop);
-  backdrop.addEventListener("click", (event) => {
-    const choice = event.target.closest("[data-stage-choice]");
-    if (choice) { finishStageSelection(choice.dataset.stageChoice); return; }
-    if (event.target.closest("[data-stage-selection-skip]")) finishStageSelection(stageKeyFromUser());
-  });
-  return backdrop;
-}
-
-function showStageSelection() {
-  const user = currentUser();
-  if (!user || stageSelectionIsComplete(user)) {
-    scheduleOnboarding(350);
-    return;
-  }
-  const backdrop = createStageSelectionModal();
-  const selected = stageKeyFromUser(user);
-  $$('[data-stage-choice]', backdrop).forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.stageChoice === selected)));
-  const skipButton = $("[data-stage-selection-skip]", backdrop);
-  if (skipButton) skipButton.textContent = `使用${stageNames[selected] || "当前阶段"}`;
-  backdrop.hidden = false;
-  backdrop.setAttribute("aria-hidden", "false");
-  backdrop.classList.add("open");
-  hydrateIcons();
-  window.setTimeout(() => $(`[data-stage-choice="${selected}"]`, backdrop)?.focus(), 0);
-}
-
-function finishStageSelection(stageKey) {
-  const user = currentUser();
-  if (!user || !STAGE_SELECTION_OPTIONS.some((option) => option.key === stageKey)) return;
-  localStorage.setItem(stageSelectionKey(user), "1");
-  updateCurrentUser({ stage: stageNames[stageKey] });
-  setStage(stageKey);
-  updateAccountHeader();
-  const backdrop = $("#stageSelectionModal");
-  if (backdrop) {
-    backdrop.classList.remove("open");
-    backdrop.hidden = true;
-    backdrop.setAttribute("aria-hidden", "true");
-  }
-  showToast(`当前决策阶段已设为：${stageNames[stageKey]}`);
-  window.setTimeout(() => startOnboarding(), 350);
-}
-
 let onboardingIndex = -1;
 let onboardingTimer = 0;
 let onboardingPositionFrame = 0;
 let onboardingRenderToken = 0;
+let currentOnboardingSteps = [];
+
+function onboardingStorageKey(user = currentUser()) {
+  return `${STORE.onboarding}:${user?.id || "guest"}`;
+}
 
 function onboardingIsComplete() {
-  return localStorage.getItem(STORE.onboarding) === "1";
+  return localStorage.getItem(onboardingStorageKey()) === "1";
 }
 
 function updateOnboardingReplayButton(announce = false) {
@@ -2811,6 +3339,8 @@ function scheduleOnboarding(delay = 700) {
 
 function startOnboarding({ force = false } = {}) {
   if ((!force && onboardingIsComplete()) || onboardingIndex >= 0) return;
+  currentOnboardingSteps = onboardingStepsForCurrentContext();
+  if (!currentOnboardingSteps.length) return;
   onboardingIndex = 0;
   document.body.classList.add("onboarding-active");
   showOnboardingStep();
@@ -2818,7 +3348,7 @@ function startOnboarding({ force = false } = {}) {
 
 function advanceOnboarding() {
   if (onboardingIndex < 0) return;
-  if (onboardingIndex >= ONBOARDING_STEPS.length - 1) {
+  if (onboardingIndex >= currentOnboardingSteps.length - 1) {
     finishOnboarding({ showComplete: true });
     return;
   }
@@ -2827,7 +3357,7 @@ function advanceOnboarding() {
 }
 
 function showOnboardingStep() {
-  const step = ONBOARDING_STEPS[onboardingIndex];
+  const step = currentOnboardingSteps[onboardingIndex];
   if (!step) return;
   const token = ++onboardingRenderToken;
   const overlay = createOnboardingOverlay();
@@ -2839,7 +3369,7 @@ function showOnboardingStep() {
   $("#sidebar")?.classList.toggle("onboarding-open", Boolean(step.mobileSidebar));
   switchView(step.view);
   window.scrollTo({ top: 0, behavior: "auto" });
-  $("#onboardingProgress").textContent = `${String(onboardingIndex + 1).padStart(2, "0")} / ${String(ONBOARDING_STEPS.length).padStart(2, "0")}`;
+  $("#onboardingProgress").textContent = `${String(onboardingIndex + 1).padStart(2, "0")} / ${String(currentOnboardingSteps.length).padStart(2, "0")}`;
   $("#onboardingTitle").textContent = step.title;
   $("#onboardingCopy").textContent = step.copy;
   $("#onboardingHint").textContent = "点击页面空白处继续";
@@ -2942,7 +3472,7 @@ function positionOnboardingArrow(arrow, placement, target, card) {
 }
 
 function finishOnboarding({ showComplete }) {
-  localStorage.setItem(STORE.onboarding, "1");
+  localStorage.setItem(onboardingStorageKey(), "1");
   updateOnboardingReplayButton(false);
   onboardingIndex = -1;
   $("#sidebar")?.classList.remove("onboarding-open");
@@ -2992,10 +3522,40 @@ function refreshOnboardingPosition() {
   if (onboardingIndex < 0) return;
   window.cancelAnimationFrame(onboardingPositionFrame);
   onboardingPositionFrame = window.requestAnimationFrame(() => {
-    const step = ONBOARDING_STEPS[onboardingIndex];
+    const step = currentOnboardingSteps[onboardingIndex];
     const target = step ? $(step.selector) : null;
     if (step && target) positionOnboarding(step, target);
   });
+}
+
+function plannerStageAllowedForRole(stageKey, role = currentIdentityRoleKey()) {
+  return !(["teacher", "professional"].includes(role) && stageKey === "gaokao");
+}
+
+function activateWorkspaceStage(stageKey, fallbackHref = "") {
+  const user = currentUser();
+  const profile = identityEntryProfile(user);
+  if (!user || !profile?.complete) {
+    navigateWithPageTransition(fallbackHref || `./index.html?view=home&stage=${encodeURIComponent(stageKey)}`);
+    return;
+  }
+  if (!plannerStageAllowedForRole(stageKey, profile.role) && profile.mode === "planner") {
+    showToast("教师和从业者的决策工作台支持考研深造与就业选择");
+    return;
+  }
+  const nextProfile = { role: profile.role, mode: profile.role === "parent" ? "family" : profile.mode, scope: stageKey };
+  const targetView = nextProfile.mode === "answerer" ? "answerer" : nextProfile.mode === "family" ? "family-overview" : "home";
+  const existing = identityRecordForProfile(nextProfile, { user });
+  const record = existing || upsertIdentityRecord(nextProfile, { lastView: targetView, metadata: { lastAction: `进入${identityEntryScopeLabel(stageKey)}` } });
+  const profiles = read(STORE.identityProfile, {});
+  profiles[identityEntryKey(user)] = { ...nextProfile, recordId: record.id, complete: true, updatedAt: new Date().toISOString() };
+  write(STORE.identityProfile, profiles);
+  upsertIdentityRecord(record, { lastView: identityRecordView(record), replaceId: record.id, metadata: { name: record.name, goal: record.goal, archived: false, lastAction: `进入${identityEntryScopeLabel(stageKey)}` } });
+  updateCurrentUser({ role: identityEntryRoleLabel(nextProfile.role), identityRole: identityEntryRoleLabel(nextProfile.role), identityMode: identityEntryModeLabel(nextProfile.mode), identityScope: identityEntryScopeLabel(stageKey), stage: identityEntryScopeLabel(stageKey) });
+  if (nextProfile.mode === "answerer") localStorage.setItem("yinlu_answerer_stage", stageKey === "graduate" ? "kaoyan" : stageKey === "career" ? "jiuye" : "gaokao");
+  setStage(stageKey);
+  updateAccountHeader();
+  navigateWithPageTransition(identityWorkspaceHref(record));
 }
 
 function updateGlobalStageSwitcher() {
@@ -3013,6 +3573,7 @@ function updateGlobalStageSwitcher() {
   $$('[data-global-planner-stage]').forEach((link) => {
     const stageKey = link.dataset.globalPlannerStage;
     const stageConfig = GLOBAL_STAGE_CONFIG.find((item) => item.key === stageKey);
+    const allowed = stageKey === "planning" || plannerStageAllowedForRole(stageKey);
     if (stageKey === "planning" && family) {
       link.href = familyPortalHref("family-planning", currentStage);
     } else if (stageConfig) {
@@ -3024,6 +3585,9 @@ function updateGlobalStageSwitcher() {
       ? activeView === (family ? "view-family-planning" : "view-planning")
       : activeView !== "view-planning" && activeView !== "view-family-planning" && stageKey === currentStage;
     link.classList.toggle("active", active);
+    link.classList.toggle("disabled", !allowed);
+    link.setAttribute("aria-disabled", String(!allowed));
+    link.title = allowed ? "" : "教师和从业者的决策工作台不包含高考阶段";
   });
   $$('[data-global-answer-stage]').forEach((control) => {
     const stageKey = control.dataset.globalAnswerStage;
@@ -3045,6 +3609,7 @@ function updateGlobalStageSwitcher() {
   const compactLabel = $("#globalStageCompactLabel");
   const planningActive = activeView === "view-planning";
   if (compactLabel) compactLabel.textContent = planningActive ? "人生规划" : stageNames[currentStage] || "当前阶段";
+  updateFloatingStageAssist();
 }
 
 function updateExperienceStageUi() {
@@ -3139,11 +3704,25 @@ function updateExperienceStageUi() {
     if (input) input.placeholder = copy.majorPlaceholder;
   });
   const compareNavItem = $("#compareNavItem");
+  const collectionsNavItem = $("#collectionsNavItem");
   const candidateAction = $("#experienceCandidateAction");
   const institutionTab = $('[data-experience-content-tab="institution"]');
   const sameSchoolFilter = $("#sameSchoolFilter");
   if (compareNavItem) compareNavItem.hidden = career && currentIdentityRoleKey() !== "parent";
-  if (candidateAction) candidateAction.hidden = career;
+  if (collectionsNavItem) {
+    collectionsNavItem.hidden = !career;
+    collectionsNavItem.href = "./index.html?view=collections&stage=career";
+  }
+  if (candidateAction) {
+    const parent = currentIdentityRoleKey() === "parent";
+    candidateAction.hidden = false;
+    candidateAction.dataset.viewTarget = parent ? "compare" : career ? "collections" : "compare";
+    candidateAction.innerHTML = `${parent ? (career ? "查看共享职业收藏" : "查看共享候选") : career ? "查看我的收藏" : "查看我的候选"} <i data-lucide="arrow-up-right"></i>`;
+  }
+  if ($("#academicExperienceSearch")) $("#academicExperienceSearch").hidden = career;
+  if ($("#experienceObjectSearch")) $("#experienceObjectSearch").hidden = career;
+  if ($("#experienceRegionIndex")) $("#experienceRegionIndex").hidden = career;
+  if ($("#careerFilterSystem")) $("#careerFilterSystem").hidden = !career;
   if (institutionTab) institutionTab.hidden = career;
   if (sameSchoolFilter) sameSchoolFilter.hidden = career;
   if (career && $("#sameSchoolToggle")) $("#sameSchoolToggle").checked = false;
@@ -3153,6 +3732,8 @@ function updateExperienceStageUi() {
   syncDimensionFilterAvailability();
   updateDimensionFilterButtons();
   updateExperienceFilterUi();
+  renderCareerFilterSystem();
+  hydrateIcons();
 }
 
 function setStage(stage) {
@@ -3180,6 +3761,14 @@ function setStage(stage) {
   if (position) position.textContent = `${activeIndex + 1} / ${stageOrder.length}`;
   updateGlobalStageSwitcher();
   updateExperienceStageUi();
+  applyIdentityRoleContext();
+  if (stageChanged && ((stage !== "career" && $("#view-collections")?.classList.contains("active")) || (stage === "career" && $("#view-compare")?.classList.contains("active")))) {
+    switchView("experience");
+    const safeUrl = new URL(window.location.href);
+    safeUrl.searchParams.set("view", "experience");
+    safeUrl.searchParams.set("stage", stage);
+    window.history.pushState(null, "", safeUrl);
+  }
   if ($("#view-home")?.classList.contains("active") && $("#breadcrumbTitle")) $("#breadcrumbTitle").textContent = `${stageNames[currentStage] || "决策"}首页`;
   if (stageChanged && $("#view-experience")?.classList.contains("active")) renderExperiences();
   renderCyberPetContext();
@@ -3250,9 +3839,16 @@ function updateExperienceFilterUi() {
 
   const selected = [];
   if (currentSearch.trim()) selected.push({ key: "keyword", label: `关键词：${currentSearch.trim()}` });
-  if (currentSchoolSearch.trim()) selected.push({ key: "school", label: `学校：${currentSchoolSearch.trim()}` });
-  if (currentMajorSearch.trim()) selected.push({ key: "major", label: `专业：${currentMajorSearch.trim()}` });
-  if (currentExperienceRegion !== "all") selected.push({ key: "region", label: `地区：${regionSelectionLabel(currentExperienceRegion)}` });
+  if (currentStage === "career") {
+    if (currentCareerIndustrySearch.trim()) selected.push({ key: "career-industry", label: `行业：${currentCareerIndustrySearch.trim()}` });
+    if (currentCareerKeywordSearch.trim()) selected.push({ key: "career-keyword", label: `岗位/能力：${currentCareerKeywordSearch.trim()}` });
+    currentCareerRoleFilters.forEach((role) => selected.push({ key: "career-role", value: role, label: `岗位：${role}` }));
+    currentCareerAbilityFilters.forEach((ability) => selected.push({ key: "career-ability", value: ability, label: `能力：${ability}` }));
+  } else {
+    if (currentSchoolSearch.trim()) selected.push({ key: "school", label: `学校：${currentSchoolSearch.trim()}` });
+    if (currentMajorSearch.trim()) selected.push({ key: "major", label: `专业：${currentMajorSearch.trim()}` });
+    if (currentExperienceRegion !== "all") selected.push({ key: "region", label: `地区：${regionSelectionLabel(currentExperienceRegion)}` });
+  }
   currentDimensionFilters.forEach((dimension) => selected.push({ key: "dimension", value: dimension, label: dimensionLabels[dimension] || dimension }));
   if (currentSourceFilter !== "all") selected.push({ key: "source", label: sourceLabels[currentSourceFilter] });
   if (currentTimeFilter !== "all") selected.push({ key: "time", label: timeLabels[currentTimeFilter] });
@@ -3287,6 +3883,70 @@ function updateDimensionFilterButtons() {
     button.classList.toggle("active", active);
     button.setAttribute("aria-pressed", String(active));
   });
+}
+
+function careerFilterMeta(item) {
+  return CAREER_ITEM_FILTERS[item.id] || {
+    industry: item.school || "其他行业",
+    group: "职能支持",
+    roles: [item.major || "其他岗位"],
+    abilities: item.tags || []
+  };
+}
+
+function renderCareerFilterSystem() {
+  const system = $("#careerFilterSystem");
+  if (!system || currentStage !== "career") return;
+  const body = $("#careerFilterBody");
+  const collapse = $("#careerFilterCollapse");
+  if (body) body.hidden = currentCareerFilterCollapsed;
+  if (collapse) {
+    collapse.setAttribute("aria-expanded", String(!currentCareerFilterCollapsed));
+    const label = $("span", collapse);
+    if (label) label.textContent = currentCareerFilterCollapsed ? "展开" : "收起";
+    const icon = $("i", collapse);
+    if (icon) icon.setAttribute("data-lucide", currentCareerFilterCollapsed ? "chevron-down" : "chevron-up");
+  }
+  const industryInput = $("#careerIndustrySearch");
+  const keywordInput = $("#careerKeywordSearch");
+  if (industryInput && document.activeElement !== industryInput) industryInput.value = currentCareerIndustrySearch;
+  if (keywordInput && document.activeElement !== keywordInput) keywordInput.value = currentCareerKeywordSearch;
+  $$('[data-career-filter-mode]').forEach((button) => {
+    const active = button.dataset.careerFilterMode === currentCareerFilterMode;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+  const groupList = $("#careerIndustryOptions");
+  if (groupList) groupList.innerHTML = Object.keys(CAREER_FILTER_GROUPS).map((group) => {
+    const count = careerExperiences.filter((item) => careerFilterMeta(item).group === group).length;
+    return `<button class="${currentCareerGroup === group ? "active" : ""}" type="button" data-career-group="${escapeHtml(group)}" aria-pressed="${currentCareerGroup === group}"><span>${escapeHtml(group)}</span><small>${count}</small></button>`;
+  }).join("");
+  const optionHeading = $("#careerOptionHeading");
+  if (optionHeading) optionHeading.textContent = currentCareerFilterMode === "role" ? `${currentCareerGroup}岗位` : "相关能力";
+  const options = currentCareerFilterMode === "role" ? CAREER_FILTER_GROUPS[currentCareerGroup] || [] : CAREER_ABILITIES;
+  const normalizedSearch = currentCareerKeywordSearch.trim().toLowerCase();
+  const visibleOptions = normalizedSearch ? options.filter((option) => option.toLowerCase().includes(normalizedSearch)) : options;
+  const optionList = $("#careerKeywordOptions");
+  if (optionList) optionList.innerHTML = visibleOptions.length ? visibleOptions.map((option) => {
+    const selectedSet = currentCareerFilterMode === "role" ? currentCareerRoleFilters : currentCareerAbilityFilters;
+    const attribute = currentCareerFilterMode === "role" ? "data-career-role" : "data-career-ability";
+    const count = careerExperiences.filter((item) => (currentCareerFilterMode === "role" ? careerFilterMeta(item).roles : careerFilterMeta(item).abilities).includes(option)).length;
+    return `<button class="${selectedSet.has(option) ? "active" : ""}" type="button" ${attribute}="${escapeHtml(option)}" aria-pressed="${selectedSet.has(option)}"><span>${escapeHtml(option)}</span><small>${count}</small></button>`;
+  }).join("") : `<span class="career-option-empty">没有匹配的${currentCareerFilterMode === "role" ? "岗位" : "能力"}关键词</span>`;
+}
+
+function matchesCareerFilters(item) {
+  if (currentStage !== "career") return true;
+  const meta = careerFilterMeta(item);
+  const industryQuery = currentCareerIndustrySearch.trim().toLowerCase();
+  const keywordQuery = currentCareerKeywordSearch.trim().toLowerCase();
+  const industryText = `${meta.industry}${meta.group}${item.school || ""}`.toLowerCase();
+  const keywordText = `${item.major || ""}${item.title || ""}${item.text || ""}${meta.roles.join("")}${meta.abilities.join("")}`.toLowerCase();
+  const industryMatches = !industryQuery || industryText.includes(industryQuery);
+  const keywordMatches = !keywordQuery || keywordText.includes(keywordQuery);
+  const roleMatches = currentCareerRoleFilters.size === 0 || meta.roles.some((role) => currentCareerRoleFilters.has(role));
+  const abilityMatches = currentCareerAbilityFilters.size === 0 || meta.abilities.some((ability) => currentCareerAbilityFilters.has(ability));
+  return industryMatches && keywordMatches && roleMatches && abilityMatches;
 }
 
 function syncAdvancedExperienceFilterPanels() {
@@ -3627,13 +4287,13 @@ function renderExperiences() {
     const itemTags = Array.isArray(item.tags) ? item.tags.join("") : "";
     const schoolText = (item.school || "").toLowerCase();
     const majorText = (item.major || "").toLowerCase();
-    const schoolMatches = !schoolQuery || schoolText.includes(schoolQuery);
-    const majorMatches = !majorQuery || majorText.includes(majorQuery);
+    const schoolMatches = currentStage === "career" || !schoolQuery || schoolText.includes(schoolQuery);
+    const majorMatches = currentStage === "career" || !majorQuery || majorText.includes(majorQuery);
     const matchesDimension = currentDimensionFilters.size === 0 || dimensions.some((dimension) => currentDimensionFilters.has(dimension));
     const matchesSource = currentSourceFilter === "all" || item.source === currentSourceFilter;
     const matchesSearch = !query || `${item.school || ""}${item.major || ""}${item.city || ""}${item.text || ""}${itemTags}${dimensions.join("")}`.toLowerCase().includes(query);
-    const regionMatches = matchesRegionSelection(item, currentExperienceRegion);
-    return schoolMatches && majorMatches && regionMatches && matchesDimension && matchesSource && matchesSearch && matchesContentTime(item.publishedAt);
+    const regionMatches = currentStage === "career" || matchesRegionSelection(item, currentExperienceRegion);
+    return schoolMatches && majorMatches && regionMatches && matchesDimension && matchesSource && matchesSearch && matchesContentTime(item.publishedAt) && matchesCareerFilters(item);
   };
   const filtered = experienceItems.filter(matchesFilters);
   const filteredInstitutions = institutionDatasetForStage().filter((item) => {
@@ -3660,7 +4320,7 @@ function renderExperiences() {
     }
     return currentExperienceSort === "newest" ? String(b.publishedAt || "").localeCompare(String(a.publishedAt || "")) : 0;
   });
-  const favorites = userFavorites();
+  const favorites = currentStage === "career" ? userCollectionIds() : userFavorites();
   const sourceLabels = currentStage === "career"
     ? { student: { cls: "level-student", icon: "user-check", text: "毕业生 / 求职者" }, official: { cls: "level-official", icon: "landmark", text: "招聘原信息" }, data: { cls: "level-data", icon: "database", text: "公开数据" }, expert: { cls: "level-expert", icon: "users", text: "从业者 / 招聘视角" } }
     : currentStage === "graduate"
@@ -3680,16 +4340,18 @@ function renderExperiences() {
     const favoriteLabel = currentStage === "career"
       ? (saved ? "已收藏参考" : "收藏参考")
       : (saved ? "已加入候选" : "加入我的候选");
+    const favoriteAttribute = currentStage === "career" ? `data-collection="${escapeHtml(item.id)}"` : `data-favorite="${escapeHtml(item.id)}"`;
     return `<article class="experience-card" onclick="saveHistory('${item.id}')">
-      <div class="experience-top"><span class="school-avatar">${(item.school || "").slice(0, 1)}</span><div class="experience-school"><strong>${item.school || "未命名学校"}</strong><small>${item.major || "未分类专业"} · ${item.city || "未标注城市"}</small></div><span class="source-level-tag ${src.cls}">${src.text}</span></div>
+      <div class="experience-top">${schoolEmblemMarkup(item.school, "school-avatar")}<div class="experience-school"><strong>${item.school || "未命名学校"}</strong><small>${item.major || "未分类专业"} · ${item.city || "未标注城市"}</small></div><span class="source-level-tag ${src.cls}">${src.text}</span></div>
       <div class="experience-divider"></div>
       ${institutionSummary}${valueHtml}${titleHtml}
       <p>${item.text || ""}</p>
       <div class="tag-row">${dimensionsHtml}${tagsHtml}</div>
-      <div class="experience-card-footer"><div class="experience-source-meta">${sourceDetail}${publishedAt}</div><div class="experience-card-actions"><button class="save-experience ${saved ? "saved" : ""}" data-favorite="${item.id}"><i data-lucide="${saved ? "bookmark-check" : "bookmark-plus"}"></i>${favoriteLabel}</button></div></div>
+      <div class="experience-card-footer"><div class="experience-source-meta">${sourceDetail}${publishedAt}</div><div class="experience-card-actions"><button class="save-experience ${saved ? "saved" : ""}" ${favoriteAttribute}><i data-lucide="${saved ? "bookmark-check" : "bookmark-plus"}"></i>${favoriteLabel}</button></div></div>
     </article>`;
   }).join("") : `<div class="empty-state"><i data-lucide="search-x"></i><p>${escapeHtml(experienceEmptyText)}</p><button class="quiet-button" data-clear-search>清空筛选</button></div>`;
   updateExperienceFilterUi();
+  renderCareerFilterSystem();
   hydrateIcons();
 }
 
@@ -3701,9 +4363,21 @@ function renderQuestionAnswers(item) {
 
 function renderQuestions() {
   const user = currentUser();
+  const guest = !user;
   const list = $("#questionList");
   if (!list) return;
-  if (!user) {
+  const qaTabs = $("#qaTabs");
+  const composer = $("#qaAskComposerPanel");
+  const guestEntry = $("#qaGuestBrowsePanel");
+  if (qaTabs) qaTabs.hidden = guest;
+  if (composer) composer.hidden = guest;
+  if (guestEntry) guestEntry.hidden = !guest;
+  if ($("#questionsPageKicker")) $("#questionsPageKicker").textContent = "问答中心";
+  if ($("#questionsPageTitle")) $("#questionsPageTitle").textContent = guest ? "先看看别人怎样提问和回答" : "把具体问题交给经历过的人";
+  if ($("#questionsPageDescription")) $("#questionsPageDescription").textContent = guest ? "浏览公开问题、回答状态与脱敏后的真实经历；登录后可以匿名提问并持续追踪回答。" : "提问者匿名表达，回答者通过认证后贡献真实经历。问与答放在同一个闭环里，避免功能割裂。";
+  if ($("#questionListTitle")) $("#questionListTitle").textContent = guest ? "公开问题与回答" : "历史发布问题";
+  if ($("#questionListBadge")) $("#questionListBadge").textContent = guest ? "浏览示例" : "状态追踪";
+  if (guest) {
     list.innerHTML = demoQuestions.map((item) => `<article class="question-list-item"><header><strong>${escapeHtml(item.title)}</strong><span class="question-status ${item.waiting ? "waiting" : ""}">${escapeHtml(item.status)}</span></header><p>${escapeHtml(item.meta)}</p>${renderQuestionAnswers(item)}</article>`).join("");
   } else {
     const mine = read(STORE.questions, []).filter((item) => item.userId === user.id);
@@ -3719,7 +4393,7 @@ function renderInstitutionCard(item) {
   const highlightHtml = item.highlights.map((highlight) => `<span class="institution-highlight">${highlight}</span>`).join("");
   const graduate = item.decisionStage === "graduate";
   return `<article class="institution-card">
-    <div class="institution-card-top"><div class="institution-mark">${item.school.slice(0, 1)}</div><div><span class="source-level-tag level-institution">${graduate ? "考研院校" : "院校信息"}</span><h3>${item.school}</h3><p>${item.city} · ${item.type}</p></div></div>
+    <div class="institution-card-top">${schoolEmblemMarkup(item.school, "institution-mark")}<div><span class="source-level-tag level-institution">${graduate ? "考研院校" : "院校信息"}</span><h3>${item.school}</h3><p>${item.city} · ${item.type}</p></div></div>
     <p class="institution-intro">${item.intro}</p>
     <div class="institution-highlights">${highlightHtml}</div>
     <div class="institution-card-block"><span>${graduate ? "硕士招生专业样本" : "重点关注专业"}</span><div class="tag-row">${majorHtml}</div></div>
@@ -3837,7 +4511,7 @@ function renderSchoolDetail() {
   const latestUpdatesSection = renderLatestUpdates(item);
   const campusSection = renderCampusSection(item);
   panel.innerHTML = `<div class="school-detail-topbar"><button class="quiet-button" data-view-target="${currentSchoolReturnView}"><i data-lucide="arrow-left"></i>${escapeHtml(returnCopy)}</button><div class="school-detail-top-actions"><a class="quiet-button" href="${escapeHtml(item.officialUrl)}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link"></i>学校官网</a><button class="primary-button" data-favorite="school-${escapeHtml(item.id)}"><i data-lucide="${saved ? "bookmark-check" : "bookmark-plus"}"></i>${saved ? "已加入候选" : "加入我的候选"}</button></div></div>
-    <header class="school-profile-header"><div class="institution-mark school-profile-mark">${escapeHtml(item.school.slice(0, 1))}</div><div class="school-profile-copy"><span class="section-kicker">${detailCopy.profileKicker}</span><h1>${escapeHtml(item.school)}</h1><p class="school-english-name">${escapeHtml(item.englishName)}</p><div class="school-profile-tags"><span><i data-lucide="map-pin"></i>${escapeHtml(item.city)}</span><span><i data-lucide="landmark"></i>${escapeHtml(item.type)}</span>${item.highlights.map((highlight) => `<span>${escapeHtml(highlight)}</span>`).join("")}</div></div></header>
+    <header class="school-profile-header">${schoolEmblemMarkup(item.school, "institution-mark school-profile-mark")}<div class="school-profile-copy"><span class="section-kicker">${detailCopy.profileKicker}</span><h1>${escapeHtml(item.school)}</h1><p class="school-english-name">${escapeHtml(item.englishName)}</p><div class="school-profile-tags"><span><i data-lucide="map-pin"></i>${escapeHtml(item.city)}</span><span><i data-lucide="landmark"></i>${escapeHtml(item.type)}</span>${item.highlights.map((highlight) => `<span>${escapeHtml(highlight)}</span>`).join("")}</div></div></header>
     <nav class="school-section-nav" aria-label="学校详情目录"><button data-school-anchor="school-overview" class="active">学校概况</button><button data-school-anchor="school-updates">最新资讯</button><button data-school-anchor="school-majors">${detailCopy.majorNav}</button><button data-school-anchor="school-admission">${detailCopy.admissionNav}</button><button data-school-anchor="school-campus">校园与城市</button><button data-school-anchor="school-progression">${detailCopy.progressionNav}</button><button data-school-anchor="school-comments">${graduate ? "在读补充" : "本校评论"}</button></nav>
     <div class="school-detail-grid">
       <section class="school-detail-main">
@@ -3888,20 +4562,266 @@ function answererStageDescriptionForRole(config) {
   }[key] || config.description;
 }
 
+function currentAnswererRoute() {
+  const config = currentAnswererStageConfig();
+  return Object.entries(ANSWERER_STAGE_CONFIG).find(([, item]) => item === config)?.[0] || "gaokao";
+}
+
+function currentAnswererRoleKey() {
+  if (isTeacherAnswerer()) return "teacher";
+  if (isProfessionalAnswerer()) return "professional";
+  return "student";
+}
+
+function answererQuestionItems() {
+  const config = currentAnswererStageConfig();
+  const route = currentAnswererRoute();
+  const role = currentAnswererRoleKey();
+  const pool = role === "professional" ? PROFESSIONAL_ANSWERER_QUESTION_EXAMPLES : role === "teacher" ? TEACHER_ANSWERER_QUESTION_EXAMPLES : ANSWERER_QUESTION_EXAMPLES;
+  const examples = (pool[route] || pool.gaokao || []).map((item, index) => ({
+    ...item,
+    id: `sample-${role}-${route}-${index + 1}`,
+    stage: config.name,
+    source: "sample"
+  }));
+  const user = currentUser();
+  const submitted = read(STORE.questions, [])
+    .filter((item) => item.stage === config.name && item.userId !== user?.id)
+    .map((item) => ({
+      id: `question-${item.id}`,
+      sourceQuestionId: item.id,
+      source: "submitted",
+      title: item.title,
+      topic: item.topic || "未分类",
+      tag: "匿名提问",
+      meta: `${item.topic || "未分类"} · 用户发布`,
+      stage: item.stage || config.name
+    }));
+  return [...submitted, ...examples];
+}
+
+function answerRecordsForCurrentUser() {
+  const user = currentUser();
+  return user ? read(STORE.answers, []).filter((item) => item.userId === user.id) : [];
+}
+
+function answerDraftsForCurrentUser() {
+  const user = currentUser();
+  if (!user) return [];
+  const all = read(STORE.answerDrafts, {});
+  return Object.values(all[user.id] || {});
+}
+
+function answerDraftForQuestion(questionId) {
+  return answerDraftsForCurrentUser().find((item) => item.questionId === questionId) || null;
+}
+
+function answerRecordForQuestion(questionId) {
+  return answerRecordsForCurrentUser().find((item) => item.questionId === questionId) || null;
+}
+
+function answerQuestionState(questionId) {
+  if (answerDraftForQuestion(questionId)) return "草稿";
+  if (answerRecordForQuestion(questionId)) return "已回答";
+  return "待回答";
+}
+
+function answerQuestionCard(item) {
+  const state = answerQuestionState(item.id);
+  const action = state === "草稿" ? "继续编辑" : state === "已回答" ? "修改回答" : "开始回答";
+  const icon = state === "草稿" ? "file-pen-line" : state === "已回答" ? "pencil" : "message-square-plus";
+  const statusClass = state === "待回答" ? "waiting" : state === "草稿" ? "draft" : "published";
+  return `<article class="question-list-item answerer-question-item"><header><strong>${escapeHtml(item.title)}</strong><span class="question-status ${statusClass}">${state}</span></header><p>${escapeHtml(item.meta)}</p><footer><span class="content-tag">${escapeHtml(item.tag)}</span><button class="quiet-button" type="button" data-answer-question-id="${escapeHtml(item.id)}"><i data-lucide="${icon}"></i>${action}</button></footer></article>`;
+}
+
+function formatAnswerRecordTime(value) {
+  if (!value) return "刚刚保存";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "已保存" : date.toLocaleString("zh-CN", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" });
+}
+
+function answerHistoryCard(item, { compact = false, draft = false } = {}) {
+  const status = draft ? "草稿" : item.status || "已发布";
+  const statusClass = draft ? "draft" : "published";
+  const updatedAt = item.updatedAt || item.createdAt;
+  const detail = draft ? `上次保存：${formatAnswerRecordTime(updatedAt)}` : `${item.stage || item.topic || "回答记录"} · 更新于 ${formatAnswerRecordTime(updatedAt)}`;
+  const actionAttribute = draft ? `data-answer-draft-edit="${escapeHtml(item.questionId)}"` : item.id ? `data-answer-history-edit="${escapeHtml(item.id)}"` : "";
+  return `<article class="question-list-item answer-history-card${compact ? " compact" : ""}"><header><strong>${escapeHtml(item.questionTitle || item.title || "回答记录")}</strong><span class="question-status ${statusClass}">${escapeHtml(status)}</span></header><p>${escapeHtml(detail)}</p>${item.content && !compact ? `<blockquote>${escapeHtml(item.content)}</blockquote>` : ""}${actionAttribute ? `<footer><span class="content-tag">${escapeHtml(item.topic || "真实经历")}</span><button class="quiet-button" type="button" ${actionAttribute}><i data-lucide="pencil"></i>${draft ? "继续编辑" : "查看并修改"}</button></footer>` : ""}</article>`;
+}
+
+function answerEditorBoundaryCopy() {
+  if (isTeacherAnswerer()) return "请区分课程或培养事实、教学观察和个人建议，并标注适用时间。";
+  if (isProfessionalAnswerer()) return "请区分岗位事实、个人从业经历和行业判断，并标注城市与时间。";
+  return "请区分亲身经历、个人判断和需要核对的官方信息。";
+}
+
+function defaultAnswerScope() {
+  const config = currentAnswererStageConfig();
+  if (isTeacherAnswerer()) return `${config.name} · 教学与指导经历`;
+  if (isProfessionalAnswerer()) return `${config.name} · 岗位与行业经历`;
+  return `${config.name} · 学生经历`;
+}
+
+function setAnswerEditorState(label, savedAt = "") {
+  const state = $("#answerEditorState");
+  if (state) state.innerHTML = `<i data-lucide="${label === "已保存" ? "cloud-check" : label === "已发布" ? "circle-check" : "cloud"}"></i>${escapeHtml(label)}`;
+  if ($("#answerEditorSavedAt")) $("#answerEditorSavedAt").textContent = savedAt || "关闭前会自动保存未发布内容";
+  hydrateIcons();
+}
+
+function answerQuestionById(questionId) {
+  return answererQuestionItems().find((item) => item.id === questionId) || null;
+}
+
+function answerQuestionFromRecord(record) {
+  return {
+    id: record.questionId,
+    sourceQuestionId: record.sourceQuestionId || "",
+    title: record.questionTitle || record.title || "回答记录",
+    topic: record.topic || "未分类",
+    tag: record.tag || "回答记录",
+    meta: record.questionMeta || `${record.topic || "未分类"} · ${record.stage || "对应阶段"}`,
+    stage: record.stage || currentAnswererStageConfig().name,
+    source: record.source || "history"
+  };
+}
+
+function openAnswerEditor(question, answerId = "") {
+  if (!requireAuth("登录后才能保存和发布回答")) return;
+  const answer = answerId ? answerRecordsForCurrentUser().find((item) => item.id === answerId) : question ? answerRecordForQuestion(question.id) : null;
+  const resolvedQuestion = question || (answer ? answerQuestionFromRecord(answer) : null);
+  if (!resolvedQuestion) { showToast("没有找到这条问题，请刷新后重试"); return; }
+  const draft = answerDraftForQuestion(resolvedQuestion.id);
+  const source = draft || answer || {};
+  activeAnswerEditor = { question: resolvedQuestion, answerId: answer?.id || source.answerId || "", dirty: false };
+  $("#answerEditorQuestionStage").textContent = resolvedQuestion.stage || currentAnswererStageConfig().name;
+  $("#answerEditorQuestionTitle").textContent = resolvedQuestion.title;
+  $("#answerEditorQuestionMeta").textContent = resolvedQuestion.meta || resolvedQuestion.topic || "真实经历回答";
+  $("#answerEditorContent").value = source.content || "";
+  $("#answerEditorScope").value = source.scope || defaultAnswerScope();
+  $("#answerEditorTime").value = source.experienceTime || "";
+  $("#answerEditorCount").textContent = $("#answerEditorContent").value.length;
+  $("#answerEditorBoundary").textContent = answerEditorBoundaryCopy();
+  $("#answerEditorPublish").innerHTML = `<i data-lucide="send"></i>${answer ? "保存修改" : "发布回答"}`;
+  setAnswerEditorState(draft ? "已保存" : answer ? "已发布" : "尚未保存", draft ? `草稿保存于 ${formatAnswerRecordTime(draft.updatedAt)}` : "");
+  openModal("answerEditorModal");
+  hydrateIcons();
+}
+
+function answerEditorPayload() {
+  if (!activeAnswerEditor) return null;
+  const question = activeAnswerEditor.question;
+  return {
+    answerId: activeAnswerEditor.answerId || "",
+    questionId: question.id,
+    sourceQuestionId: question.sourceQuestionId || "",
+    questionTitle: question.title,
+    questionMeta: question.meta || "",
+    topic: question.topic || question.tag || "未分类",
+    tag: question.tag || "回答记录",
+    stage: question.stage || currentAnswererStageConfig().name,
+    source: question.source || "sample",
+    role: currentAnswererRoleKey(),
+    content: $("#answerEditorContent")?.value.trim() || "",
+    scope: $("#answerEditorScope")?.value.trim() || "",
+    experienceTime: $("#answerEditorTime")?.value.trim() || ""
+  };
+}
+
+function saveAnswerDraft({ notify = true } = {}) {
+  const user = currentUser();
+  const payload = answerEditorPayload();
+  if (!user || !payload) return;
+  if (!payload.content && !payload.experienceTime && payload.scope === defaultAnswerScope()) {
+    if (notify) showToast("写下一些内容后再保存草稿");
+    return;
+  }
+  const all = read(STORE.answerDrafts, {});
+  all[user.id] = all[user.id] || {};
+  all[user.id][payload.questionId] = { ...payload, userId: user.id, updatedAt: new Date().toISOString() };
+  write(STORE.answerDrafts, all);
+  activeAnswerEditor.dirty = false;
+  setAnswerEditorState("已保存", `草稿保存于 ${formatAnswerRecordTime(all[user.id][payload.questionId].updatedAt)}`);
+  if (notify) showToast("回答草稿已保存");
+  renderAnswerSurfaces();
+}
+
+function removeAnswerDraft(questionId) {
+  const user = currentUser();
+  if (!user) return;
+  const all = read(STORE.answerDrafts, {});
+  if (!all[user.id]?.[questionId]) return;
+  delete all[user.id][questionId];
+  write(STORE.answerDrafts, all);
+}
+
+function publishAnswer() {
+  const user = currentUser();
+  const payload = answerEditorPayload();
+  if (!user || !payload) return;
+  if (payload.content.length < 30) { showToast("请至少写 30 字，把真实经历说明得更具体"); $("#answerEditorContent")?.focus(); return; }
+  if (payload.scope.length < 2) { showToast("请补充学校、专业、岗位或其他适用范围"); $("#answerEditorScope")?.focus(); return; }
+  if (payload.experienceTime.length < 4) { showToast("请补充经历发生的年份或时间范围"); $("#answerEditorTime")?.focus(); return; }
+  const now = new Date().toISOString();
+  const answers = read(STORE.answers, []);
+  const existingIndex = answers.findIndex((item) => item.id === payload.answerId && item.userId === user.id);
+  const previous = existingIndex >= 0 ? answers[existingIndex] : null;
+  const answer = {
+    ...previous,
+    ...payload,
+    id: previous?.id || uid("answer"),
+    userId: user.id,
+    title: payload.questionTitle,
+    status: "已发布",
+    createdAt: previous?.createdAt || now,
+    updatedAt: now,
+    version: (previous?.version || 0) + 1
+  };
+  if (existingIndex >= 0) answers[existingIndex] = answer;
+  else answers.unshift(answer);
+  write(STORE.answers, answers);
+  if (payload.sourceQuestionId) {
+    const questions = read(STORE.questions, []);
+    const question = questions.find((item) => item.id === payload.sourceQuestionId);
+    if (question) {
+      question.answers = Array.isArray(question.answers) ? question.answers : [];
+      const linkedIndex = question.answers.findIndex((item) => item.answerId === answer.id);
+      const linked = { answerId: answer.id, author: `${identityEntryRoleLabel(currentIdentityRoleKey())} · 回答者`, text: answer.content, updatedAt: now };
+      if (linkedIndex >= 0) question.answers[linkedIndex] = linked;
+      else question.answers.push(linked);
+      question.status = "已回答";
+      write(STORE.questions, questions);
+    }
+  }
+  removeAnswerDraft(payload.questionId);
+  setAnswerEditorState("已发布", `发布于 ${formatAnswerRecordTime(now)} · 第 ${answer.version} 版`);
+  activeAnswerEditor = null;
+  closeModal("answerEditorModal");
+  renderQuestions();
+  renderAnswerSurfaces();
+  showToast(previous ? "回答修改已发布" : "回答已发布，可以在历史回答中继续修改");
+}
+
+function renderAnswerSurfaces() {
+  renderAnswererWorkbench();
+  renderAnswerQuestionPool();
+  renderAnswerHistory();
+  renderAnswererHistoryPage();
+}
+
 function renderAnswererWorkbench() {
   const config = currentAnswererStageConfig();
-  const route = Object.entries(ANSWERER_STAGE_CONFIG).find(([, item]) => item === config)?.[0] || "gaokao";
   const teacher = isTeacherAnswerer();
   const professional = isProfessionalAnswerer();
-  const questionPool = professional ? PROFESSIONAL_ANSWERER_QUESTION_EXAMPLES : teacher ? TEACHER_ANSWERER_QUESTION_EXAMPLES : ANSWERER_QUESTION_EXAMPLES;
-  const questions = questionPool[route] || questionPool.gaokao || ANSWERER_QUESTION_EXAMPLES.gaokao;
+  const questions = answererQuestionItems();
   const stageLabel = $("#answererStageLabel");
   const stageDescription = $("#answererStageDescription");
   const questionCount = $("#answererQuestionCount");
   const questionList = $("#answererQuestionList");
   const historyList = $("#answererHistoryList");
   const user = currentUser();
-  const history = user ? read(STORE.answers, []).filter((item) => item.userId === user.id) : demoAnswers;
+  const history = user ? answerRecordsForCurrentUser() : demoAnswers;
+  const drafts = user ? answerDraftsForCurrentUser() : [];
   const verification = user ? read(STORE.verification, {})[user.id] : null;
   const student = currentIdentityRoleKey() === "student";
   if ($("#answererHomeKicker")) $("#answererHomeKicker").textContent = teacher ? "教师回答首页" : professional ? "从业者回答首页" : student ? "学生回答首页" : "回答者工作台";
@@ -3920,14 +4840,14 @@ function renderAnswererWorkbench() {
   if ($("#answererBoundaryTitle")) $("#answererBoundaryTitle").textContent = teacher ? "让建议有依据，也有边界" : professional ? "让行业经验具体，也有边界" : "让经验保持可信";
   if ($("#answererBoundaryList")) $("#answererBoundaryList").innerHTML = (teacher ? ["区分课程事实与个人判断", "标注适用的年级与时间", "不代替学校或官方文件下结论"] : professional ? ["区分岗位事实与个人经历", "标注行业、城市与时间", "不把单个公司经验当成普遍规律"] : ["只分享亲身经历", "标注经历发生时间", "不代替官方信息下结论"]).map((item) => `<li><i data-lucide="check"></i>${item}</li>`).join("");
   if ($("#answererWorkbenchHistoryTitle")) $("#answererWorkbenchHistoryTitle").textContent = teacher ? "教学回答" : professional ? "行业回答" : "历史回答";
-  if (questionCount) questionCount.textContent = `${questions.length} 条匹配`;
+  if (questionCount) questionCount.textContent = `${questions.filter((item) => answerQuestionState(item.id) !== "已回答").length} 条待处理`;
   if ($("#answererQuestionsCount")) $("#answererQuestionsCount").textContent = questions.length;
-  if ($("#answererHomeQuestionCount")) $("#answererHomeQuestionCount").textContent = `${questions.length} 条问题`;
-  if ($("#answererHomeHistoryCount")) $("#answererHomeHistoryCount").textContent = `${history.length} 条回答`;
+  if ($("#answererHomeQuestionCount")) $("#answererHomeQuestionCount").textContent = `${questions.filter((item) => answerQuestionState(item.id) !== "已回答").length} 条问题`;
+  if ($("#answererHomeHistoryCount")) $("#answererHomeHistoryCount").textContent = `${history.length} 条回答${drafts.length ? ` · ${drafts.length} 份草稿` : ""}`;
   if ($("#answererHomeTrustStatus")) $("#answererHomeTrustStatus").textContent = verification?.status || "待认证";
   if ($("#answererHistoryCount")) $("#answererHistoryCount").textContent = `${history.length} 条`;
-  if (questionList) questionList.innerHTML = questions.map((item) => `<article class="question-list-item answerer-question-item"><header><strong>${escapeHtml(item.title)}</strong><span class="question-status waiting">待回答</span></header><p>${escapeHtml(item.meta)}</p><footer><span class="content-tag">${escapeHtml(item.tag)}</span><button class="quiet-button" type="button" data-answerer-question><i data-lucide="message-square-plus"></i>开始回答</button></footer></article>`).join("");
-  if (historyList) historyList.innerHTML = history.length ? history.map((item) => `<article class="question-list-item"><header><strong>${escapeHtml(item.title)}</strong><span class="question-status">${escapeHtml(item.status)}</span></header><p>${escapeHtml(item.meta || `${item.topic || "未分类"} · 已完成回答`)}</p></article>`).join("") : `<div class="qa-empty"><i data-lucide="message-square-off"></i><p>${teacher ? "你还没有教学回答记录" : professional ? "你还没有行业回答记录" : "你还没有回答记录"}</p><span>${teacher ? "完成一条指导回答后，可以在这里继续查看和补充。" : professional ? "完成一条职业回答后，可以在这里继续查看和补充。" : "完成回答后，可以在这里继续查看和补充。"}</span></div>`;
+  if (questionList) questionList.innerHTML = questions.map(answerQuestionCard).join("");
+  if (historyList) historyList.innerHTML = history.length || drafts.length ? `${drafts.map((item) => answerHistoryCard(item, { compact: true, draft: true })).join("")}${history.map((item) => answerHistoryCard(item, { compact: true })).join("")}` : `<div class="qa-empty"><i data-lucide="message-square-off"></i><p>${teacher ? "你还没有教学回答记录" : professional ? "你还没有行业回答记录" : "你还没有回答记录"}</p><span>${teacher ? "完成一条指导回答后，可以在这里继续查看和补充。" : professional ? "完成一条职业回答后，可以在这里继续查看和补充。" : "完成回答后，可以在这里继续查看和补充。"}</span></div>`;
   hydrateIcons();
 }
 
@@ -3948,8 +4868,9 @@ function renderAnswerHistory() {
   const list = $("#answerList");
   if (!list) return;
   const user = currentUser();
-  const history = user ? read(STORE.answers, []).filter((item) => item.userId === user.id) : demoAnswers;
-  list.innerHTML = history.length ? history.map((item) => `<article class="question-list-item"><header><strong>${escapeHtml(item.title)}</strong><span class="question-status">${escapeHtml(item.status)}</span></header><p>${escapeHtml(item.meta || `${item.topic || "未分类"} · 已完成回答`)}</p></article>`).join("") : `<div class="qa-empty"><i data-lucide="message-square-off"></i><p>你还没有回答过问题</p><span>完成认证后，可以从左侧问题池选择自己真正经历过的问题。</span></div>`;
+  const history = user ? answerRecordsForCurrentUser() : demoAnswers;
+  const drafts = user ? answerDraftsForCurrentUser() : [];
+  list.innerHTML = history.length || drafts.length ? `${drafts.map((item) => answerHistoryCard(item, { draft: true })).join("")}${history.map((item) => answerHistoryCard(item)).join("")}` : `<div class="qa-empty"><i data-lucide="message-square-off"></i><p>你还没有回答过问题</p><span>从左侧问题池选择自己真正经历过的问题，可以先保存草稿。</span></div>`;
   hydrateIcons();
 }
 
@@ -3974,12 +4895,15 @@ function renderAnswererExperiencePage() {
 function renderAnswererHistoryPage() {
   const panel = $("#answererHistoryContent");
   if (!panel) return;
-  const user = currentUser();
-  const answers = user ? read(STORE.answers, []).filter((item) => item.userId === user.id) : [];
+  const answers = answerRecordsForCurrentUser();
+  const drafts = answerDraftsForCurrentUser();
   const answerCount = answers.length;
+  const coveredStages = new Set(answers.map((item) => item.stage).filter(Boolean)).size;
+  const latest = [...answers].sort((a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0))[0];
   const teacher = isTeacherAnswerer();
   const professional = isProfessionalAnswerer();
-  panel.innerHTML = `${answererInternalPageHeader(teacher ? "教学回答记录" : professional ? "行业回答记录" : "回答记录", "历史回答", teacher ? "查看已经提供的教学与指导观察，随时补充适用范围和时间信息。" : professional ? "查看已经分享过的岗位与行业观察，随时补充适用城市、行业和时间信息。" : "查看你已经分享过的经历，随时补充或修订时间信息。")}<section class="answerer-history-summary"><div><small>${teacher ? "已完成指导" : "已完成回答"}</small><strong>${answerCount} 条</strong></div><div><small>覆盖阶段</small><strong>${answerCount ? "2 个" : "0 个"}</strong></div><div><small>最近回答</small><strong>${answerCount ? "最近一次" : "还没有"}</strong></div><a class="quiet-button" href="${answererPortalHref("questions")}">继续回答问题 <i data-lucide="arrow-right"></i></a></section><div class="answerer-history-filter"><span>${teacher ? "搜索教学回答" : professional ? "搜索行业回答" : "搜索回答内容"}</span><button type="button" class="active">全部阶段</button><button type="button">按时间排序</button><button type="button">清除筛选</button></div><div class="answerer-history-list">${answerCount ? answers.map((answer) => `<article class="answerer-history-item"><div><span>${teacher ? "教学回答" : professional ? "行业回答" : "回答记录"}</span><h2>${escapeHtml(answer.questionTitle || (teacher ? "已完成的指导回答" : professional ? "已完成的职业回答" : "已完成的经验回答"))}</h2><small>${escapeHtml(answer.stage || currentAnswererStageConfig().name)} · ${escapeHtml(answer.createdAt ? new Date(answer.createdAt).toLocaleDateString("zh-CN") : "已保存")}</small></div><button type="button" data-answerer-history-open>查看 <i data-lucide="arrow-up-right"></i></button></article>`).join("") : `<div class="answerer-history-empty"><i data-lucide="history"></i><strong>${teacher ? "还没有教学回答" : professional ? "还没有行业回答" : "还没有完成回答"}</strong><p>${teacher ? "从回答中心选择一条适合你的指导问题开始。" : professional ? "从回答中心选择一条适合你的职业问题开始。" : "从回答中心选择一条真正经历过的问题开始。"}</p><a class="quiet-button" href="${answererPortalHref("questions")}">查看回答中心 <i data-lucide="arrow-right"></i></a></div>`}</div>`;
+  const records = `${drafts.map((item) => answerHistoryCard(item, { draft: true })).join("")}${answers.map((item) => answerHistoryCard(item)).join("")}`;
+  panel.innerHTML = `${answererInternalPageHeader(teacher ? "教学回答记录" : professional ? "行业回答记录" : "回答记录", "历史回答", teacher ? "查看已经提供的教学与指导观察，随时补充适用范围和时间信息。" : professional ? "查看已经分享过的岗位与行业观察，随时补充适用城市、行业和时间信息。" : "查看你已经分享过的经历，随时补充或修订时间信息。")}<section class="answerer-history-summary"><div><small>${teacher ? "已完成指导" : "已完成回答"}</small><strong>${answerCount} 条</strong></div><div><small>未发布草稿</small><strong>${drafts.length} 份</strong></div><div><small>覆盖阶段</small><strong>${coveredStages} 个</strong></div><div><small>最近更新</small><strong>${latest ? formatAnswerRecordTime(latest.updatedAt || latest.createdAt) : "还没有"}</strong></div><a class="quiet-button" href="${answererPortalHref("questions")}">继续回答问题 <i data-lucide="arrow-right"></i></a></section><div class="answerer-history-filter"><span>${teacher ? "教学回答与草稿" : professional ? "行业回答与草稿" : "回答与草稿"}</span><span class="answer-history-filter-note">当前按最近更新时间排列</span></div><div class="answerer-history-list answerer-history-record-list">${records || `<div class="answerer-history-empty"><i data-lucide="history"></i><strong>${teacher ? "还没有教学回答" : professional ? "还没有行业回答" : "还没有完成回答"}</strong><p>${teacher ? "从回答中心选择一条适合你的指导问题开始。" : professional ? "从回答中心选择一条适合你的职业问题开始。" : "从回答中心选择一条真正经历过的问题开始。"}</p><a class="quiet-button" href="${answererPortalHref("questions")}">查看回答中心 <i data-lucide="arrow-right"></i></a></div>`}</div>`;
   hydrateIcons();
 }
 
@@ -4010,11 +4934,8 @@ function renderAnswererInternalView(name) {
 function renderAnswerQuestionPool() {
   const pool = $("#answerQuestionPool");
   if (!pool) return;
-  const config = currentAnswererStageConfig();
-  const route = Object.entries(ANSWERER_STAGE_CONFIG).find(([, item]) => item === config)?.[0] || "gaokao";
-  const questionPool = isProfessionalAnswerer() ? PROFESSIONAL_ANSWERER_QUESTION_EXAMPLES : isTeacherAnswerer() ? TEACHER_ANSWERER_QUESTION_EXAMPLES : ANSWERER_QUESTION_EXAMPLES;
-  const questions = questionPool[route] || questionPool.gaokao || ANSWERER_QUESTION_EXAMPLES.gaokao;
-  pool.innerHTML = questions.map((item) => `<article class="question-list-item"><header><strong>${escapeHtml(item.title)}</strong><span class="question-status waiting">待回答</span></header><p>${escapeHtml(item.tag)} · ${escapeHtml(item.meta)}</p></article>`).join("");
+  pool.innerHTML = answererQuestionItems().map(answerQuestionCard).join("");
+  hydrateIcons();
 }
 
 function candidateStatusFor(type, key) {
@@ -4092,7 +5013,7 @@ function renderSchoolComparison(candidates) {
     <div class="school-compare-heading"><div><span class="subsection-kicker"><i data-lucide="columns-3"></i>院校对比</span><h2>${candidates.length} 所候选院校并列查看</h2><p>只呈现已有资料与来源状态，不生成综合评分或推荐结论。</p></div><button class="quiet-button" type="button" data-exit-school-compare><i data-lucide="arrow-left"></i>返回候选列表</button></div>
     <div class="school-compare-table-wrap">
       <table class="school-compare-table">
-        <thead><tr><th scope="col">比较维度</th>${candidates.map((item) => `<th scope="col"><span class="compare-school-mark">${item.school.slice(0, 1)}</span><strong>${item.school}</strong><small>${item.city}</small></th>`).join("")}</tr></thead>
+        <thead><tr><th scope="col">比较维度</th>${candidates.map((item) => `<th scope="col">${schoolEmblemMarkup(item.school, "compare-school-mark")}<strong>${item.school}</strong><small>${item.city}</small></th>`).join("")}</tr></thead>
         <tbody>
           <tr><th scope="row">我的状态</th>${cell((item) => `<span class="compare-status">${candidateStatusFor("school", item.id)}</span>`)}</tr>
           <tr><th scope="row">院校身份</th>${cell((item) => `<div class="compare-tag-list identity-tags">${(item.identityTags || ["身份标签待更新"]).map((tag) => `<span>${tag}</span>`).join("")}</div><strong>${item.type}</strong><small>${item.identityNote || "重新发起对比后显示最新院校身份"}</small>`)}</tr>
@@ -4133,7 +5054,7 @@ function renderSchoolMajorSelection(school) {
   const selectedCount = selectedSchoolMajorNames.size;
   return `<div class="school-major-selection-view">
     <div class="school-compare-heading"><div><span class="subsection-kicker"><i data-lucide="list-tree"></i>院校优先 · 第二步</span><h2>比较 ${school.school} 的不同专业</h2><p>学校条件保持不变，只比较该校专业之间的培养与发展差异。</p></div><button class="quiet-button" type="button" data-back-school-comparison><i data-lucide="arrow-left"></i>返回院校对比</button></div>
-    <header class="within-school-heading"><span class="candidate-mark">${school.school.slice(0, 1)}</span><div><strong>${school.school}</strong><small>${school.city} · ${school.identityTags.join(" · ")}</small></div></header>
+    <header class="within-school-heading">${schoolEmblemMarkup(school.school, "candidate-mark")}<div><strong>${school.school}</strong><small>${school.city} · ${school.identityTags.join(" · ")}</small></div></header>
     <div class="school-major-choice-list">${school.majorPrograms.map((program) => `<article class="school-major-choice"><label class="school-major-checkbox"><input type="checkbox" data-select-school-major="${escapeHtml(program.name)}"${selectedSchoolMajorNames.has(program.name) ? " checked" : ""}><span></span></label><div class="school-major-choice-name"><strong>${program.name}</strong><small>${program.school}</small></div><div class="school-major-choice-detail"><p>${program.note}</p><div><span>${program.category}</span><span>${program.level}</span><a href="${program.officialUrl}" target="_blank" rel="noopener noreferrer">专业官方信息<i data-lucide="external-link"></i></a></div></div></article>`).join("")}</div>
     <div class="school-major-selection-actions"><div><strong>已选择 ${selectedCount} / 3</strong><span>请选择 2–3 个专业进行校内比较。</span></div><button class="primary-button" type="button" data-start-school-major-compare${selectedCount < 2 ? " disabled" : ""}><i data-lucide="columns-3"></i>开始校内专业对比</button></div>
   </div>`;
@@ -4263,18 +5184,51 @@ function deleteComparisonHistory(id) {
   showToast("这条历史对比已删除");
 }
 
-function parentFamilyConnection(user = currentUser()) {
-  if (!user) return null;
-  const families = read(STORE.family, {});
-  const entry = Object.entries(families).find(([, family]) => Array.isArray(family.parents) && family.parents.includes(user.id));
-  return entry ? { ownerId: entry[0], family: entry[1] } : null;
+const FAMILY_PERMISSION_OPTIONS = [
+  { key: "candidates", icon: "bookmark-check", title: "候选院校与专业", text: "共享当前升学阶段主动收藏的院校与专业候选。" },
+  { key: "careerCollections", icon: "briefcase-business", title: "就业收藏与岗位参考", text: "逐项共享职业阶段收藏的岗位、行业或求职参考。" },
+  { key: "candidateStatuses", icon: "tags", title: "候选判断状态", text: "允许家长看到待了解、重点考虑等当前判断。" },
+  { key: "comparisons", icon: "columns-3", title: "对比结果", text: "共享已保存的院校或专业对比记录。" },
+  { key: "calendar", icon: "calendar-days", title: "家庭决策日历节点", text: "共享关键日期，不开放个人浏览记录。" },
+  { key: "planningSummary", icon: "route", title: "人生规划摘要", text: "只授权摘要可见，不允许家长编辑规划。" },
+  { key: "familyContributions", icon: "messages-square", title: "家庭讨论与建议", text: "允许关联家长参与讨论并留下可撤回建议。" }
+];
+const FAMILY_ALWAYS_PRIVATE = ["匿名提问与回答", "搜索与浏览记录", "账户资料与认证材料", "未授权的就业收藏与岗位参考"];
+let familyPrivacyShowItems = false;
+let familyPrivacyPreview = false;
+
+function defaultFamilyPermissions() {
+  return { candidates: true, careerCollections: false, candidateStatuses: true, comparisons: false, calendar: false, planningSummary: false, familyContributions: true, hiddenCandidateIds: [], updatedAt: "" };
 }
 
-function parentSharedContext(user = currentUser()) {
-  const connection = parentFamilyConnection(user);
-  if (!connection) return { connection: null, owner: null, items: [] };
-  const owner = read(STORE.users, []).find((item) => item.id === connection.ownerId) || null;
-  const favoriteIds = new Set(read(STORE.favorites, {})[connection.ownerId] || []);
+function familyPermissionOptionsForStage(stage = currentStage) {
+  return FAMILY_PERMISSION_OPTIONS.filter((item) => item.key !== (stage === "career" ? "candidates" : "careerCollections"));
+}
+
+function familyPermissionsForOwner(ownerId) {
+  if (!ownerId) return defaultFamilyPermissions();
+  const stored = read(STORE.familyPermissions, {})[ownerId] || {};
+  return { ...defaultFamilyPermissions(), ...stored, hiddenCandidateIds: Array.isArray(stored.hiddenCandidateIds) ? stored.hiddenCandidateIds : [] };
+}
+
+function saveFamilyPermissions(ownerId, patch) {
+  if (!ownerId) return null;
+  const all = read(STORE.familyPermissions, {});
+  const next = { ...familyPermissionsForOwner(ownerId), ...patch, updatedAt: new Date().toISOString() };
+  all[ownerId] = next;
+  write(STORE.familyPermissions, all);
+  return next;
+}
+
+function familyPermissionOwnerId(user = currentUser()) {
+  if (!user) return "";
+  if (currentIdentityRoleKey() === "parent") return parentFamilyConnection(user)?.ownerId || "";
+  return user.id;
+}
+
+function familyCandidateCatalog(ownerId) {
+  if (!ownerId) return [];
+  const favoriteIds = new Set(read(STORE.favorites, {})[ownerId] || []);
   const items = new Map();
   const add = (item) => { if (!items.has(item.favoriteId)) items.set(item.favoriteId, item); };
   const stageSources = [
@@ -4285,18 +5239,100 @@ function parentSharedContext(user = currentUser()) {
   stageSources.forEach((source) => {
     source.schools.forEach((school) => {
       const schoolFavoriteId = `school-${school.id}`;
-      if (favoriteIds.has(schoolFavoriteId)) add({ id: `${source.stage}:school:${school.id}`, favoriteId: schoolFavoriteId, stage: source.stage, stageLabel: source.label, kind: "院校", title: school.school, subtitle: `${school.city} · ${school.type}`, schoolId: school.id, decisionKey: `school:${school.id}` });
+      if (favoriteIds.has(schoolFavoriteId)) add({ id: `${source.stage}:school:${school.id}`, favoriteId: schoolFavoriteId, permissionKey: "candidates", stage: source.stage, stageLabel: source.label, kind: "院校", title: school.school, subtitle: `${school.city} · ${school.type}`, schoolId: school.id, decisionKey: `school:${school.id}` });
       (school.majorPrograms || []).forEach((program) => {
         const favoriteId = majorCandidateId(school.id, program.name);
-        if (favoriteIds.has(favoriteId)) add({ id: `${source.stage}:major:${school.id}:${encodeURIComponent(program.name)}`, favoriteId, stage: source.stage, stageLabel: source.label, kind: "专业", title: program.name, subtitle: `${school.school} · ${program.school || school.city}`, schoolId: school.id, decisionKey: `major:${majorDecisionKey(school.school, program.name)}` });
+        if (favoriteIds.has(favoriteId)) add({ id: `${source.stage}:major:${school.id}:${encodeURIComponent(program.name)}`, favoriteId, permissionKey: "candidates", stage: source.stage, stageLabel: source.label, kind: "专业", title: program.name, subtitle: `${school.school} · ${program.school || school.city}`, schoolId: school.id, decisionKey: `major:${majorDecisionKey(school.school, program.name)}` });
       });
     });
     source.experiences.forEach((item) => {
       if (!favoriteIds.has(item.id)) return;
-      add({ id: `${source.stage}:experience:${item.id}`, favoriteId: item.id, stage: source.stage, stageLabel: source.label, kind: source.stage === "career" ? "岗位与职业" : "经验信息", title: item.title || item.major || item.school, subtitle: [item.school, item.major, item.city].filter(Boolean).join(" · "), decisionKey: "" });
+      add({ id: `${source.stage}:experience:${item.id}`, favoriteId: item.id, permissionKey: source.stage === "career" ? "careerCollections" : "candidates", stage: source.stage, stageLabel: source.label, kind: source.stage === "career" ? "岗位与职业" : "经验信息", title: item.title || item.major || item.school, subtitle: [item.school, item.major, item.city].filter(Boolean).join(" · "), decisionKey: "" });
     });
   });
-  return { connection, owner, items: [...items.values()] };
+  const collectionEntries = read(STORE.collections, {})[ownerId] || [];
+  const collectionIds = new Set(collectionEntries.map((entry) => typeof entry === "string" ? entry : entry?.id).filter(Boolean));
+  collectionCatalog().filter((item) => collectionIds.has(item.id)).forEach((item) => add({ id: `career:collection:${item.id}`, favoriteId: `career:${item.id}`, permissionKey: "careerCollections", stage: "career", stageLabel: "就业选择", kind: item.typeLabel || "岗位参考", title: item.title, subtitle: [item.school, item.major, item.city].filter(Boolean).join(" · ") || item.sourceName, decisionKey: "" }));
+  return [...items.values()];
+}
+
+function familyPermissionEnabled(context, key) {
+  return Boolean(context?.connection && context?.permissions?.[key]);
+}
+
+function familyPermissionTime(value) {
+  return value ? identityRecordTime(value) : "尚未调整";
+}
+
+function renderFamilyPrivacyModal(root = $("#familyPrivacyContent"), { embedded = false } = {}) {
+  const user = currentUser();
+  if (!root) return;
+  if (!user) {
+    root.innerHTML = `<div class="modal-kicker">家庭协同边界</div><h2 id="familyPrivacyTitle">登录后管理共享授权</h2><p class="modal-description">游客状态不会创建家庭共享记录。</p><button class="primary-button" type="button" data-open-account><i data-lucide="log-in"></i>登录</button>`;
+    hydrateIcons();
+    return;
+  }
+  const parent = currentIdentityRoleKey() === "parent";
+  const ownerId = familyPermissionOwnerId(user);
+  const permissions = familyPermissionsForOwner(ownerId);
+  const stageOptions = familyPermissionOptionsForStage();
+  const catalog = familyCandidateCatalog(ownerId).filter((item) => item.stage === currentStage);
+  const hidden = new Set(permissions.hiddenCandidateIds);
+  const visibleItems = catalog.filter((item) => permissions[item.permissionKey || "candidates"] && !hidden.has(item.favoriteId));
+  const enabledCount = stageOptions.filter((item) => permissions[item.key]).length;
+  const ownerName = parent ? parentFamilyConnection(user)?.family?.ownerName || "孩子" : user.nickname || "我";
+  const controls = stageOptions.map((item) => `<label class="family-permission-toggle ${permissions[item.key] ? "is-on" : ""}"><span class="family-permission-toggle-icon"><i data-lucide="${item.icon}"></i></span><span><strong>${item.title}</strong><small>${item.text}</small></span><input type="checkbox" data-family-permission="${item.key}" ${permissions[item.key] ? "checked" : ""} ${parent || !ownerId ? "disabled" : ""}><span class="family-toggle-track" aria-hidden="true"></span></label>`).join("");
+  const itemManager = catalog.length ? `<div class="family-specific-list">${catalog.map((item) => {
+    const permissionKey = item.permissionKey || "candidates";
+    return `<label><input type="checkbox" data-family-item-permission="${escapeHtml(item.favoriteId)}" ${permissions[permissionKey] && !hidden.has(item.favoriteId) ? "checked" : ""} ${parent ? "disabled" : ""}><span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.stageLabel)} · ${escapeHtml(item.kind)}</small></span></label>`;
+  }).join("")}</div>` : `<div class="family-specific-empty"><i data-lucide="bookmark"></i><span>当前还没有可管理的${currentStage === "career" ? "就业收藏" : "候选内容"}</span></div>`;
+  const itemLabel = currentStage === "career" ? "就业收藏" : "候选";
+  root.innerHTML = `<div class="${embedded ? "section-kicker" : "modal-kicker"}">${escapeHtml(stageNames[currentStage] || "当前阶段")} · 家庭协同边界</div><div class="family-privacy-heading"><div><h2${embedded ? "" : ' id="familyPrivacyTitle"'}>${parent ? `查看${escapeHtml(ownerName)}的共享授权` : "决定家长可以看到什么"}</h2><p class="modal-description">${parent ? "以下权限由学生设置，家长端只读。" : "所有开关都可随时撤回，匿名内容和账户资料始终私密。"}</p></div><div class="family-share-summary"><strong>${visibleItems.length}</strong><span>条${itemLabel}已共享</span><small>${enabledCount} 类已开启 · ${familyPermissionTime(permissions.updatedAt)}</small></div></div><div class="family-permission-control-grid">${controls}</div><div class="family-permission-tools"><button class="quiet-button" type="button" data-family-manage-items aria-expanded="${familyPrivacyShowItems}"><i data-lucide="list-checks"></i>${familyPrivacyShowItems ? "收起具体内容" : "管理具体内容"}</button>${parent ? "" : `<button class="quiet-button" type="button" data-family-preview aria-pressed="${familyPrivacyPreview}"><i data-lucide="eye"></i>${familyPrivacyPreview ? "退出家长预览" : "以家长视角预览"}</button><button class="text-button family-revoke-all" type="button" data-family-revoke-all><i data-lucide="shield-off"></i>撤回全部授权</button>`}</div>${familyPrivacyShowItems ? `<section class="family-specific-manager"><header><div><strong>逐项管理${itemLabel}</strong><small>关闭某项后，即使总开关开启，家长也看不到该内容。</small></div><span>${visibleItems.length} / ${catalog.length}</span></header>${itemManager}</section>` : ""}${familyPrivacyPreview ? `<section class="family-parent-preview"><div><span class="privacy-section-icon shared"><i data-lucide="users-round"></i></span><div><strong>家长将看到</strong><p>${enabledCount ? stageOptions.filter((item) => permissions[item.key]).map((item) => item.title).join("、") : "当前未授权任何协同内容"}</p></div></div><small>${itemLabel} ${visibleItems.length} 条 · 状态${permissions.candidateStatuses ? "可见" : "隐藏"} · 人生规划${permissions.planningSummary ? "仅摘要可见" : "保持私密"}</small></section>` : ""}<section class="family-always-private"><span class="privacy-section-icon private"><i data-lucide="lock-keyhole"></i></span><div><strong>始终保持私密</strong><p>${FAMILY_ALWAYS_PRIVATE.join("、")}</p></div></section>`;
+  hydrateIcons();
+}
+
+function refreshFamilyPermissionSurfaces() {
+  renderFamilyPrivacyModal();
+  const inline = $("#familyPermissionsInline");
+  if (inline) renderFamilyPrivacyModal(inline, { embedded: true });
+}
+
+function parentFamilyConnections(user = currentUser()) {
+  if (!user) return [];
+  const users = read(STORE.users, []);
+  const families = read(STORE.family, {});
+  return Object.entries(families)
+    .filter(([, family]) => Array.isArray(family.parents) && family.parents.includes(user.id))
+    .map(([ownerId, family]) => ({ ownerId, family, owner: users.find((item) => item.id === ownerId) || null }));
+}
+
+function setActiveFamilyChild(ownerId, user = currentUser()) {
+  if (!user) return;
+  const active = read(STORE.familyActiveChild, {});
+  if (ownerId) active[user.id] = ownerId;
+  else delete active[user.id];
+  write(STORE.familyActiveChild, active);
+}
+
+function parentFamilyConnection(user = currentUser()) {
+  if (!user) return null;
+  const connections = parentFamilyConnections(user);
+  if (!connections.length) return null;
+  const activeOwnerId = read(STORE.familyActiveChild, {})[user.id];
+  const selected = connections.find((item) => item.ownerId === activeOwnerId) || connections[0];
+  if (selected.ownerId !== activeOwnerId) setActiveFamilyChild(selected.ownerId, user);
+  return selected;
+}
+
+function parentSharedContext(user = currentUser()) {
+  const connection = parentFamilyConnection(user);
+  if (!connection) return { connection: null, owner: null, permissions: defaultFamilyPermissions(), items: [], allItems: [] };
+  const owner = read(STORE.users, []).find((item) => item.id === connection.ownerId) || null;
+  const permissions = familyPermissionsForOwner(connection.ownerId);
+  const allItems = familyCandidateCatalog(connection.ownerId);
+  const hidden = new Set(permissions.hiddenCandidateIds);
+  const items = allItems.filter((item) => permissions[item.permissionKey || "candidates"] && !hidden.has(item.favoriteId));
+  return { connection, owner, permissions, items, allItems };
 }
 
 function familySuggestions(user = currentUser()) {
@@ -4305,12 +5341,17 @@ function familySuggestions(user = currentUser()) {
 }
 
 function familyPageHeader(kicker, title, description, id) {
-  return `<div class="page-header family-internal-header"><div><div class="section-kicker">${escapeHtml(kicker)}</div><h1 id="${id}">${escapeHtml(title)}</h1><p>${escapeHtml(description)}</p></div><a class="quiet-button" href="${familyPortalHref("portal", currentStage)}"><i data-lucide="corner-up-left"></i>返回家庭协同首页</a></div>`;
+  const student = currentIdentityRoleKey() === "student";
+  const returnView = student ? currentStage === "career" ? "collections" : "compare" : "family-overview";
+  const returnHref = student ? `./index.html?view=${returnView}&stage=${encodeURIComponent(currentStage)}` : familyPortalHref("family-overview", currentStage);
+  const returnLabel = student ? currentStage === "career" ? "返回我的收藏" : "返回我的候选" : "返回协同概览";
+  return `<div class="page-header family-internal-header"><div><div class="section-kicker">${escapeHtml(kicker)}</div><h1 id="${id}">${escapeHtml(title)}</h1><p>${escapeHtml(description)}</p></div><a class="quiet-button" href="${returnHref}" data-view="${returnView}"><i data-lucide="corner-up-left"></i>${returnLabel}</a></div>`;
 }
 
 function familyConnectionStrip(context) {
   if (!context.connection) return `<section class="family-connection-strip is-empty"><span><i data-lucide="link-2-off"></i></span><div><small>家庭关联</small><strong>还没有关联孩子的决策空间</strong><p>前往授权边界，输入孩子提供的邀请码后再查看共享内容。</p></div><a class="primary-button" href="${familyPortalHref("family-permissions", currentStage)}" data-view="family-permissions">去关联</a></section>`;
-  return `<section class="family-connection-strip"><span><i data-lucide="shield-check"></i></span><div><small>已关联学生</small><strong>${escapeHtml(context.owner?.nickname || "孩子")} · ${escapeHtml(stageNames[currentStage] || "当前阶段")}</strong><p>本页只读取孩子主动共享的候选；未授权内容继续保持私密。</p></div><a class="quiet-button" href="${familyPortalHref("family-permissions", currentStage)}" data-view="family-permissions">查看边界</a></section>`;
+  const enabled = familyPermissionOptionsForStage().filter((item) => context.permissions?.[item.key]).length;
+  return `<section class="family-connection-strip"><span><i data-lucide="shield-check"></i></span><div><small>已关联学生</small><strong>${escapeHtml(context.owner?.nickname || "孩子")} · ${escapeHtml(stageNames[currentStage] || "当前阶段")}</strong><p>当前开放 ${enabled} 类内容；页面只读取孩子主动授权的范围。</p></div><a class="quiet-button" href="${familyPortalHref("family-permissions", currentStage)}" data-view="family-permissions">查看边界</a></section>`;
 }
 
 function renderFamilyOverview() {
@@ -4341,9 +5382,10 @@ function renderFamilyDiscussion() {
   const root = $("#familyDiscussionContent");
   if (!root) return;
   const context = parentSharedContext();
-  const statuses = context.connection ? read(STORE.candidateStatus, {})[context.connection.ownerId] || {} : {};
+  const statuses = familyPermissionEnabled(context, "candidateStatuses") ? read(STORE.candidateStatus, {})[context.connection.ownerId] || {} : {};
   const items = context.items.filter((item) => item.stage === currentStage);
-  const cards = items.map((item) => `<article class="family-discussion-card"><header><span>${escapeHtml(item.kind)}</span><em>${escapeHtml(item.stageLabel)}</em></header><h2>${escapeHtml(item.title)}</h2><p>${escapeHtml(item.subtitle || "孩子主动共享的候选")}</p><div class="family-viewpoint-row"><div><small>孩子当前判断</small><strong>${escapeHtml(item.decisionKey ? statuses[item.decisionKey] || "待了解" : "已共享，待讨论")}</strong></div><i data-lucide="arrow-left-right"></i><div><small>家长可以做</small><strong>补充信息或提出问题</strong></div></div><button class="quiet-button" type="button" data-family-suggestion-target="${escapeHtml(item.id)}">针对这项写建议<i data-lucide="arrow-right"></i></button></article>`).join("");
+  const canContribute = familyPermissionEnabled(context, "familyContributions");
+  const cards = items.map((item) => `<article class="family-discussion-card"><header><span>${escapeHtml(item.kind)}</span><em>${escapeHtml(item.stageLabel)}</em></header><h2>${escapeHtml(item.title)}</h2><p>${escapeHtml(item.subtitle || "孩子主动共享的候选")}</p><div class="family-viewpoint-row"><div><small>孩子当前判断</small><strong>${familyPermissionEnabled(context, "candidateStatuses") ? escapeHtml(item.decisionKey ? statuses[item.decisionKey] || "待了解" : "已共享，待讨论") : "未授权查看"}</strong></div><i data-lucide="arrow-left-right"></i><div><small>家长可以做</small><strong>${canContribute ? "补充信息或提出问题" : "当前仅可查看"}</strong></div></div>${canContribute ? `<button class="quiet-button" type="button" data-family-suggestion-target="${escapeHtml(item.id)}">针对这项写建议<i data-lucide="arrow-right"></i></button>` : `<span class="family-readonly-badge"><i data-lucide="lock-keyhole"></i>讨论未授权</span>`}</article>`).join("");
   root.innerHTML = `${familyPageHeader("家庭讨论", `${stageNames[currentStage] || "当前阶段"} · 讨论桌面`, "围绕孩子主动共享的选项讨论事实、担忧与偏好，不把不同意见写回孩子的判断。", "familyDiscussionTitle")}${familyConnectionStrip(context)}<div class="family-discussion-grid">${cards || `<div class="family-empty-state full"><i data-lucide="messages-square"></i><strong>还没有可以讨论的共享候选</strong><p>关联家庭并等待孩子主动共享后再开始讨论。</p></div>`}</div>`;
   const count = $("#familyDiscussionCount");
   if (count) count.textContent = String(items.length);
@@ -4354,11 +5396,13 @@ function renderFamilyAdvice() {
   const root = $("#familyAdviceContent");
   if (!root) return;
   const context = parentSharedContext();
-  const suggestions = familySuggestions();
-  const options = context.items.map((item) => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.stageLabel)} · ${escapeHtml(item.title)}</option>`).join("");
+  const stageItems = context.items.filter((item) => item.stage === currentStage);
+  const suggestions = familySuggestions().filter((item) => item.stage === currentStage);
+  const canContribute = familyPermissionEnabled(context, "familyContributions");
+  const options = canContribute ? stageItems.map((item) => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.stageLabel)} · ${escapeHtml(item.title)}</option>`).join("") : "";
   const list = suggestions.map((item) => `<article class="family-advice-item"><span>${escapeHtml(item.stageLabel || "家庭建议")}</span><div><strong>${escapeHtml(item.targetTitle || item.category)}</strong><p>${escapeHtml(item.content)}</p><small>${escapeHtml(formatProfileDate(item.createdAt))} · ${item.status === "withdrawn" ? "已撤回" : "等待孩子查看"}</small></div>${item.status === "withdrawn" ? "" : `<button type="button" data-withdraw-family-suggestion="${escapeHtml(item.id)}">撤回</button>`}</article>`).join("");
   root.innerHTML = `${familyPageHeader("家庭建议", "把建议说清楚，也给孩子留下选择空间", "建议由家长单独保存，可以撤回；不会自动改变孩子的候选状态或规划。", "familyAdviceTitle")}
-    <div class="family-advice-layout"><form class="family-advice-form" id="familySuggestionForm"><div><span class="section-kicker">新增建议</span><h2>写一条可讨论的建议</h2><p>尽量说明信息来源、担心的原因，以及希望一起核对的问题。</p></div><label for="familySuggestionTarget">关联共享内容</label><select id="familySuggestionTarget" required ${options ? "" : "disabled"}><option value="">请选择</option>${options}</select><label for="familySuggestionCategory">建议类型</label><select id="familySuggestionCategory"><option>补充信息</option><option>需要核对</option><option>表达担忧</option><option>支持孩子</option></select><label for="familySuggestionContent">建议内容</label><textarea id="familySuggestionContent" maxlength="300" placeholder="例如：我支持你继续了解这个方向，也想和你一起核对培养费用和城市生活成本。" required></textarea><button class="primary-button" type="submit" ${options ? "" : "disabled"}><i data-lucide="send"></i>保存家庭建议</button><small><i data-lucide="shield-check"></i>只保存家长自己的表达，不覆盖孩子的数据。</small></form><section class="family-advice-history"><header><div><h2>我的建议记录</h2><p>已提交 ${suggestions.length} 条</p></div></header><div>${list || `<div class="family-empty-state"><i data-lucide="notebook-pen"></i><strong>还没有建议记录</strong><p>选择一条孩子共享的内容后开始。</p></div>`}</div></section></div>`;
+    <div class="family-advice-layout"><form class="family-advice-form" id="familySuggestionForm"><div><span class="section-kicker">新增建议</span><h2>${canContribute ? "写一条可讨论的建议" : "家庭建议暂未授权"}</h2><p>${canContribute ? "尽量说明信息来源、担心的原因，以及希望一起核对的问题。" : "学生开启“家庭讨论与建议”后，家长才能提交内容。"}</p></div><label for="familySuggestionTarget">关联共享内容</label><select id="familySuggestionTarget" required ${options ? "" : "disabled"}><option value="">请选择</option>${options}</select><label for="familySuggestionCategory">建议类型</label><select id="familySuggestionCategory" ${canContribute ? "" : "disabled"}><option>补充信息</option><option>需要核对</option><option>表达担忧</option><option>支持孩子</option></select><label for="familySuggestionContent">建议内容</label><textarea id="familySuggestionContent" maxlength="300" placeholder="例如：我支持你继续了解这个方向，也想和你一起核对培养费用和城市生活成本。" required ${canContribute ? "" : "disabled"}></textarea><button class="primary-button" type="submit" ${options ? "" : "disabled"}><i data-lucide="send"></i>保存家庭建议</button><small><i data-lucide="shield-check"></i>只保存家长自己的表达，不覆盖孩子的数据。</small></form><section class="family-advice-history"><header><div><h2>我的建议记录</h2><p>已提交 ${suggestions.length} 条</p></div></header><div>${list || `<div class="family-empty-state"><i data-lucide="notebook-pen"></i><strong>还没有建议记录</strong><p>选择一条孩子共享的内容后开始。</p></div>`}</div></section></div>`;
   hydrateIcons();
 }
 
@@ -4367,20 +5411,58 @@ function renderFamilyPlanning() {
   if (!root) return;
   const context = parentSharedContext();
   const stageGroups = ["gaokao", "graduate", "career"].map((stage) => ({ stage, items: context.items.filter((item) => item.stage === stage) }));
+  const planningAllowed = familyPermissionEnabled(context, "planningSummary");
+  const calendarAllowed = familyPermissionEnabled(context, "calendar");
+  const nextEvent = calendarAllowed ? decisionEvents().find((item) => daysUntilDecision(item.date) >= 0) : null;
   root.innerHTML = `${familyPageHeader("授权人生规划", "看见孩子愿意共享的路线，不越过未授权边界", "候选可以作为规划讨论的上下文；完整路径、私人复盘和未授权节点不会自动向家长开放。", "familyPlanningTitle")}${familyConnectionStrip(context)}
-    <section class="family-planning-boundary"><div><span><i data-lucide="route"></i></span><small>当前授权状态</small><h2>${context.connection ? "已共享阶段候选，完整规划尚未授权" : "尚未建立家庭关联"}</h2><p>${context.connection ? "你可以根据下面的共享候选提出建议，但不能编辑、增加或删除孩子的规划节点。" : "完成关联后，只会显示孩子主动共享的规划摘要。"}</p></div><span class="family-readonly-badge"><i data-lucide="eye"></i>只读查看</span></section>
-    <div class="family-planning-stage-grid">${stageGroups.map((group, index) => `<article class="tone-${index}"><header><span>0${index + 1}</span><strong>${escapeHtml(group.stage === "career" ? "就业选择" : stageNames[group.stage])}</strong></header><p>${group.items.length ? `${group.items.length} 条共享候选可作为家庭讨论依据` : "暂无共享候选"}</p><div>${group.items.slice(0, 3).map((item) => `<span>${escapeHtml(item.title)}</span>`).join("")}</div></article>`).join("")}</div>
+    <section class="family-planning-boundary"><div><span><i data-lucide="route"></i></span><small>当前授权状态</small><h2>${context.connection ? planningAllowed ? "人生规划摘要已授权" : "人生规划保持私密" : "尚未建立家庭关联"}</h2><p>${context.connection ? planningAllowed ? "下面只展示阶段摘要，家长不能编辑、增加或删除孩子的规划节点。" : "候选仍可单独共享，但不会因此自动开放人生规划。" : "完成关联后，只会显示孩子主动共享的规划摘要。"}</p></div><span class="family-readonly-badge"><i data-lucide="${planningAllowed ? "eye" : "lock-keyhole"}"></i>${planningAllowed ? "只读查看" : "未授权"}</span></section>
+    ${planningAllowed ? `<div class="family-planning-stage-grid">${stageGroups.map((group, index) => `<article class="tone-${index}"><header><span>0${index + 1}</span><strong>${escapeHtml(group.stage === "career" ? "就业选择" : stageNames[group.stage])}</strong></header><p>${group.items.length ? `${group.items.length} 条共享候选可作为家庭讨论依据` : "暂无共享候选"}</p><div>${group.items.slice(0, 3).map((item) => `<span>${escapeHtml(item.title)}</span>`).join("")}</div></article>`).join("")}</div>` : `<div class="family-empty-state full"><i data-lucide="lock-keyhole"></i><strong>学生尚未授权人生规划摘要</strong><p>这里不会使用候选数据推测或还原私人规划。</p></div>`}
+    <section class="family-planning-agreement"><div><span class="section-kicker">共享日历</span><h2>${calendarAllowed ? nextEvent ? `下一节点：${escapeHtml(nextEvent.title)}` : "已授权，暂时没有未来节点" : "家庭决策日历未授权"}</h2><p>${calendarAllowed && nextEvent ? `${formatDecisionDate(nextEvent.date)} · ${decisionDistanceText(daysUntilDecision(nextEvent.date))}` : "日历与人生规划分别授权，不会因查看规划而自动开放日期。"}</p></div><span class="family-readonly-badge"><i data-lucide="calendar-days"></i>${calendarAllowed ? "可见" : "私密"}</span></section>
     <section class="family-planning-agreement"><div><span class="section-kicker">家庭共识</span><h2>建议与孩子的计划分开记录</h2><p>家长可以表达支持、补充条件或提出待核对的问题；只有孩子确认后，才由孩子决定是否调整自己的路径。</p></div><a class="primary-button" href="${familyPortalHref("family-advice", currentStage)}" data-view="family-advice"><i data-lucide="notebook-pen"></i>写一条规划建议</a></section>`;
+  hydrateIcons();
+}
+
+function renderStudentFamilyPermissions(root, user) {
+  const family = read(STORE.family, {})[user.id];
+  const parentIds = family?.parents || [];
+  const inviteMarkup = family
+    ? `<div class="family-invite-panel"><div><small>家庭邀请码</small><strong>${escapeHtml(family.code)}</strong><p>邀请码可用于邀请多个家长，适用于高考、考研和就业阶段。</p></div><button class="quiet-button" type="button" data-copy-code="${escapeHtml(family.code)}"><i data-lucide="copy"></i>复制邀请码</button></div>`
+    : `<div class="family-invite-panel is-empty"><div><small>还没有家庭邀请码</small><strong>先创建家庭关联入口</strong><p>创建后可以邀请家长加入，再由你决定哪些内容可以共享。</p></div><button class="primary-button" type="button" data-family-invite><i data-lucide="user-plus"></i>创建邀请码</button></div>`;
+  root.innerHTML = `${familyPageHeader("授权边界", "哪些可以一起看，哪些仍属于自己", "你可以管理家庭关联，并决定家长能看到哪些阶段内容。", "familyPermissionsTitle")}
+    <section class="family-permission-status"><div class="family-permission-identity"><span><i data-lucide="${parentIds.length ? "shield-check" : "link-2"}"></i></span><div><small>家庭关联状态</small><strong>${parentIds.length ? `已关联 ${parentIds.length} 位家长` : "尚未关联家长"}</strong><p>${parentIds.length ? "家长只能查看你主动授权的内容。" : "创建邀请码后再邀请家长加入。"}</p></div></div><div class="family-permission-actions"><span class="family-permission-ok"><i data-lucide="lock-keyhole"></i>默认仅自己可见</span>${family ? `<button class="quiet-button" type="button" data-family-manage-connections><i data-lucide="users-round"></i>管理已关联成员</button>` : ""}</div></section>
+    ${inviteMarkup}
+    <section class="family-permissions-inline" id="familyPermissionsInline" aria-label="共享内容开关"></section>`;
+  refreshFamilyPermissionSurfaces();
   hydrateIcons();
 }
 
 function renderFamilyPermissions() {
   const root = $("#familyPermissionsContent");
   if (!root) return;
+  const user = currentUser();
+  if (!user) {
+    root.innerHTML = `${familyPageHeader("授权边界", "登录后管理家庭关联", "家庭关联和共享授权只保存在账号中。", "familyPermissionsTitle")}<section class="family-permission-principle"><i data-lucide="lock-keyhole"></i><div><strong>请先登录</strong><p>登录后可以创建或加入家庭关联，并管理共享范围。</p><button class="primary-button" type="button" data-open-account><i data-lucide="log-in"></i>登录 / 注册</button></div></section>`;
+    hydrateIcons();
+    return;
+  }
+  if (user && currentIdentityRoleKey() === "student") {
+    renderStudentFamilyPermissions(root, user);
+    return;
+  }
+  if (currentIdentityRoleKey() !== "parent") {
+    root.innerHTML = `${familyPageHeader("授权边界", "当前身份不参与家庭协同", "教师和从业者可以分享经验，但不参与家庭账号关联。", "familyPermissionsTitle")}<section class="family-permission-principle"><i data-lucide="users-round"></i><div><strong>请在身份中心切换到学生或家长</strong><p>切换后可以创建、加入或管理家庭关联。</p></div></section>`;
+    hydrateIcons();
+    return;
+  }
   const context = parentSharedContext();
+  const stageOptions = familyPermissionOptionsForStage();
+  const enabled = stageOptions.filter((item) => context.permissions?.[item.key]);
+  const stageItems = context.items.filter((item) => item.stage === currentStage);
+  const joinMarkup = `<div class="family-permission-join"><label for="familyPermissionCode">${context.connection ? "关联另一个孩子" : "学生邀请码"}</label><div><input id="familyPermissionCode" type="text" maxlength="11" placeholder="YL-XXXXXXXX" autocomplete="off"><button class="primary-button" id="joinFamilyFromPermissions" type="button">${context.connection ? "添加关联" : "加入家庭"}</button></div></div>`;
+  const linkedActions = context.connection ? `<div class="family-permission-actions"><span class="family-permission-ok"><i data-lucide="check"></i>隐私边界已生效</span><button class="quiet-button" type="button" data-family-manage-connections><i data-lucide="users-round"></i>管理已关联成员</button></div>` : "";
   root.innerHTML = `${familyPageHeader("授权边界", "哪些可以一起看，哪些仍属于孩子", "家庭协同以孩子主动授权为前提，不会因为关联家庭而自动扩大访问范围。", "familyPermissionsTitle")}
-    <section class="family-permission-status"><div class="family-permission-identity"><span><i data-lucide="${context.connection ? "shield-check" : "link-2"}"></i></span><div><small>家庭关联状态</small><strong>${context.connection ? `已关联 ${escapeHtml(context.owner?.nickname || "孩子")}` : "等待关联"}</strong><p>${context.connection ? `当前可查看 ${context.items.length} 条主动共享内容。` : "输入孩子生成的邀请码后建立家庭关联。"}</p></div></div>${context.connection ? `<span class="family-permission-ok"><i data-lucide="check"></i>隐私边界已生效</span>` : `<div class="family-permission-join"><label for="familyPermissionCode">学生邀请码</label><div><input id="familyPermissionCode" type="text" maxlength="11" placeholder="YL-XXXXXXXX" autocomplete="off"><button class="primary-button" id="joinFamilyFromPermissions" type="button">加入家庭</button></div></div>`}</section>
-    <div class="family-permission-grid"><section><span class="permission-icon shared"><i data-lucide="users"></i></span><h2>孩子可以主动共享</h2><ul><li><i data-lucide="check"></i>明确授权的院校、专业与岗位候选</li><li><i data-lucide="check"></i>候选的当前判断状态</li><li><i data-lucide="check"></i>明确授权的人生规划摘要</li><li><i data-lucide="check"></i>家庭讨论中双方主动提交的内容</li></ul></section><section><span class="permission-icon private"><i data-lucide="lock-keyhole"></i></span><h2>默认保持私密</h2><ul><li><i data-lucide="check"></i>匿名提问、回答与搜索记录</li><li><i data-lucide="check"></i>未授权收藏和浏览历史</li><li><i data-lucide="check"></i>账户资料与认证材料</li><li><i data-lucide="check"></i>未授权规划节点和个人复盘</li></ul></section></div>
+    <section class="family-permission-status"><div class="family-permission-identity"><span><i data-lucide="${context.connection ? "shield-check" : "link-2"}"></i></span><div><small>家庭关联状态</small><strong>${context.connection ? `已关联 ${escapeHtml(context.owner?.nickname || "孩子")}` : "等待关联"}</strong><p>${context.connection ? `${escapeHtml(stageNames[currentStage] || "当前阶段")}可查看 ${stageItems.length} 条主动共享内容。` : "输入孩子生成的邀请码后建立家庭关联。"}</p></div></div>${linkedActions}${joinMarkup}</section>
+    <div class="family-permission-grid"><section><span class="permission-icon shared"><i data-lucide="users"></i></span><h2>当前已授权 ${enabled.length} 类</h2><ul>${stageOptions.map((item) => `<li class="${context.permissions?.[item.key] ? "is-enabled" : "is-disabled"}"><i data-lucide="${context.permissions?.[item.key] ? "check" : "x"}"></i>${escapeHtml(item.title)} · ${context.permissions?.[item.key] ? "可查看" : "未授权"}</li>`).join("")}</ul></section><section><span class="permission-icon private"><i data-lucide="lock-keyhole"></i></span><h2>始终保持私密</h2><ul>${FAMILY_ALWAYS_PRIVATE.map((item) => `<li><i data-lucide="lock-keyhole"></i>${escapeHtml(item)}</li>`).join("")}</ul></section></div>
     <section class="family-permission-principle"><i data-lucide="scale"></i><div><strong>协同不等于代替决定</strong><p>家长建议与孩子的数据分开保存。平台不会把家长的建议自动写成孩子的选择，也不会静默扩大共享范围。</p></div></section>`;
   hydrateIcons();
 }
@@ -4398,6 +5480,7 @@ function submitFamilySuggestion(event) {
   const user = currentUser();
   const context = parentSharedContext(user);
   if (!user || !context.connection) { showToast("请先关联孩子的决策空间"); return; }
+  if (!familyPermissionEnabled(context, "familyContributions")) { showToast("学生尚未开放家庭讨论与建议"); return; }
   const targetId = $("#familySuggestionTarget")?.value || "";
   const target = context.items.find((item) => item.id === targetId);
   const content = $("#familySuggestionContent")?.value.trim() || "";
@@ -4427,14 +5510,83 @@ function withdrawFamilySuggestion(id) {
 function renderParentSharedCandidates(panel, user) {
   const context = parentSharedContext(user);
   if (!context.connection) {
-    panel.innerHTML = `<div class="compare-empty parent-shared-empty"><i data-lucide="users-round"></i><strong>还没有关联孩子的决策空间</strong><p>在上方输入学生提供的邀请码。关联后，这里只展示学生主动共享的候选。</p></div>`;
+    panel.innerHTML = `<div class="compare-empty parent-shared-empty"><i data-lucide="users-round"></i><strong>还没有关联孩子的决策空间</strong><p>请使用上方家庭协同入口前往授权边界完成关联。关联后，这里只展示学生主动共享的候选。</p></div>`;
     hydrateIcons();
     return;
   }
-  const statuses = read(STORE.candidateStatus, {})[context.connection.ownerId] || {};
-  const rows = context.items.map((item) => `<article class="candidate-row parent-shared-row"><div class="candidate-identity"><span class="candidate-mark">${escapeHtml(item.title.slice(0, 1))}</span><div><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.subtitle || item.stageLabel)}</small></div></div><div class="candidate-summary"><span>${escapeHtml(item.stageLabel)} · 学生当前判断</span><p>${escapeHtml(item.decisionKey ? statuses[item.decisionKey] || "待了解" : "已共享")}</p><div><span class="content-tag">${escapeHtml(item.kind)}</span><span class="content-tag">${escapeHtml(item.stageLabel)}</span></div></div><div class="candidate-actions"><span class="parent-shared-readonly"><i data-lucide="eye"></i>仅查看</span>${item.schoolId ? `<button class="text-button" type="button" data-school-detail="${escapeHtml(item.schoolId)}" data-family-school-stage="${escapeHtml(item.stage)}">查看详情<i data-lucide="arrow-up-right"></i></button>` : `<a class="text-button" href="${familyPortalHref("family-discussion", item.stage)}">去讨论<i data-lucide="arrow-up-right"></i></a>`}</div></article>`).join("");
-  panel.innerHTML = `<div class="parent-shared-heading"><div><span class="subsection-kicker"><i data-lucide="link"></i>已关联家庭</span><h2>${escapeHtml(context.owner?.nickname || "孩子")}共享的候选</h2><p>当前页面只读取孩子主动授权的候选，家长不能增删或修改其判断。</p></div><span>${context.items.length} 条内容</span></div>${rows ? `<div class="candidate-list">${rows}</div>` : `<div class="compare-empty compact"><i data-lucide="school"></i><strong>暂时没有共享候选</strong><p>孩子添加并授权候选后会显示在这里。</p></div>`}`;
+  const stageItems = context.items.filter((item) => item.stage === currentStage);
+  const career = currentStage === "career";
+  const statuses = familyPermissionEnabled(context, "candidateStatuses") ? read(STORE.candidateStatus, {})[context.connection.ownerId] || {} : {};
+  const rows = stageItems.map((item) => `<article class="candidate-row parent-shared-row"><div class="candidate-identity"><span class="candidate-mark">${escapeHtml(item.title.slice(0, 1))}</span><div><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.subtitle || item.stageLabel)}</small></div></div><div class="candidate-summary"><span>${escapeHtml(item.stageLabel)} · ${career ? "学生共享参考" : "学生当前判断"}</span><p>${familyPermissionEnabled(context, "candidateStatuses") ? escapeHtml(item.decisionKey ? statuses[item.decisionKey] || "待了解" : "已共享") : "未授权查看"}</p><div><span class="content-tag">${escapeHtml(item.kind)}</span><span class="content-tag">${escapeHtml(item.stageLabel)}</span></div></div><div class="candidate-actions"><span class="parent-shared-readonly"><i data-lucide="eye"></i>仅查看</span>${item.schoolId ? `<button class="text-button" type="button" data-school-detail="${escapeHtml(item.schoolId)}" data-family-school-stage="${escapeHtml(item.stage)}">查看详情<i data-lucide="arrow-up-right"></i></button>` : familyPermissionEnabled(context, "familyContributions") ? `<a class="text-button" href="${familyPortalHref("family-discussion", item.stage)}">去讨论<i data-lucide="arrow-up-right"></i></a>` : ""}</div></article>`).join("");
+  const permissionKey = career ? "careerCollections" : "candidates";
+  const itemLabel = career ? "职业收藏" : "候选";
+  panel.innerHTML = `<div class="parent-shared-heading"><div><span class="subsection-kicker"><i data-lucide="link"></i>已关联家庭</span><h2>${escapeHtml(context.owner?.nickname || "孩子")}共享的${itemLabel}</h2><p>当前页面只读取孩子主动授权的${itemLabel}，家长不能增删或修改其判断。</p></div><span>${stageItems.length} 条内容</span></div><div class="parent-permission-note"><i data-lucide="${familyPermissionEnabled(context, career ? "careerCollections" : "comparisons") ? (career ? "bookmark-check" : "columns-3") : "lock-keyhole"}"></i><span>${career ? "就业收藏与岗位参考" : "历史对比结果"}：${familyPermissionEnabled(context, career ? "careerCollections" : "comparisons") ? "已授权，可结合共享内容继续讨论" : "未授权"}</span></div>${rows ? `<div class="candidate-list">${rows}</div>` : `<div class="compare-empty compact"><i data-lucide="${career ? "briefcase-business" : "school"}"></i><strong>暂时没有共享${itemLabel}</strong><p>${context.permissions[permissionKey] ? `孩子添加并授权${itemLabel}后会显示在这里。` : `孩子尚未开启${itemLabel}共享。`}</p></div>`}`;
   hydrateIcons();
+}
+
+function renderCollections() {
+  const list = $("#collectionsList");
+  if (!list) return;
+  const user = currentUser();
+  const catalog = collectionCatalog();
+  const entries = user ? userCollectionEntries() : [];
+  const entryById = new Map(entries.map((entry) => [entry.id, entry]));
+  const savedItems = catalog.filter((item) => entryById.has(item.id)).map((item) => ({ ...item, savedAt: entryById.get(item.id)?.savedAt || "" }));
+  const counts = {
+    all: savedItems.length,
+    expert: savedItems.filter((item) => item.type === "expert").length,
+    student: savedItems.filter((item) => item.type === "student").length,
+    official: savedItems.filter((item) => item.type === "official").length
+  };
+  const countTargets = { all: "#collectionAllCount", expert: "#collectionExpertCount", student: "#collectionStudentCount", official: "#collectionOfficialCount" };
+  Object.entries(countTargets).forEach(([key, selector]) => { const node = $(selector); if (node) node.textContent = String(counts[key]); });
+  if ($("#collectionsCount")) $("#collectionsCount").textContent = String(savedItems.length);
+  $$('[data-collection-tab]').forEach((button) => {
+    const active = button.dataset.collectionTab === currentCollectionTab;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-selected", String(active));
+  });
+  if (!user) {
+    $("#collectionsResultNote") && ($("#collectionsResultNote").textContent = "登录后可以保存就业参考");
+    list.innerHTML = `<div class="collections-empty"><i data-lucide="bookmark"></i><strong>登录后建立你的就业收藏</strong><p>收藏的岗位、行业和求职资料只保存在当前账户。</p><button class="primary-button" type="button" data-open-account><i data-lucide="log-in"></i>登录 / 注册</button></div>`;
+    hydrateIcons();
+    return;
+  }
+  const query = currentCollectionSearch.trim().toLowerCase();
+  const filtered = savedItems.filter((item) => {
+    const matchesTab = currentCollectionTab === "all" || item.type === currentCollectionTab;
+    const matchesScope = currentCollectionStage === "all" || item.scopes.includes(currentCollectionStage);
+    const matchesSearch = !query || item.searchValue.toLowerCase().includes(query);
+    return matchesTab && matchesScope && matchesSearch;
+  }).sort((a, b) => currentCollectionSort === "published"
+    ? String(b.publishedAt || "").localeCompare(String(a.publishedAt || ""))
+    : String(b.savedAt || "").localeCompare(String(a.savedAt || "")));
+  $("#collectionsResultNote") && ($("#collectionsResultNote").textContent = `当前显示 ${filtered.length} 条就业收藏`);
+  list.innerHTML = filtered.length ? filtered.map((item) => {
+    const typeClass = item.type === "official" ? "official" : item.type === "student" ? "student" : "expert";
+    const sourceAction = item.sourceUrl ? `<a class="quiet-button" href="${escapeHtml(item.sourceUrl)}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link"></i>查看原资料</a>` : `<button class="quiet-button" type="button" data-open-collection="${escapeHtml(item.id)}"><i data-lucide="arrow-up-right"></i>查看原内容</button>`;
+    return `<article class="collection-item collection-${typeClass}">
+      <div class="collection-item-main"><div class="collection-item-tags"><span>${escapeHtml(item.typeLabel)}</span><span>${escapeHtml(item.major || item.school || "就业参考")}</span></div><h2>${escapeHtml(item.title)}</h2><p>${escapeHtml(item.description)}</p></div>
+      <div class="collection-item-source"><span>内容来源</span><strong>${escapeHtml(item.sourceName)}</strong><small>${escapeHtml([item.city, item.publishedAt ? `发布于 ${formatContentDate(item.publishedAt)}` : ""].filter(Boolean).join(" · "))}</small></div>
+      <div class="collection-item-actions">${sourceAction}<button class="collection-remove" type="button" data-collection="${escapeHtml(item.id)}"><i data-lucide="bookmark-x"></i>取消收藏</button></div>
+    </article>`;
+  }).join("") : `<div class="collections-empty"><i data-lucide="search-x"></i><strong>${savedItems.length ? "没有符合当前条件的收藏" : "还没有收藏就业参考"}</strong><p>${savedItems.length ? "可以调整类型、范围或搜索关键词。" : "前往就业参考，将需要继续核对的内容收藏起来。"}</p><button class="quiet-button" type="button" data-view-target="experience">前往就业参考</button></div>`;
+  hydrateIcons();
+}
+
+function openCollectionItem(id) {
+  const item = collectionItemById(id);
+  if (!item) return;
+  setStage("career");
+  currentCareerIndustrySearch = item.school || "";
+  currentCareerKeywordSearch = item.major || "";
+  currentCareerRoleFilters.clear();
+  currentCareerAbilityFilters.clear();
+  switchView("experience");
+  const url = new URL(window.location.href);
+  url.searchParams.set("view", "experience");
+  url.searchParams.set("stage", "career");
+  window.history.pushState(null, "", url);
 }
 
 function renderCompare() {
@@ -4582,7 +5734,7 @@ function renderCompare() {
       schoolCompareMode = false;
       schoolMajorSelectionMode = false;
       schoolMajorCompareMode = false;
-      panel.innerHTML = schoolCandidates.length ? `<div class="candidate-list-heading"><div><strong>候选院校</strong><span>${user ? `已收藏 ${schoolCandidates.length} 所学校` : "访客示例,登录后保存自己的候选"}</span></div><div class="candidate-compare-toolbar"><span>已选择 <strong>${selectedCandidates.length}</strong> / 3</span><button class="primary-button" type="button" data-start-school-compare${selectedCandidates.length < 2 ? " disabled" : ""}><i data-lucide="columns-3"></i>开始对比</button></div></div><div class="candidate-list">${schoolCandidates.map((item) => `<article class="candidate-row"><label class="candidate-select" aria-label="选择${escapeHtml(item.school)}进行对比"><input type="checkbox" data-select-school-candidate="${escapeHtml(item.id)}"${selectedSchoolCandidateIds.has(item.id) ? " checked" : ""}><span></span></label><div class="candidate-identity"><span class="candidate-mark">${escapeHtml(item.school.slice(0, 1))}</span><div><strong>${escapeHtml(item.school)}</strong><small>${escapeHtml(item.city)} · ${escapeHtml(item.type)}</small></div></div><div class="candidate-summary"><span>重点专业</span><p>${escapeHtml(item.majors.slice(0, 3).join(" · "))}</p><div>${item.highlights.slice(0, 3).map((highlight) => `<span class="content-tag">${escapeHtml(highlight)}</span>`).join("")}</div></div><div class="candidate-actions">${renderCandidateStatusControl("school", item.id, user)}<button class="text-button" type="button" data-school-detail="${escapeHtml(item.id)}">查看详情<i data-lucide="arrow-up-right"></i></button>${user ? `<button class="remove-candidate" type="button" data-remove-school-candidate="${escapeHtml(item.id)}"><i data-lucide="trash-2"></i>移出候选</button>` : `<button class="remove-candidate" type="button" data-open-account><i data-lucide="log-in"></i>登录后保存</button>`}</div></article>`).join("")}</div>` : `<div class="compare-empty"><i data-lucide="school"></i><strong>你还没有收藏学校</strong><p>前往院校与经验页面,将感兴趣的学校加入候选。</p><button class="quiet-button" data-view-target="experience">去查找院校</button></div>`;
+      panel.innerHTML = schoolCandidates.length ? `<div class="candidate-list-heading"><div><strong>候选院校</strong><span>${user ? `已收藏 ${schoolCandidates.length} 所学校` : "访客示例,登录后保存自己的候选"}</span></div><div class="candidate-compare-toolbar"><span>已选择 <strong>${selectedCandidates.length}</strong> / 3</span><button class="primary-button" type="button" data-start-school-compare${selectedCandidates.length < 2 ? " disabled" : ""}><i data-lucide="columns-3"></i>开始对比</button></div></div><div class="candidate-list">${schoolCandidates.map((item) => `<article class="candidate-row"><label class="candidate-select" aria-label="选择${escapeHtml(item.school)}进行对比"><input type="checkbox" data-select-school-candidate="${escapeHtml(item.id)}"${selectedSchoolCandidateIds.has(item.id) ? " checked" : ""}><span></span></label><div class="candidate-identity">${schoolEmblemMarkup(item.school, "candidate-mark")}<div><strong>${escapeHtml(item.school)}</strong><small>${escapeHtml(item.city)} · ${escapeHtml(item.type)}</small></div></div><div class="candidate-summary"><span>重点专业</span><p>${escapeHtml(item.majors.slice(0, 3).join(" · "))}</p><div>${item.highlights.slice(0, 3).map((highlight) => `<span class="content-tag">${escapeHtml(highlight)}</span>`).join("")}</div></div><div class="candidate-actions">${renderCandidateStatusControl("school", item.id, user)}<button class="text-button" type="button" data-school-detail="${escapeHtml(item.id)}">查看详情<i data-lucide="arrow-up-right"></i></button>${user ? `<button class="remove-candidate" type="button" data-remove-school-candidate="${escapeHtml(item.id)}"><i data-lucide="trash-2"></i>移出候选</button>` : `<button class="remove-candidate" type="button" data-open-account><i data-lucide="log-in"></i>登录后保存</button>`}</div></article>`).join("")}</div>` : `<div class="compare-empty"><i data-lucide="school"></i><strong>你还没有收藏学校</strong><p>前往院校与经验页面,将感兴趣的学校加入候选。</p><button class="quiet-button" data-view-target="experience">去查找院校</button></div>`;
     }
   } else {
     const selectedCandidates = majorCandidates.filter((item) => selectedMajorCandidateKeys.has(item.key));
@@ -4704,23 +5856,129 @@ function removeMajorCandidate(school, major) {
   showToast("已从候选专业中移除");
 }
 
+function familyAccountLabel(id, fallback = "家庭成员") {
+  const account = read(STORE.users, []).find((item) => item.id === id);
+  return { name: account?.nickname || account?.name || fallback, detail: account?.email || "已关联账号" };
+}
+
+function createFamilyConnectionsModal() {
+  let backdrop = $("#familyConnectionsModal");
+  if (backdrop) return backdrop;
+  backdrop = document.createElement("div");
+  backdrop.id = "familyConnectionsModal";
+  backdrop.className = "modal-backdrop";
+  backdrop.setAttribute("aria-hidden", "true");
+  backdrop.innerHTML = `<section class="modal family-connections-modal" role="dialog" aria-modal="true" aria-labelledby="familyConnectionsTitle"><button class="modal-close" type="button" data-close-modal="familyConnectionsModal" aria-label="关闭"><i data-lucide="x"></i></button><div id="familyConnectionsContent"></div></section>`;
+  document.body.appendChild(backdrop);
+  return backdrop;
+}
+
+function renderFamilyConnectionsModal() {
+  const user = currentUser();
+  const modal = createFamilyConnectionsModal();
+  const root = $("#familyConnectionsContent", modal);
+  if (!root) return;
+  if (!user) {
+    root.innerHTML = `<div class="modal-kicker">家庭关联</div><h2 id="familyConnectionsTitle">登录后管理家庭成员</h2><p class="modal-description">家庭关联不会在游客状态下保存。</p><button class="primary-button" type="button" data-open-account><i data-lucide="log-in"></i>登录</button>`;
+    hydrateIcons();
+    return;
+  }
+  const role = currentIdentityRoleKey();
+  if (role === "parent") {
+    const connections = parentFamilyConnections(user);
+    const active = parentFamilyConnection(user);
+    const rows = connections.map((connection) => {
+      const person = connection.owner || familyAccountLabel(connection.ownerId, "孩子");
+      const name = person.nickname || person.name || "孩子";
+      const detail = person.email || person.detail || "学生账号";
+      const selected = connection.ownerId === active?.ownerId;
+      return `<article class="family-connection-member ${selected ? "is-active" : ""}"><span class="family-member-avatar"><i data-lucide="graduation-cap"></i></span><div><strong>${escapeHtml(name)}</strong><small>${escapeHtml(detail)} · ${selected ? "当前查看" : "已关联"}</small></div>${selected ? `<span class="family-active-child"><i data-lucide="check"></i>当前</span>` : `<button class="quiet-button" type="button" data-family-select-child="${escapeHtml(connection.ownerId)}">切换查看</button>`}<button class="icon-button family-unlink-button" type="button" data-family-remove-owner="${escapeHtml(connection.ownerId)}" data-family-remove-parent="${escapeHtml(user.id)}" title="解除关联" aria-label="解除与${escapeHtml(name)}的关联"><i data-lucide="link-2-off"></i></button></article>`;
+    }).join("");
+    root.innerHTML = `<div class="modal-kicker">家庭成员管理</div><div class="family-connections-heading"><div><h2 id="familyConnectionsTitle">我关联的孩子</h2><p>这里负责切换当前查看对象和解除关联；新增关联统一在授权边界完成。</p></div><strong>${connections.length} 个关联</strong></div><div class="family-connection-member-list">${rows || `<div class="family-specific-empty"><i data-lucide="users-round"></i><span>还没有关联孩子，请前往授权边界输入学生邀请码</span></div>`}</div><a class="family-permissions-link quiet-button" href="${familyPortalHref("family-permissions", currentStage)}" data-view="family-permissions"><i data-lucide="shield-check"></i>前往授权边界</a><p class="family-connection-rule"><i data-lucide="shield-check"></i>家长可以解除与任一孩子的关联；切换孩子只改变当前查看对象，不会合并数据。</p>`;
+  } else if (role === "student") {
+    const family = read(STORE.family, {})[user.id];
+    const parentIds = family?.parents || [];
+    const rows = parentIds.map((parentId) => {
+      const person = familyAccountLabel(parentId, "家长");
+      return `<article class="family-connection-member"><span class="family-member-avatar"><i data-lucide="users-round"></i></span><div><strong>${escapeHtml(person.name)}</strong><small>${escapeHtml(person.detail)} · 可查看你主动授权的内容</small></div><button class="icon-button family-unlink-button" type="button" data-family-remove-owner="${escapeHtml(user.id)}" data-family-remove-parent="${escapeHtml(parentId)}" title="解除关联" aria-label="解除与${escapeHtml(person.name)}的关联"><i data-lucide="link-2-off"></i></button></article>`;
+    }).join("");
+    root.innerHTML = `<div class="modal-kicker">家庭成员管理</div><div class="family-connections-heading"><div><h2 id="familyConnectionsTitle">我的家庭关联</h2><p>一个学生可以关联多个家长；所有家长分别受到同一套主动授权边界约束。</p></div><strong>${parentIds.length} 位家长</strong></div>${family ? `<section class="family-invite-panel"><div><small>家庭邀请码</small><strong>${escapeHtml(family.code)}</strong><p>邀请码属于你的账号，在高考、考研和就业阶段通用。</p></div><button class="quiet-button" type="button" data-copy-code="${escapeHtml(family.code)}"><i data-lucide="copy"></i>复制邀请码</button></section>` : `<section class="family-invite-panel is-empty"><div><small>还没有家庭邀请码</small><strong>先创建关联入口</strong><p>创建后可以发送给多个家长使用。</p></div><button class="primary-button" type="button" data-family-invite><i data-lucide="user-plus"></i>创建邀请码</button></section>`}<div class="family-connection-member-list">${rows || `<div class="family-specific-empty"><i data-lucide="users-round"></i><span>${family ? "邀请码尚未被家长使用" : "创建邀请码后再添加家庭成员"}</span></div>`}</div><p class="family-connection-rule"><i data-lucide="shield-check"></i>解除关联后立即停止共享，但不会删除双方各自保存的账号内容。</p>`;
+  } else {
+    root.innerHTML = `<div class="modal-kicker">家庭成员管理</div><h2 id="familyConnectionsTitle">请切换到学生或家长身份</h2><p class="modal-description">教师和从业者身份不参与家庭账号关联。</p>`;
+  }
+  hydrateIcons();
+}
+
+function openFamilyConnectionsManager() {
+  renderFamilyConnectionsModal();
+  openModal("familyConnectionsModal");
+}
+
+function selectFamilyChild(ownerId) {
+  const connection = parentFamilyConnections().find((item) => item.ownerId === ownerId);
+  if (!connection) { showToast("这个家庭关联已经失效"); return; }
+  setActiveFamilyChild(ownerId);
+  renderFamilyConnectionsModal();
+  renderFamily();
+  const activeFamilyView = $(".family-internal-view.active")?.id.replace("view-", "");
+  if (activeFamilyView) renderFamilyInternalView(activeFamilyView);
+  showToast(`已切换查看：${connection.owner?.nickname || "孩子"}`);
+}
+
+function removeFamilyConnection(ownerId, parentId) {
+  const user = currentUser();
+  if (!user || (user.id !== ownerId && user.id !== parentId)) return;
+  const owner = familyAccountLabel(ownerId, "孩子");
+  const parent = familyAccountLabel(parentId, "家长");
+  const otherName = user.id === ownerId ? parent.name : owner.name;
+  openSwitchConfirm({ title: `解除与“${otherName}”的家庭关联？`, description: "解除后，家长将立即停止查看该学生的共享内容。双方账号中的候选、收藏、建议和日历不会因此被删除。", confirmLabel: "确认解除", action: () => {
+    const all = read(STORE.family, {});
+    const family = all[ownerId];
+    if (!family) return;
+    family.parents = (family.parents || []).filter((id) => id !== parentId);
+    family.status = family.parents.length ? "linked" : "waiting";
+    family.updatedAt = new Date().toISOString();
+    write(STORE.family, all);
+    if (user.id === parentId && read(STORE.familyActiveChild, {})[user.id] === ownerId) {
+      setActiveFamilyChild(parentFamilyConnections(user).find((item) => item.ownerId !== ownerId)?.ownerId || "", user);
+    }
+    renderFamily();
+    renderFamilyConnectionsModal();
+    const activeFamilyView = $(".family-internal-view.active")?.id.replace("view-", "");
+    if (activeFamilyView) renderFamilyInternalView(activeFamilyView);
+    updateFamilyPortalLinks();
+    showToast("家庭关联已解除");
+  } });
+}
+
+function familyCompactMarkup(user) {
+  if (!user) return `<div class="family-compact-status"><span class="linked-status inactive"><span></span>未关联</span><small>登录后创建家庭关联</small></div><button class="primary-button" type="button" data-open-account><i data-lucide="log-in"></i>登录后关联</button>`;
+  const role = currentIdentityRoleKey();
+  if (role === "parent") {
+    const connections = parentFamilyConnections(user);
+    const connection = parentFamilyConnection(user);
+    return connection
+      ? `<div class="family-compact-status"><span class="linked-status"><span></span>已关联 ${connections.length} 个孩子</span><small>当前查看 ${escapeHtml(connection.owner?.nickname || "孩子")} 的主动共享内容</small></div><a class="quiet-button family-permissions-link" href="${familyPortalHref("family-permissions", currentStage)}" data-view="family-permissions"><i data-lucide="shield-check"></i>查看授权边界</a>`
+      : `<div class="family-compact-status"><span class="linked-status inactive"><span></span>尚未关联孩子</span><small>前往授权边界，输入孩子提供的邀请码后查看共享内容</small></div><a class="quiet-button family-permissions-link" href="${familyPortalHref("family-permissions", currentStage)}" data-view="family-permissions"><i data-lucide="shield-check"></i>去授权边界</a>`;
+  }
+  if (role === "student") {
+    const family = read(STORE.family, {})[user.id];
+    const count = family?.parents?.length || 0;
+    return family
+      ? `<div class="family-compact-status"><span class="linked-status"><span></span>${count ? `已关联 ${count} 位家长` : "邀请码待使用"}</span><small>邀请码 ${escapeHtml(family.code)} · 各阶段通用</small></div><button class="quiet-button" type="button" data-copy-code="${escapeHtml(family.code)}"><i data-lucide="copy"></i>复制邀请码</button><button class="quiet-button" type="button" data-family-manage-connections><i data-lucide="users-round"></i>管理关联</button>`
+      : `<div class="family-compact-status"><span class="linked-status inactive"><span></span>未关联</span><small>创建一个各阶段通用的家庭邀请码</small></div><button class="primary-button" type="button" data-family-invite><i data-lucide="user-plus"></i>创建关联</button>`;
+  }
+  return `<div class="family-compact-status"><span class="linked-status inactive"><span></span>当前身份不参与家庭关联</span><small>请在身份中心切换到学生或家长</small></div>`;
+}
+
 function renderFamily() {
   const user = currentUser();
-  const main = $("#familyMainContent");
-  if (!main) return;
-  if (!user) {
-    main.innerHTML = `<div class="family-compact-status"><span class="linked-status inactive"><span></span>未关联</span><small>登录后创建家庭关联</small></div><button class="primary-button" type="button" data-open-account><i data-lucide="log-in"></i>登录后关联</button>`;
-  } else if (currentIdentityRoleKey() === "parent") {
-    const connection = parentFamilyConnection(user);
-    main.innerHTML = connection
-      ? `<div class="family-compact-status"><span class="linked-status"><span></span>已关联学生</span><small>仅查看主动共享的候选</small></div><span class="family-parent-linked"><i data-lucide="shield-check"></i>隐私边界生效</span>`
-      : `<div class="family-parent-join"><label for="familyCodeInput">学生邀请码</label><input id="familyCodeInput" type="text" maxlength="11" placeholder="YL-XXXXXXXX" autocomplete="off"><button class="primary-button" id="joinFamily" type="button">加入家庭</button></div>`;
-  } else {
-    const family = read(STORE.family, {})[user.id];
-    main.innerHTML = family
-      ? `<div class="family-compact-status"><span class="linked-status"><span></span>已创建关联</span><small>邀请码 ${family.code}</small></div><button class="quiet-button" type="button" data-copy-code="${family.code}"><i data-lucide="copy"></i>复制邀请码</button>`
-      : `<div class="family-compact-status"><span class="linked-status inactive"><span></span>未关联</span><small>尚未向家庭成员共享候选</small></div><button class="primary-button" type="button" data-family-invite><i data-lucide="user-plus"></i>创建关联</button>`;
-  }
+  const targets = [$("#familyMainContent"), $("#familyMainContentCareer")].filter(Boolean);
+  if (!targets.length) return;
+  const markup = familyCompactMarkup(user);
+  targets.forEach((main) => { main.innerHTML = markup; });
+  $$('[data-family-privacy-action]').forEach((button) => { button.hidden = currentIdentityRoleKey() === "parent"; });
+  renderFamilyPrivacyModal();
   hydrateIcons();
 }
 
@@ -4732,6 +5990,9 @@ function renderTrust() {
   const status = verification.status || "未认证";
   const isVerified = ["已认证", "认证通过"].includes(status);
   const isPending = status === "申请中";
+  const credential = identityCredentialState(identityEntryProfile(user), user);
+  const credentialVerified = credential.keyState === "verified";
+  const credentialPending = credential.keyState === "pending";
   const completedSteps = !user ? 0 : (isVerified ? 3 : (isPending ? 2 : 1));
   const progress = [0, 34, 67, 100][completedSteps];
   const stateClass = isVerified ? "is-verified" : (isPending ? "is-pending" : "");
@@ -4749,9 +6010,14 @@ function renderTrust() {
   } else if (isPending) {
     action = `<div class="verify-notice pending"><span><i data-lucide="circle"></i></span><div><strong>认证申请审核中</strong><small>审核完成前继续保持未认证状态</small></div></div>`;
     footnote = `<p class="verify-footnote"><i data-lucide="lock-keyhole"></i>提交于 ${escapeHtml(formatProfileDate(verification.submittedAt || new Date()))} · 材料仅用于后台核验</p>`;
-  } else if (isVerified) {
+  } else if (isVerified && credentialPending) {
+    action = `<div class="verify-notice pending"><span><i data-lucide="clock-3"></i></span><div><strong>${escapeHtml(credential.label)}</strong><small>账号实名已完成，当前经历材料正在单独审核</small></div></div>`;
+  } else if (isVerified && credentialVerified) {
     action = `<div class="verify-notice"><span><i data-lucide="shield-check"></i></span><div><strong>认证标签已生效</strong><small>现在可以发布带有认证来源的回答</small></div></div>`;
     footnote = `<p class="verify-footnote"><i data-lucide="lock-keyhole"></i>完成认证于 ${escapeHtml(formatProfileDate(verification.verifiedAt || verification.submittedAt || new Date()))} · 前台保持匿名</p>`;
+  } else if (isVerified) {
+    action = `<button class="primary-button full-button verification-action" type="button" data-start-verify><i data-lucide="badge-check"></i>补充${escapeHtml(credential.label.replace(/待认证|审核中|已认证/g, ""))}材料</button>`;
+    footnote = `<p class="verify-footnote"><i data-lucide="info"></i>账号实名与经历认证分开；可以继续补充其他阶段的经历材料</p>`;
   }
 
   card.classList.toggle("is-unverified-card", !isVerified && !isPending);
@@ -4770,6 +6036,7 @@ function renderTrust() {
       <div><span>${isVerified ? "前台认证标签" : "前台显示"}</span><strong>${escapeHtml(publicLabel)}</strong></div>
       <div><span>${isVerified ? "隐私状态" : "后台核验"}</span><strong>${isVerified ? "实名信息仅后台可见" : "实名材料 · 身份证明"}</strong></div>
     </div>
+    <div class="credential-scope-status is-${credential.keyState}"><span>当前专门认证</span><strong><i data-lucide="${credential.icon}"></i>${escapeHtml(credential.label)}</strong><small>其他阶段可继续提交不同的经历或资质材料</small></div>
     <div class="verify-progress">
       <div class="progress-title"><span>认证进度</span><strong>${completedSteps} / 3</strong></div>
       <div class="progress-track"><span></span></div>
@@ -4787,8 +6054,9 @@ function updateAccountHeader() {
   const profileNameEl = $("#profileName");
   if (profileNameEl) profileNameEl.textContent = user ? user.nickname : "访客浏览";
   updatePublicLandingActions(user);
+  updateOnboardingReplayButton();
   applyIdentityRoleContext();
-  renderQuestions(); renderAnswerHistory(); renderExperiences(); renderCompare(); renderFamily(); renderTrust();
+  renderQuestions(); renderAnswerHistory(); renderExperiences(); renderCollections(); renderCompare(); renderFamily(); renderTrust();
 }
 
 function updatePublicLandingActions(user = currentUser()) {
@@ -4808,6 +6076,7 @@ function updatePublicLandingActions(user = currentUser()) {
 
 function populateProfile(user) {
   if (!user) return;
+  const identityProfile = identityEntryProfile(user);
   const createdAt = userCreatedAt(user);
   const createdDate = formatProfileDate(createdAt);
   const { province, city } = userRegionParts(user);
@@ -4815,14 +6084,16 @@ function populateProfile(user) {
   const birthDate = String(user.birthDate || "");
   const age = ageFromBirthDate(birthDate);
   $("#profileSummaryName") && ($("#profileSummaryName").textContent = user.nickname);
-  $("#profileSummaryMeta") && ($("#profileSummaryMeta").textContent = `${user.role} · ${user.email}`);
+  const socialRole = identityProfile?.complete ? identityEntryRoleLabel(identityProfile.role) : user.role;
+  const workStage = identityProfile?.complete ? identityEntryScopeLabel(identityProfile.scope) : user.stage;
+  $("#profileSummaryMeta") && ($("#profileSummaryMeta").textContent = `${socialRole} · ${user.email}`);
   $("#profileSummaryRegion") && ($("#profileSummaryRegion").textContent = region || "地域未设置");
   $("#profileSummaryAge") && ($("#profileSummaryAge").textContent = age === null ? "年龄未设置" : `${age} 岁`);
   $("#profileCreatedAt") && ($("#profileCreatedAt").textContent = createdDate);
   setUserAvatar($("#profileAvatarLarge"), user);
   $("#profileAvatarRemove")?.classList.toggle("hidden", !user.avatarDataUrl);
   $("#profileNameInput") && ($("#profileNameInput").value = user.nickname);
-  $("#profileRoleInput") && ($("#profileRoleInput").value = user.role);
+  $("#profileRoleInput") && ($("#profileRoleInput").value = socialRole || "尚未选择");
   setRegionOptions(province, city);
   const birthDateInput = $("#profileBirthDateInput");
   if (birthDateInput) {
@@ -4832,7 +6103,7 @@ function populateProfile(user) {
   updateProfileAge();
   $("#profileCreatedAtInput") && ($("#profileCreatedAtInput").value = createdDate);
   $("#profileEmailInput") && ($("#profileEmailInput").value = user.email);
-  $("#profileStageInput") && ($("#profileStageInput").value = user.stage);
+  $("#profileStageInput") && ($("#profileStageInput").value = workStage || "尚未选择");
   $("#profileQuestionCount") && ($("#profileQuestionCount").textContent = read(STORE.questions, []).filter((item) => item.userId === user.id).length);
   $("#profileFavoriteCount") && ($("#profileFavoriteCount").textContent = userFavorites().length);
   $("#profileFamilyCode") && ($("#profileFamilyCode").textContent = read(STORE.family, {})[user.id]?.code || "未生成");
@@ -4866,18 +6137,24 @@ function enterAuthenticatedWorkspace() {
     return;
   }
   const profile = identityEntryProfile();
-  if (profile?.role === "parent" || profile?.mode === "family") {
-    navigateWithPageTransition(familyPortalHref("portal", profile.scope));
+  const activeRecord = identityRecordsForUser().find((record) => record.id === profile?.recordId)
+    || identityRecordForProfile(profile || {});
+  if (activeRecord) {
+    navigateWithPageTransition(identityWorkspaceHref(activeRecord));
     return;
   }
-  if (["teacher", "professional"].includes(profile?.role) || profile?.mode === "answerer") {
+  if (profile?.role === "parent" || profile?.mode === "family") {
+    navigateWithPageTransition(familyPortalHref("family-overview", profile.scope));
+    return;
+  }
+  if (profile?.mode === "answerer") {
     const answerStage = profile.scope === "graduate" ? "kaoyan" : profile.scope === "career" ? "jiuye" : "gaokao";
     localStorage.setItem("yinlu_answerer_stage", answerStage);
     setStage(profile.scope || "gaokao");
-    navigateWithPageTransition(answererPortalHref("portal"));
+    navigateWithPageTransition(identityWorkspaceHref(profile));
     return;
   }
-  navigateWithPageTransition("./index.html?workspace=1");
+  navigateWithPageTransition(identityWorkspaceHref(profile || { role: "student", mode: "planner", scope: "gaokao" }));
 }
 
 function handlePublicLoginAction() {
@@ -4921,8 +6198,8 @@ async function register(event) {
     email,
     passwordSalt: passwordRecord.passwordSalt,
     passwordHash: passwordRecord.passwordHash,
-    role: $("#registerRole")?.value || "学生",
-    stage: $("#registerStage")?.value || "高考志愿",
+    role: "学生",
+    stage: "高考志愿",
     createdAt: new Date().toISOString()
   };
   write(STORE.users, [...users, user]);
@@ -4997,17 +6274,13 @@ function saveProfile(event) {
   }
   const updatedUser = updateCurrentUser({
     nickname,
-    role: $("#profileRoleInput")?.value || user.role,
     region: [province, city].filter(Boolean).join(" "),
     regionProvince: province,
     regionCity: city,
     birthDate,
-    stage: $("#profileStageInput")?.value || user.stage,
     createdAt: user.createdAt || userCreatedAt(user).toISOString()
   });
   if (!updatedUser) return;
-  const updatedStageKey = Object.entries(stageNames).find(([, label]) => label === updatedUser.stage)?.[0];
-  if (updatedStageKey && stageOrder.includes(updatedStageKey)) setStage(updatedStageKey);
   updateAccountHeader();
   populateProfile(updatedUser);
   showToast("个人资料已保存");
@@ -5089,8 +6362,24 @@ function submitInlineQuestion() {
 
 function toggleFavorite(id) {
   if (!requireAuth("登录后才能保存候选")) return;
+  if (!isCandidateFavoriteId(id)) return;
   const user = currentUser(); const all = read(STORE.favorites, {}); const list = all[user.id] || []; all[user.id] = list.includes(id) ? list.filter((item) => item !== id) : [...list, id]; write(STORE.favorites, all); renderExperiences(); renderCompare(); if ($("#view-school-detail")?.classList.contains("active")) renderSchoolDetail(); showToast(all[user.id].includes(id) ? "已加入候选" : "已从候选移除");
   if ($("#view-planning")?.classList.contains("active")) window.YinluPlanning?.render();
+}
+
+function toggleCollection(id) {
+  if (!requireAuth("登录后才能收藏就业参考")) return;
+  if (!collectionItemById(id)) return;
+  const user = currentUser();
+  userCollectionEntries();
+  const all = read(STORE.collections, {});
+  const entries = Array.isArray(all[user.id]) ? all[user.id].map((entry) => typeof entry === "string" ? { id: entry, savedAt: "" } : entry) : [];
+  const saved = entries.some((entry) => entry.id === id);
+  all[user.id] = saved ? entries.filter((entry) => entry.id !== id) : [{ id, savedAt: new Date().toISOString() }, ...entries];
+  write(STORE.collections, all);
+  renderExperiences();
+  renderCollections();
+  showToast(saved ? "已取消收藏" : "已收藏到就业资料夹");
 }
 
 // ✅ 完整的家庭功能（从第三组集成）
@@ -5120,6 +6409,7 @@ function generateFamilyInvite() {
 
   write(STORE.family, all);
   renderFamily();
+  renderFamilyConnectionsModal();
   renderCompare();
   showToast("家庭邀请码已生成");
 }
@@ -5170,7 +6460,9 @@ function joinFamilyInvite(code) {
   family.linkedAt = new Date().toISOString();
 
   write(STORE.family, all);
+  setActiveFamilyChild(targetUserId, user);
   renderFamily();
+  renderFamilyConnectionsModal();
   renderCompare();
   const activeFamilyView = $(".family-internal-view.active")?.id.replace("view-", "");
   if (activeFamilyView) renderFamilyInternalView(activeFamilyView);
@@ -5180,7 +6472,18 @@ function joinFamilyInvite(code) {
 
 function requestVerification() {
   if (!requireAuth("登录后才能提交认证申请")) return;
-  const user = currentUser(); const all = read(STORE.verification, {}); if (!all[user.id]) all[user.id] = { status: "申请中", submittedAt: new Date().toISOString() }; write(STORE.verification, all); renderTrust(); showToast("认证申请已提交");
+  const user = currentUser();
+  const all = read(STORE.verification, {});
+  const previous = all[user.id] || {};
+  const definition = identityCredentialDefinition(identityEntryProfile(user));
+  const credentials = Array.isArray(previous.credentials) ? Object.fromEntries(previous.credentials.filter(Boolean).map((item) => [item.key, item])) : { ...(previous.credentials || {}) };
+  const submittedAt = new Date().toISOString();
+  credentials[definition.key] = { ...(credentials[definition.key] || {}), key: definition.key, label: definition.label, status: "申请中", submittedAt };
+  all[user.id] = { ...previous, status: ["已认证", "认证通过"].includes(previous.status) ? previous.status : "申请中", submittedAt: previous.submittedAt || submittedAt, credentials };
+  write(STORE.verification, all);
+  renderTrust();
+  renderIdentityCenter();
+  showToast(`${definition.label}认证申请已提交`);
 }
 
 function submitSchoolComment(event) {
@@ -5228,6 +6531,36 @@ document.addEventListener("click", (event) => {
   if (experienceLayout) { applyExperienceLayout(experienceLayout.dataset.experienceLayout, { notify: true }); return; }
   const experienceContentTab = event.target.closest("[data-experience-content-tab]");
   if (experienceContentTab) { switchExperienceContentTab(experienceContentTab.dataset.experienceContentTab); return; }
+  const collectionTab = event.target.closest("[data-collection-tab]");
+  if (collectionTab) { currentCollectionTab = collectionTab.dataset.collectionTab; renderCollections(); return; }
+  const collectionItem = event.target.closest("[data-collection]");
+  if (collectionItem) { toggleCollection(collectionItem.dataset.collection); return; }
+  const openCollection = event.target.closest("[data-open-collection]");
+  if (openCollection) { openCollectionItem(openCollection.dataset.openCollection); return; }
+  if (event.target.closest("#careerFilterCollapse")) {
+    currentCareerFilterCollapsed = !currentCareerFilterCollapsed;
+    localStorage.setItem(STORE.careerFilterCollapsed, currentCareerFilterCollapsed ? "1" : "0");
+    renderCareerFilterSystem();
+    return;
+  }
+  const careerMode = event.target.closest("[data-career-filter-mode]");
+  if (careerMode) { currentCareerFilterMode = careerMode.dataset.careerFilterMode; currentCareerKeywordSearch = ""; renderCareerFilterSystem(); return; }
+  const careerGroup = event.target.closest("[data-career-group]");
+  if (careerGroup) { currentCareerGroup = careerGroup.dataset.careerGroup; currentCareerFilterMode = "role"; currentCareerKeywordSearch = ""; renderCareerFilterSystem(); return; }
+  const careerRole = event.target.closest("[data-career-role]");
+  if (careerRole) {
+    const role = careerRole.dataset.careerRole;
+    if (currentCareerRoleFilters.has(role)) currentCareerRoleFilters.delete(role); else currentCareerRoleFilters.add(role);
+    renderExperiences();
+    return;
+  }
+  const careerAbility = event.target.closest("[data-career-ability]");
+  if (careerAbility) {
+    const ability = careerAbility.dataset.careerAbility;
+    if (currentCareerAbilityFilters.has(ability)) currentCareerAbilityFilters.delete(ability); else currentCareerAbilityFilters.add(ability);
+    renderExperiences();
+    return;
+  }
   const regionToggle = event.target.closest("[data-region-toggle]");
   if (regionToggle) {
     const library = regionToggle.dataset.regionToggle;
@@ -5343,20 +6676,33 @@ document.addEventListener("click", (event) => {
   const deleteDecision = event.target.closest("[data-delete-decision-event]");
   if (deleteDecision) { deleteDecisionEvent(deleteDecision.dataset.deleteDecisionEvent); return; }
   if (event.target.closest("[data-identity-center-new]")) { showIdentityCenterEditor(); return; }
-  if (event.target.closest("[data-identity-center-records]")) { identityCenterState = { screen: "records" }; renderIdentityCenter(); return; }
+  if (event.target.closest("[data-identity-center-records]")) { identityCenterState = { screen: "records", viewMode: "cards", showArchived: false }; renderIdentityCenter(); return; }
+  const identityViewMode = event.target.closest("[data-identity-view-mode]");
+  if (identityViewMode) { identityCenterState = { screen: "records", viewMode: identityViewMode.dataset.identityViewMode, showArchived: Boolean(identityCenterState?.showArchived) }; renderIdentityCenter(); return; }
+  if (event.target.closest("[data-identity-show-archived]")) { identityCenterState = { screen: "records", viewMode: identityCenterState?.viewMode || "cards", showArchived: !identityCenterState?.showArchived }; renderIdentityCenter(); return; }
   const identityRecordUse = event.target.closest("[data-identity-record-use]");
   if (identityRecordUse) { enterIdentityRecord(identityRecordsForUser().find((record) => record.id === identityRecordUse.dataset.identityRecordUse)); return; }
   const identityRecordEdit = event.target.closest("[data-identity-record-edit]");
   if (identityRecordEdit) { showIdentityCenterEditor(identityRecordsForUser().find((record) => record.id === identityRecordEdit.dataset.identityRecordEdit)); return; }
+  const identityRecordArchive = event.target.closest("[data-identity-record-archive]");
+  if (identityRecordArchive) { const record = identityRecordsForUser().find((item) => item.id === identityRecordArchive.dataset.identityRecordArchive); setIdentityRecordArchived(record, !record?.archived); return; }
+  const identityRecordDelete = event.target.closest("[data-identity-record-delete]");
+  if (identityRecordDelete) { deleteIdentityRecord(identityRecordsForUser().find((record) => record.id === identityRecordDelete.dataset.identityRecordDelete)); return; }
   const identityCenterRole = event.target.closest("[data-identity-center-role]");
   if (identityCenterRole && identityCenterState?.screen === "editor") {
     identityCenterState.role = identityCenterRole.dataset.identityCenterRole;
-    identityCenterState.mode = identityCenterState.role === "parent" ? "family" : ["teacher", "professional"].includes(identityCenterState.role) ? "answerer" : identityCenterState.mode === "family" ? "planner" : identityCenterState.mode;
+    identityCenterState.mode = identityCenterState.role === "parent" ? "family" : identityCenterState.mode === "family" ? "planner" : identityCenterState.mode;
+    if (["teacher", "professional"].includes(identityCenterState.role) && identityCenterState.mode === "planner" && identityCenterState.scope === "gaokao") identityCenterState.scope = "graduate";
     renderIdentityCenter();
     return;
   }
   const identityCenterMode = event.target.closest("[data-identity-center-mode]");
-  if (identityCenterMode && identityCenterState?.screen === "editor") { identityCenterState.mode = identityCenterMode.dataset.identityCenterMode; renderIdentityCenter(); return; }
+  if (identityCenterMode && identityCenterState?.screen === "editor") {
+    identityCenterState.mode = identityCenterMode.dataset.identityCenterMode;
+    if (["teacher", "professional"].includes(identityCenterState.role) && identityCenterState.mode === "planner" && identityCenterState.scope === "gaokao") identityCenterState.scope = "graduate";
+    renderIdentityCenter();
+    return;
+  }
   const identityCenterScope = event.target.closest("[data-identity-center-scope]");
   if (identityCenterScope && identityCenterState?.screen === "editor") { identityCenterState.scope = identityCenterScope.dataset.identityCenterScope; renderIdentityCenter(); return; }
   if (event.target.closest("[data-identity-center-back]") && identityCenterState?.screen === "editor") {
@@ -5372,14 +6718,29 @@ document.addEventListener("click", (event) => {
     renderIdentityCenter();
     return;
   }
-  const answererQuestion = event.target.closest("[data-answerer-question]");
-  if (answererQuestion) {
-    switchView("questions");
-    switchQaTab("answer");
-    const url = new URL(window.location.href);
-    url.searchParams.set("view", "questions");
-    url.searchParams.set("tab", "answer");
-    window.history.pushState(null, "", url);
+  const answerQuestion = event.target.closest("[data-answer-question-id]");
+  if (answerQuestion) {
+    openAnswerEditor(answerQuestionById(answerQuestion.dataset.answerQuestionId));
+    return;
+  }
+  const answerHistoryEdit = event.target.closest("[data-answer-history-edit]");
+  if (answerHistoryEdit) {
+    const answer = answerRecordsForCurrentUser().find((item) => item.id === answerHistoryEdit.dataset.answerHistoryEdit);
+    if (answer) openAnswerEditor(answerQuestionFromRecord(answer), answer.id);
+    return;
+  }
+  const answerDraftEdit = event.target.closest("[data-answer-draft-edit]");
+  if (answerDraftEdit) {
+    const draft = answerDraftForQuestion(answerDraftEdit.dataset.answerDraftEdit);
+    if (draft) openAnswerEditor(answerQuestionById(draft.questionId) || answerQuestionFromRecord(draft), draft.answerId || "");
+    return;
+  }
+  if (event.target.closest("#answerEditorSaveDraft")) {
+    saveAnswerDraft();
+    return;
+  }
+  if (event.target.closest("#answerEditorPublish")) {
+    publishAnswer();
     return;
   }
   const answererHistoryEntry = event.target.closest("[data-answerer-history-entry]");
@@ -5389,20 +6750,31 @@ document.addEventListener("click", (event) => {
     return;
   }
   {
+    const floatingStageOption = event.target.closest("[data-floating-stage-option]");
+    if (floatingStageOption) setFloatingStageDrawerOpen(false);
+  }
+  {
     const plannerStageLink = event.target.closest("[data-global-planner-stage]");
     if (plannerStageLink) {
       event.preventDefault();
+      if (plannerStageLink.closest("#floatingStageDrawer")) setFloatingStageDrawerOpen(false);
       const stageKey = plannerStageLink.dataset.globalPlannerStage;
       if (stageKey === "planning") {
         window.location.href = plannerStageLink.href;
         return;
       }
-      if (stageKey === currentStage) return;
+      if (plannerStageLink.getAttribute("aria-disabled") === "true") {
+        showToast("教师和从业者的决策工作台支持考研深造与就业选择");
+        return;
+      }
+      const activeView = $(".view.active")?.id;
+      const alreadyInStage = stageKey === currentStage && !["view-planning", "view-family-planning"].includes(activeView);
+      if (alreadyInStage) return;
       const stageLabel = stageNames[stageKey] || "新的决策阶段";
       openSwitchConfirm({
         title: `切换到${stageLabel}？`,
         description: `切换后，当前工作台会进入${stageLabel}决策阶段，相关内容也会随之更新。`,
-        action: () => { navigateWithPageTransition(plannerStageLink.href); }
+        action: () => { activateWorkspaceStage(stageKey, plannerStageLink.href); }
       });
       return;
     }
@@ -5430,7 +6802,7 @@ document.addEventListener("click", (event) => {
   if (answerStageControl?.classList.contains("disabled")) { event.preventDefault(); showToast("当前决策阶段暂不能回答这个阶段的问题"); return; }
   const nav = event.target.closest("[data-view]"); if (nav) {
     event.preventDefault();
-    const targetName = nav.dataset.view;
+    const targetName = normalizeViewForContext(nav.dataset.view);
     if (!navigateToFeatureRoute(targetName)) {
       const activeName = $(".view.active")?.id.replace("view-", "");
       if (activeName !== targetName) switchView(targetName);
@@ -5438,7 +6810,14 @@ document.addEventListener("click", (event) => {
     }
     return;
   }
-  const targetView = event.target.closest("[data-view-target]"); if (targetView) { if (!navigateToFeatureRoute(targetView.dataset.viewTarget)) switchView(targetView.dataset.viewTarget); return; }
+  const targetView = event.target.closest("[data-view-target]"); if (targetView) {
+    const targetName = normalizeViewForContext(targetView.dataset.viewTarget);
+    if (!navigateToFeatureRoute(targetName)) {
+      switchView(targetName);
+      updateShellViewUrl(targetName);
+    }
+    return;
+  }
   const schoolDetail = event.target.closest("[data-school-detail]"); if (schoolDetail) {
     if (schoolDetail.dataset.familySchoolStage && stageOrder.includes(schoolDetail.dataset.familySchoolStage)) setStage(schoolDetail.dataset.familySchoolStage);
     const activeView = $(".view.active")?.id.replace("view-", "");
@@ -5448,7 +6827,19 @@ document.addEventListener("click", (event) => {
     return;
   }
   const schoolAnchor = event.target.closest("[data-school-anchor]"); if (schoolAnchor) { scrollToAnchor(schoolAnchor.dataset.schoolAnchor); $$("[data-school-anchor]").forEach((button) => button.classList.toggle("active", button === schoolAnchor)); return; }
-  const modalTrigger = event.target.closest("[data-open-modal]"); if (modalTrigger) { openModal(modalTrigger.dataset.openModal); return; }
+  const modalTrigger = event.target.closest("[data-open-modal]"); if (modalTrigger) { if (modalTrigger.dataset.openModal === "familyPrivacyModal") renderFamilyPrivacyModal(); openModal(modalTrigger.dataset.openModal); return; }
+  if (event.target.closest("[data-family-manage-items]")) { familyPrivacyShowItems = !familyPrivacyShowItems; refreshFamilyPermissionSurfaces(); return; }
+  if (event.target.closest("[data-family-preview]")) { familyPrivacyPreview = !familyPrivacyPreview; refreshFamilyPermissionSurfaces(); return; }
+  if (event.target.closest("[data-family-revoke-all]")) {
+    const ownerId = familyPermissionOwnerId();
+    openSwitchConfirm({ title: "撤回全部家庭共享授权？", description: "家长将暂时看不到候选、状态、日历、规划摘要和讨论入口，之后仍可逐项重新开启。", confirmLabel: "确认撤回", action: () => {
+      saveFamilyPermissions(ownerId, Object.fromEntries(FAMILY_PERMISSION_OPTIONS.map((item) => [item.key, false])));
+      refreshFamilyPermissionSurfaces();
+      renderFamily();
+      showToast("已撤回全部家庭共享授权");
+    } });
+    return;
+  }
   if (event.target.closest("[data-open-account]")) { showAccount(); return; }
   const candidateTab = event.target.closest("[data-candidate-tab]"); if (candidateTab) { switchCandidateTab(candidateTab.dataset.candidateTab); return; }
   if (event.target.closest("[data-open-compare-history]")) { openComparisonHistory(); return; }
@@ -5495,9 +6886,14 @@ document.addEventListener("click", (event) => {
   if (event.target.classList.contains("modal-backdrop")) closeModal(event.target.id);
   const favorite = event.target.closest("[data-favorite]"); if (favorite) { toggleFavorite(favorite.dataset.favorite); return; }
   if (event.target.closest("[data-family-invite]")) { generateFamilyInvite(); return; }
-  const joinFamily = event.target.closest("#joinFamily");
+  if (event.target.closest("[data-family-manage-connections]")) { openFamilyConnectionsManager(); return; }
+  const selectFamilyChildButton = event.target.closest("[data-family-select-child]");
+  if (selectFamilyChildButton) { selectFamilyChild(selectFamilyChildButton.dataset.familySelectChild); return; }
+  const removeFamilyLinkButton = event.target.closest("[data-family-remove-owner][data-family-remove-parent]");
+  if (removeFamilyLinkButton) { removeFamilyConnection(removeFamilyLinkButton.dataset.familyRemoveOwner, removeFamilyLinkButton.dataset.familyRemoveParent); return; }
+  const joinFamily = event.target.closest("[data-family-join]");
   if (joinFamily) {
-    const code = document.querySelector("#familyCodeInput")?.value.trim();
+    const code = joinFamily.closest(".family-parent-join, .family-add-connection")?.querySelector("[data-family-code-input]")?.value.trim();
     joinFamilyInvite(code);
     return;
   }
@@ -5533,6 +6929,38 @@ document.addEventListener("click", (event) => {
 });
 
 document.addEventListener("input", (event) => {
+  if (["answerEditorContent", "answerEditorScope", "answerEditorTime"].includes(event.target.id)) {
+    if (!activeAnswerEditor) return;
+    activeAnswerEditor.dirty = true;
+    if (event.target.id === "answerEditorContent" && $("#answerEditorCount")) $("#answerEditorCount").textContent = event.target.value.length;
+    setAnswerEditorState("正在保存", "停止输入后自动保存到当前浏览器");
+    window.clearTimeout(saveAnswerDraft.timer);
+    saveAnswerDraft.timer = window.setTimeout(() => saveAnswerDraft({ notify: false }), 700);
+    return;
+  }
+  const familyPermission = event.target.closest("[data-family-permission]");
+  if (familyPermission && !familyPermission.disabled) {
+    const ownerId = familyPermissionOwnerId();
+    saveFamilyPermissions(ownerId, { [familyPermission.dataset.familyPermission]: familyPermission.checked });
+    refreshFamilyPermissionSurfaces();
+    renderFamily();
+    showToast("共享边界已更新");
+    return;
+  }
+  const familyItemPermission = event.target.closest("[data-family-item-permission]");
+  if (familyItemPermission && !familyItemPermission.disabled) {
+    const ownerId = familyPermissionOwnerId();
+    const permissions = familyPermissionsForOwner(ownerId);
+    const hidden = new Set(permissions.hiddenCandidateIds);
+    if (familyItemPermission.checked) hidden.delete(familyItemPermission.dataset.familyItemPermission);
+    else hidden.add(familyItemPermission.dataset.familyItemPermission);
+    const item = familyCandidateCatalog(ownerId).find((entry) => entry.favoriteId === familyItemPermission.dataset.familyItemPermission);
+    const permissionKey = item?.permissionKey || "candidates";
+    saveFamilyPermissions(ownerId, { [permissionKey]: familyItemPermission.checked || permissions[permissionKey], hiddenCandidateIds: [...hidden] });
+    refreshFamilyPermissionSurfaces();
+    renderFamily();
+    return;
+  }
   if (event.target.id !== "schoolMajorSearch") return;
   const item = findInstitutionById(currentSchoolDetail);
   if (!item) return;
@@ -5712,6 +7140,11 @@ if (stageCarousel) {
     moveStage(distance > 0 ? -1 : 1);
   }, { passive: true });
 }
+const careerIndustrySearch = $("#careerIndustrySearch"); if (careerIndustrySearch) careerIndustrySearch.addEventListener("input", (event) => { currentCareerIndustrySearch = event.target.value; renderExperiences(); });
+const careerKeywordSearch = $("#careerKeywordSearch"); if (careerKeywordSearch) careerKeywordSearch.addEventListener("input", (event) => { currentCareerKeywordSearch = event.target.value; renderExperiences(); });
+const collectionsSearch = $("#collectionsSearch"); if (collectionsSearch) collectionsSearch.addEventListener("input", (event) => { currentCollectionSearch = event.target.value; renderCollections(); });
+const collectionsStageFilter = $("#collectionsStageFilter"); if (collectionsStageFilter) collectionsStageFilter.addEventListener("change", (event) => { currentCollectionStage = event.target.value; renderCollections(); });
+const collectionsSort = $("#collectionsSort"); if (collectionsSort) collectionsSort.addEventListener("change", (event) => { currentCollectionSort = event.target.value; renderCollections(); });
 $$('[data-dimension-filter]').forEach((button) => button.addEventListener("click", () => {
   const dimension = button.dataset.dimensionFilter;
   if (dimension === "all") currentDimensionFilters.clear();
@@ -5812,6 +7245,10 @@ const experienceSelectedFilters = $("#experienceSelectedFilters"); if (experienc
   if (key === "school") { currentSchoolSearch = ""; if (experienceSchoolSearch) experienceSchoolSearch.value = ""; }
   if (key === "major") { currentMajorSearch = ""; currentExperienceMajorCategory = ""; if (experienceMajorSearch) experienceMajorSearch.value = ""; }
   if (key === "region") currentExperienceRegion = "all";
+  if (key === "career-industry") { currentCareerIndustrySearch = ""; if (careerIndustrySearch) careerIndustrySearch.value = ""; }
+  if (key === "career-keyword") { currentCareerKeywordSearch = ""; if (careerKeywordSearch) careerKeywordSearch.value = ""; }
+  if (key === "career-role") currentCareerRoleFilters.delete(tag.dataset.filterValue);
+  if (key === "career-ability") currentCareerAbilityFilters.delete(tag.dataset.filterValue);
   if (key === "dimension") currentDimensionFilters.delete(tag.dataset.filterValue);
   if (key === "source") currentSourceFilter = "all";
   if (key === "time") currentTimeFilter = "all";
@@ -5830,15 +7267,26 @@ const clearExperienceFilters = $("#clearExperienceFilters"); if (clearExperience
   currentExperienceRegionOpen = false;
   currentExperienceMajorCategory = "";
   currentExperienceMajorOpen = false;
+  currentCareerIndustrySearch = "";
+  currentCareerKeywordSearch = "";
+  currentCareerRoleFilters.clear();
+  currentCareerAbilityFilters.clear();
   $$('[data-stage-search]').forEach((input) => { input.value = ""; });
   if (experienceSchoolSearch) experienceSchoolSearch.value = "";
   if (experienceMajorSearch) experienceMajorSearch.value = "";
+  if (careerIndustrySearch) careerIndustrySearch.value = "";
+  if (careerKeywordSearch) careerKeywordSearch.value = "";
   if (sameSchoolToggle) sameSchoolToggle.checked = false;
   setExperienceFilters();
   renderExperiences();
 });
 
 document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && $("#floatingStageDrawer")?.hidden === false) {
+    event.preventDefault();
+    setFloatingStageDrawerOpen(false);
+    return;
+  }
   if (event.key === "Escape" && document.body.classList.contains("portal-stage-picker-open")) {
     event.preventDefault();
     closePortalStagePicker();
@@ -5872,18 +7320,13 @@ document.addEventListener("keydown", (event) => {
 window.addEventListener("resize", refreshOnboardingPosition);
 window.addEventListener("popstate", () => {
   const params = new URLSearchParams(window.location.search);
-  const requestedStage = params.get("stage");
+  const profile = identityEntryIsComplete() ? identityEntryProfile() : null;
+  const requestedStage = profile?.scope || params.get("stage");
   if (stageOrder.includes(requestedStage) && requestedStage !== currentStage) setStage(requestedStage);
   const requestedView = params.get("view") || "home";
-  const allowedViews = new Set(["home", "experience", "questions", "answerer", "compare", "planning", "trust", "identity"]);
-  const targetView = currentStage === "career" && requestedView === "compare" ? "experience" : requestedView;
-  if (!allowedViews.has(targetView)) return;
+  const targetView = normalizeViewForContext(requestedView);
   if (targetView === "answerer" && params.get("section") === "history") {
     openAnswererHistory({ updateUrl: false });
-    return;
-  }
-  if (currentIdentityMode === "answerer" && ["home", "experience", "compare", "planning"].includes(targetView)) {
-    switchView("answerer");
     return;
   }
   switchView(targetView);
@@ -5891,7 +7334,6 @@ window.addEventListener("popstate", () => {
 });
 window.addEventListener("scroll", refreshOnboardingPosition, true);
 window.addEventListener("scroll", scheduleBackToTopUpdate, { passive: true });
-window.addEventListener("scroll", scheduleGlobalStageBarUpdate, { passive: true });
 window.addEventListener("resize", scheduleBackToTopUpdate);
 $("#backToTopButton")?.addEventListener("click", scrollCurrentPageToTop);
 $("#globalStageToggle")?.addEventListener("click", () => {
@@ -5919,6 +7361,7 @@ window.addEventListener("resize", () => {
   applyInitialRouteState();
   updateBackToTopButton();
   setGlobalStageBarCollapsed(false);
+  initializeFloatingStageAssist();
   const answererPortalActive = initializeAnswererPortal();
   const familyPortalActive = initializeFamilyPortal();
   const portalEntryActive = answererPortalActive || familyPortalActive || initializePortalHome();
